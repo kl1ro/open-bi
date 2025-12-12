@@ -20,13 +20,21 @@ export default function GridResizeHandle(props: ResizeHandleProps) {
   const dependencies: ResizeHandleDependencies = useMemo(
     () => ({
       setSelected: props.setSelected,
+      setResize: props.setResize,
       setOverlayShown,
       neighbors: props.neighbors,
+      orientation: props.orientation,
     }),
-    [props],
+    [props, setOverlayShown],
   );
 
   const start = useCallback(() => startResizing(dependencies), [dependencies]);
+
+  const resize = useCallback(
+    (move: number) => handleResize(dependencies, move),
+    [dependencies],
+  );
+
   const stop = useCallback(() => stopResizing(dependencies), [dependencies]);
 
   return (
@@ -51,10 +59,10 @@ export default function GridResizeHandle(props: ResizeHandleProps) {
 
       {overlayShown && (
         <GridResizeOverlay
-          onResizeStart={() => start()}
-          onResize={() => resize()}
-          onResizeEnd={() => stop()}
-          {...{ ...props, handleRef }}
+          onResizeStart={start}
+          onResize={resize}
+          onResizeEnd={stop}
+          {...props}
         />
       )}
     </>
@@ -62,15 +70,20 @@ export default function GridResizeHandle(props: ResizeHandleProps) {
 }
 
 export interface ResizeHandleProps {
-  orientation: "vertical" | "horizontal";
+  orientation: ResizeHandleOrientation;
   grid: Grid;
   position: WidgetPosition;
   neighbors: number[];
   setSelected: Dispatch<SetStateAction<number[]>>;
+  setResize: Dispatch<SetStateAction<number | undefined>>;
 }
 
+export type ResizeHandleOrientation = "horizontal" | "vertical";
+
 interface ResizeHandleDependencies {
+  orientation: ResizeHandleOrientation;
   setSelected: Dispatch<SetStateAction<number[]>>;
+  setResize: Dispatch<SetStateAction<number | undefined>>;
   setOverlayShown: Dispatch<SetStateAction<boolean>>;
   neighbors: number[];
 }
@@ -79,7 +92,9 @@ function startResizing(dependencies: ResizeHandleDependencies) {
   dependencies.setSelected(dependencies.neighbors);
 }
 
-function resize() {}
+function handleResize(dependencies: ResizeHandleDependencies, move: number) {
+  dependencies.setResize(move);
+}
 
 function stopResizing(dependencies: ResizeHandleDependencies) {
   dependencies.setSelected([]);
