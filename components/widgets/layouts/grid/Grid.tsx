@@ -1,27 +1,52 @@
-import { Fragment, useMemo, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  ViewTransition,
+  startTransition,
+} from "react";
 
 import WidgetComponent, { HighlightProps } from "../../../Widget";
 import GridResizeHandle from "./GridResizeHandle";
 
 import Layout, { type Grid } from "@/lib/widgets/layout";
-import Widget from "@/lib/widgets/widget";
+import Widget, { WidgetPosition } from "@/lib/widgets/widget";
 import Void from "@/lib/widgets/void";
+import { useAppDispatch } from "@/state/hooks";
+import { upsertWidget } from "@/state/features/widget";
 
 export default function Grid(props: Grid) {
+  const dispatch = useAppDispatch();
   const [resize, setResize] = useState<number>();
   const [selected, setSelected] = useState<number[]>([]);
   const widgets = useMemo(() => getWidgets(props), [props]);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const dependencies = useMemo(
+    () => ({ dispatch, resize, setResize, grid: props, setSelected }),
+    [props, resize, setResize, setSelected],
+  );
+
+  const applyResize = useCallback(
+    (handlePosition: WidgetPosition) =>
+      startTransition(() => handleResizeApply(dependencies, handlePosition)),
+    [dependencies],
+  );
 
   return (
     <div
+      ref={ref}
       className="w-full h-full grid gap-4"
       style={{
-        gridTemplateRows: calculateGridTemplate(props.rows),
-        gridTemplateColumns: calculateGridTemplate(props.columns),
+        gridTemplateRows: calculateRowsTemplate(widgets),
+        gridTemplateColumns: calculateColumnsTemplate(widgets),
       }}
     >
       {widgets.map((widget, i) => (
-        <Fragment key={i}>
+        <ViewTransition key={i}>
           {i && i % props.columns == 0 ? (
             Array.from({ length: props.columns }).map((_, j) => (
               <GridResizeHandle
@@ -31,6 +56,8 @@ export default function Grid(props: Grid) {
                 neighbors={[i - props.columns + j, i + j]}
                 setSelected={setSelected}
                 setResize={setResize}
+                onResizeEnd={applyResize}
+                gridRef={ref}
                 position={{
                   row: Math.floor(i / props.columns) * 2,
                   column: j * 2 + 1,
@@ -48,6 +75,8 @@ export default function Grid(props: Grid) {
               neighbors={[i - 1, i]}
               setSelected={setSelected}
               setResize={setResize}
+              onResizeEnd={applyResize}
+              gridRef={ref}
               position={{
                 row: Math.floor(i / props.columns) * 2 + 1,
                 column: (i % props.columns) * 2,
@@ -59,16 +88,28 @@ export default function Grid(props: Grid) {
             {...widget}
             highlight={calculateHighlight({ i, props, resize, selected })}
           />
-        </Fragment>
+        </ViewTransition>
       ))}
     </div>
   );
 }
 
-function calculateGridTemplate(n: number) {
-  return Array.from({ length: n * 2 - 1 }, (_, i) =>
-    (i + 1) % 2 === 0 ? "auto" : "1fr",
-  ).join(" ");
+interface GridDependencies {
+  dispatch: ReturnType<typeof useAppDispatch>;
+  grid: Grid;
+  resize: number | undefined;
+  setResize: Dispatch<SetStateAction<number | undefined>>;
+  setSelected: Dispatch<SetStateAction<number[]>>;
+}
+
+function calculateRowsTemplate(widgets: Widget[]) {
+  const column = widgets.filter((widget) => widget.position.column == 1);
+  return column.map((widget) => `${widget.size.rowSpan}fr`).join(" auto ");
+}
+
+function calculateColumnsTemplate(widgets: Widget[]) {
+  const row = widgets.filter((widget) => widget.position.row == 1);
+  return row.map((widget) => `${widget.size.colSpan}fr`).join(" auto ");
 }
 
 function getWidgets(grid: Grid): Widget[] {
@@ -107,7 +148,11 @@ function fillWidgetsWithVoids(
 
 function intersectCellWidget(widgets: Widget[], i: number, j: number) {
   return widgets.find(
-    (widget) => widget.position.row == i && widget.position.column == j,
+    (widget) =>
+      i >= widget.position.row &&
+      i < widget.position.row + widget.size.rowSpan &&
+      j >= widget.position.column &&
+      j <= widget.position.column + widget.size.colSpan,
   );
 }
 
@@ -125,7 +170,7 @@ function calculateHighlight(params: HightlightParams) {
   const isSelected = selected.includes(i);
   const isAvailiable = isAvailableToResize(i, selected, props);
 
-  if (!isSelected && !isAvailiable) return;
+  if (!isSelected && !isAvailiable) return {};
 
   const highlight: HighlightProps = {
     active: true,
@@ -171,35 +216,29 @@ function calculateHighlightPosition(params: HightlightParams) {
     }
   }
 
-  const position: HighlightProps = {};
+  const position: HighlightProps = { zIndex: 30 };
 
   if (resizingRow) {
     if (resize > 0 && !selectedIndex) {
       position.width = `calc(100% + (100% + 2.375rem) * ${resize})`;
       position.right = "auto";
       position.left = 0;
-      position.zIndex = 30;
     } else if (resize < 0 && selectedIndex) {
       position.width = `calc(100% + (100% + 2.375rem) * ${Math.abs(resize)})`;
       position.left = "auto";
       position.right = 0;
-      position.zIndex = 30;
-    } else return { "--tw-ring-color": "var(--color-blue-950)" };
+    } else return { "--tw-ring-color": "var(--color-blue-950)", zIndex: 20 };
   } else {
     if (resize > 0 && !selectedIndex) {
       position.height = `calc(100% + (100% + 2.375rem) * ${resize})`;
       position.bottom = "auto";
       position.top = 0;
-      position.zIndex = 30;
     } else if (resize < 0 && selectedIndex) {
       position.height = `calc(100% + (100% + 2.375rem) * ${Math.abs(resize)})`;
       position.top = "auto";
       position.bottom = 0;
-      position.zIndex = 30;
-    } else return { "--tw-ring-color": "var(--color-blue-950)" };
+    } else return { "--tw-ring-color": "var(--color-blue-950)", zIndex: 20 };
   }
-
-  console.log(position);
 
   return position;
 }
@@ -232,4 +271,38 @@ function areInSameRow(i1: number, i2: number, grid: Grid) {
 
 function areInSameColumn(i1: number, i2: number, grid: Grid) {
   return i1 % grid.columns == i2 % grid.columns;
+}
+
+function handleResizeApply(
+  dependencies: GridDependencies,
+  handlePosition: WidgetPosition,
+) {
+  if (dependencies.resize) {
+    handlePosition.column =
+      handlePosition.column + (dependencies.resize > 0 ? -1 : 1);
+
+    const resizable = findWidgetInGrid(
+      handlePosition,
+      dependencies.grid,
+    ) as Widget;
+
+    resizable.size.colSpan += dependencies.resize;
+
+    dependencies.dispatch(upsertWidget(resizable));
+  }
+  dependencies.setResize(0);
+  dependencies.setSelected([]);
+}
+
+function findWidgetInGrid(
+  position: WidgetPosition,
+  grid: Grid,
+): Widget | undefined {
+  const widget = grid.children.find(
+    (widget) =>
+      widget.position.row == position.row &&
+      widget.position.column == position.column,
+  );
+
+  return widget && { ...widget, size: { ...widget.size } };
 }

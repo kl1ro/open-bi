@@ -1,4 +1,4 @@
-import { CSSProperties } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 
 import Layout from "./widgets/Layout";
 import { Void } from "./widgets/Void";
@@ -13,6 +13,8 @@ export default function Widget(props: WidgetProps) {
       style={{
         gridRowStart: props.position.row,
         gridColumnStart: props.position.column,
+        gridRowEnd: `span ${props.size.rowSpan}`,
+        gridColumnEnd: `span ${props.size.colSpan}`,
       }}
     >
       <Highlight {...props.highlight} />
@@ -35,10 +37,27 @@ function getWidgetFromType(props: WidgetProps) {
   }
 }
 
-function Highlight({ active, ...styles }: HighlightProps) {
+function Highlight(props: HighlightProps) {
+  const { active, ...style } = props;
+  const [styleFallback, setStyleFallback] = useState<HighlightProps>(style);
+
+  useEffect(() => {
+    if (Object.keys(style).length) setStyleFallback(style);
+    else {
+      setTimeout(
+        () => setStyleFallback({ ...style, transitionProperty: "none" }),
+        300,
+      );
+      setTimeout(
+        () => setStyleFallback({ ...style, transitionProperty: "all" }),
+        320,
+      );
+    }
+  }, [props]);
+
   return (
     <div
-      style={styles}
+      style={styleFallback}
       className={cn(
         "w-full h-full absolute inset-0 rounded-xl pointer-events-none animated z-20",
         active && "ring-2",
@@ -47,14 +66,7 @@ function Highlight({ active, ...styles }: HighlightProps) {
   );
 }
 
-export interface HighlightProps {
+export interface HighlightProps extends CSSProperties {
   active?: boolean;
   "--tw-ring-color"?: CSSProperties["backgroundColor"];
-  top?: CSSProperties["top"];
-  right?: CSSProperties["right"];
-  left?: CSSProperties["left"];
-  bottom?: CSSProperties["bottom"];
-  width?: CSSProperties["width"];
-  height?: CSSProperties["height"];
-  zIndex?: CSSProperties["zIndex"];
 }

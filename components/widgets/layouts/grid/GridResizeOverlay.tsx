@@ -22,20 +22,19 @@ export default function GridResizeOverlay(props: ResizeOverlayProps) {
 }
 
 interface ResizeOverlayProps extends ResizeHandleProps {
-  grid: Grid;
-  orientation: ResizeHandleOrientation;
   onResizeStart?: () => unknown;
   onResize?: (move: number) => unknown;
-  onResizeEnd?: (move: number) => unknown;
+  onResizeEnd?: () => unknown;
 }
 
 interface ResizeOverlayDependencies {
   grid: Grid;
   orientation: ResizeHandleOrientation;
+  gridRef: RefObject<HTMLDivElement | null>;
   overlayRef: RefObject<HTMLDivElement | null>;
   onResizeStart: () => unknown;
   onResize: (move: number) => unknown;
-  onResizeEnd: (move: number) => unknown;
+  onResizeEnd: () => unknown;
   start: RefObject<Point | null>;
 }
 
@@ -46,10 +45,11 @@ function useResizing(props: ResizeOverlayProps) {
   const dependencies: ResizeOverlayDependencies = useMemo(
     () => ({
       grid: props.grid,
+      gridRef: props.gridRef,
       overlayRef,
       onResizeStart: () => props.onResizeStart?.(),
       onResize: (move: number) => props.onResize?.(move),
-      onResizeEnd: (move: number) => props.onResizeEnd?.(move),
+      onResizeEnd: () => props.onResizeEnd?.(),
       orientation: props.orientation,
       start,
     }),
@@ -101,27 +101,39 @@ function calculateMove(
   const start = dependencies.start.current;
   const currentPoint: Point = { x: event.clientX, y: event.clientY };
 
-  if (dependencies.orientation == "horizontal")
-    return Math.round(
-      (currentPoint.y - start.y) / calculateRowHeight(dependencies.grid),
+  if (dependencies.orientation == "horizontal") {
+    const move = Math.round(
+      (currentPoint.y - start.y) /
+        calculateRowHeight(dependencies.gridRef, dependencies.grid),
     );
-  else
-    return Math.round(
-      (currentPoint.x - start.x) / calculateColumnWidth(dependencies.grid),
+
+    return move <= dependencies.grid.rows ? move : dependencies.grid.rows;
+  } else {
+    const move = Math.round(
+      (currentPoint.x - start.x) /
+        calculateColumnWidth(dependencies.gridRef, dependencies.grid),
     );
+
+    return move < dependencies.grid.columns ? move : dependencies.grid.rows;
+  }
 }
 
-function calculateRowHeight(grid: Grid) {
-  return window.innerHeight / grid.rows;
+function calculateRowHeight(ref: RefObject<HTMLDivElement | null>, grid: Grid) {
+  if (!ref.current) throw new Error("Grid ref unavailable");
+  return ref.current.clientHeight / grid.rows;
 }
 
-function calculateColumnWidth(grid: Grid) {
-  return window.innerWidth / grid.columns;
+function calculateColumnWidth(
+  ref: RefObject<HTMLDivElement | null>,
+  grid: Grid,
+) {
+  if (!ref.current) throw new Error("Grid ref unavailable");
+  return ref.current.clientWidth / grid.columns;
 }
 
 function handleResizeStop(dependencies: ResizeOverlayDependencies) {
   document.body.style.cursor = "default";
-  dependencies.onResizeEnd(0);
+  dependencies.onResizeEnd();
 }
 
 interface Point {

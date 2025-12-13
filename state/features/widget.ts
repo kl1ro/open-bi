@@ -17,57 +17,24 @@ const slice = createSlice({
   name: "widget",
   initialState: rootWidget,
   reducers: {
-    appendWidget: handleWidgetAppend,
-    updateWidget: handleWidgetUpdate,
+    upsertWidget: handleWidgetUpsert,
   },
 });
 
-export const { appendWidget, updateWidget } = slice.actions;
+export const { upsertWidget } = slice.actions;
 export default slice.reducer;
 
-function handleWidgetAppend(
-  state: WidgetState,
-  action: PayloadAction<WidgetCreationProps>,
-) {
-  const { appendTo, widget } = action.payload;
+function handleWidgetUpsert(state: WidgetState, action: PayloadAction<Widget>) {
   const { value: root } = state;
-
-  const leaf = findLeaf(root, appendTo);
-
-  if (!leaf) state.value = widget;
-  else {
-    widget.parent = { ...leaf };
-    leaf.children = [...leaf.children, widget];
-  }
-}
-
-export interface WidgetCreationProps {
-  appendTo: Widget;
-  widget: NonEmptyWidget;
-}
-
-function findLeaf(
-  suspect: Widget,
-  target?: Widget,
-): NonEmptyWidget | undefined {
-  if (!suspect.type || !target) return;
-  if (suspect?.id == target.id) return suspect;
-  if (!suspect.children.length) return;
-  return suspect.children.find((child) => findLeaf(child, target));
-}
-
-function handleWidgetUpdate(
-  state: WidgetState,
-  action: PayloadAction<WidgetUpdateProps>,
-) {
-  const { value: root } = state;
-  const widget = action.payload.widget;
-  const parent = findLeaf(root, widget.parent);
+  const widget = action.payload;
+  const parent = findLeaf(root, widget.parent) as NonEmptyWidget | undefined;
 
   if (!parent) {
     state.value = widget;
     return;
   }
+
+  widget.parent = { ...parent };
 
   parent.children = [
     ...parent.children.filter((child) => child.id != widget.id),
@@ -75,6 +42,9 @@ function handleWidgetUpdate(
   ];
 }
 
-export interface WidgetUpdateProps {
-  widget: NonEmptyWidget;
+function findLeaf(suspect: Widget, target?: Widget): Widget | undefined {
+  if (!suspect.type || !target) return;
+  if (suspect?.id == target.id) return suspect;
+  if (!suspect.children.length) return;
+  return suspect.children.find((child) => findLeaf(child, target));
 }

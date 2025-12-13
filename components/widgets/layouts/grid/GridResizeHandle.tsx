@@ -5,6 +5,7 @@ import {
   SetStateAction,
   useMemo,
   useCallback,
+  RefObject,
 } from "react";
 
 import GridResizeOverlay from "./GridResizeOverlay";
@@ -19,8 +20,10 @@ export default function GridResizeHandle(props: ResizeHandleProps) {
 
   const dependencies: ResizeHandleDependencies = useMemo(
     () => ({
+      position: props.position,
       setSelected: props.setSelected,
       setResize: props.setResize,
+      onResizeEnd: props.onResizeEnd,
       setOverlayShown,
       neighbors: props.neighbors,
       orientation: props.orientation,
@@ -59,10 +62,10 @@ export default function GridResizeHandle(props: ResizeHandleProps) {
 
       {overlayShown && (
         <GridResizeOverlay
+          {...props}
           onResizeStart={start}
           onResize={resize}
           onResizeEnd={stop}
-          {...props}
         />
       )}
     </>
@@ -72,18 +75,22 @@ export default function GridResizeHandle(props: ResizeHandleProps) {
 export interface ResizeHandleProps {
   orientation: ResizeHandleOrientation;
   grid: Grid;
+  gridRef: RefObject<HTMLDivElement | null>;
   position: WidgetPosition;
   neighbors: number[];
   setSelected: Dispatch<SetStateAction<number[]>>;
   setResize: Dispatch<SetStateAction<number | undefined>>;
+  onResizeEnd?: (handlePosition: WidgetPosition) => unknown;
 }
 
 export type ResizeHandleOrientation = "horizontal" | "vertical";
 
 interface ResizeHandleDependencies {
+  position: WidgetPosition;
   orientation: ResizeHandleOrientation;
   setSelected: Dispatch<SetStateAction<number[]>>;
   setResize: Dispatch<SetStateAction<number | undefined>>;
+  onResizeEnd?: (position: WidgetPosition) => unknown;
   setOverlayShown: Dispatch<SetStateAction<boolean>>;
   neighbors: number[];
 }
@@ -97,6 +104,6 @@ function handleResize(dependencies: ResizeHandleDependencies, move: number) {
 }
 
 function stopResizing(dependencies: ResizeHandleDependencies) {
-  dependencies.setSelected([]);
   dependencies.setOverlayShown(false);
+  dependencies.onResizeEnd?.(dependencies.position);
 }

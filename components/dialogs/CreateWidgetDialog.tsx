@@ -28,9 +28,9 @@ import {
 } from "../ui/select";
 import { Button } from "../ui/button";
 
-import Widget, { NonEmptyWidgetType, WIDGET_TYPE } from "@/lib/widgets/widget";
+import { NonEmptyWidgetType, WIDGET_TYPE } from "@/lib/widgets/widget";
 import { SPACING_OPTIONS } from "@/lib/grid";
-import { appendWidget } from "@/state/features/widget";
+import { upsertWidget } from "@/state/features/widget";
 import Void from "@/lib/widgets/void";
 import { useAppDispatch } from "@/state/hooks";
 import { Grid } from "@/lib/widgets/layout";
@@ -54,14 +54,13 @@ export default function CreateWidgetDialog(props: WidgetDialogProps) {
       type: values.type as NonEmptyWidgetType,
       columns: Number(values.columns),
       rows: Number(values.rows),
+      parent: props.void.parent,
       children: [],
       position: props.void.position,
       size: props.void.size,
     };
 
-    dispatch(
-      appendWidget({ widget: grid, appendTo: props.void.parent as Widget }),
-    );
+    dispatch(upsertWidget(grid));
     props.setOpen(false);
   }
 

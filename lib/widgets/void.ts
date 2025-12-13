@@ -5,5 +5,6 @@ export default interface Void extends Required<
 > {
   id?: undefined;
   type?: undefined;
+  children?: undefined;
   parent?: NonEmptyWidget;
 }

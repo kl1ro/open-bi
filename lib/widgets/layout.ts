@@ -1,4 +1,4 @@
-import { AbstractWidget, NonEmptyWidget } from "./widget";
+import Widget, { AbstractWidget, NonEmptyWidget } from "./widget";
 
 type Layout = Grid | Absolute | Flex;
 export default Layout;
@@ -25,7 +25,7 @@ export interface AbstractLayout extends AbstractWidget {
   type: "layout";
   layout: LayoutType;
   parent?: NonEmptyWidget;
-  children: NonEmptyWidget[];
+  children: Widget[];
 }
 
 export type LayoutType = "grid" | "flex" | "absolute";
