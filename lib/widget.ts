@@ -1,14 +1,19 @@
-import Layout from "./layout";
-import Void from "./void";
+import Layout, { fillLayoutWithVoids } from "./widgets/layout";
+import Void from "./widgets/void";
 
 type Widget = Layout | Void;
 
 export default Widget;
 
+export function prepareWidget(widget: Widget): Widget {
+  if (widget.type == "layout") return fillLayoutWithVoids(widget);
+  return widget;
+}
+
 export type NonEmptyWidget = Exclude<Widget, Void>;
 
 export interface AbstractWidget {
-  id: number;
+  id: string;
   type: WidgetType;
   position: WidgetPosition;
   size: WidgetSize;

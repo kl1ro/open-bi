@@ -28,12 +28,12 @@ import {
 } from "../ui/select";
 import { Button } from "../ui/button";
 
-import { NonEmptyWidgetType, WIDGET_TYPE } from "@/lib/widgets/widget";
-import { SPACING_OPTIONS } from "@/lib/grid";
+import { NonEmptyWidgetType, WIDGET_TYPE } from "@/lib/widget";
+import { SPACING_OPTIONS } from "@/lib/widgets/layouts/grid";
 import { upsertWidget } from "@/state/features/widget";
 import Void from "@/lib/widgets/void";
 import { useAppDispatch } from "@/state/hooks";
-import { Grid } from "@/lib/widgets/layout";
+import Grid from "@/lib/widgets/layouts/grid";
 
 export default function CreateWidgetDialog(props: WidgetDialogProps) {
   const dispatch = useAppDispatch();
@@ -49,7 +49,7 @@ export default function CreateWidgetDialog(props: WidgetDialogProps) {
 
   function onSubmit(values: FormValues) {
     const grid: Grid = {
-      id: Math.round(Math.random() * 1000000000),
+      id: props.void.id,
       layout: "grid",
       type: values.type as NonEmptyWidgetType,
       columns: Number(values.columns),

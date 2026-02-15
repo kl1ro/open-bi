@@ -1,109 +1,79 @@
-import {
-  useState,
-  useRef,
-  Dispatch,
-  SetStateAction,
-  useMemo,
-  useCallback,
-  RefObject,
-} from "react";
+import { useState, useRef } from "react";
 
 import GridResizeOverlay from "./GridResizeOverlay";
 
-import { Grid } from "@/lib/widgets/layout";
-import { WidgetPosition } from "@/lib/widgets/widget";
+import { WidgetPosition } from "@/lib/widget";
 import { cn } from "@/lib/utils";
 
 export default function GridResizeHandle(props: ResizeHandleProps) {
-  const [overlayShown, setOverlayShown] = useState(false);
-  const handleRef = useRef<HTMLDivElement>(null);
-
-  const dependencies: ResizeHandleDependencies = useMemo(
-    () => ({
-      position: props.position,
-      setSelected: props.setSelected,
-      setResize: props.setResize,
-      onResizeEnd: props.onResizeEnd,
-      setOverlayShown,
-      neighbors: props.neighbors,
-      orientation: props.orientation,
-    }),
-    [props, setOverlayShown],
-  );
-
-  const start = useCallback(() => startResizing(dependencies), [dependencies]);
-
-  const resize = useCallback(
-    (move: number) => handleResize(dependencies, move),
-    [dependencies],
-  );
-
-  const stop = useCallback(() => stopResizing(dependencies), [dependencies]);
+  const state = useGridResizeHandleState(props);
 
   return (
     <>
       <div
         className={`group ${props.orientation == "vertical" ? "h-full w-1.5 cursor-col-resize flex items-center" : "w-full h-1.5 cursor-row-resize flex justify-center"}`}
-        onMouseDown={() => setOverlayShown(true)}
+        onMouseDown={() => state.setOverlayShown(true)}
         style={{
           gridColumnStart: props.position.column,
           gridRowStart: props.position.row,
         }}
-        ref={handleRef}
+        ref={state.handleRef}
       >
         <div
           className={cn(
             "group-hover:bg-blue-700 bg-medium animated rounded-xs",
-            `${overlayShown ? "bg-blue-700" : ""}`,
+            `${state.overlayShown ? "bg-blue-700" : ""}`,
             `${props.orientation == "vertical" ? "h-2/5 w-full" : "w-3/5 h-full"}`,
           )}
         />
       </div>
 
-      {overlayShown && (
+      {state.overlayShown && (
         <GridResizeOverlay
+          onResizeStart={() => startResizing(state)}
+          onResize={() => resize(state)}
+          onResizeEnd={() => stopResizing(state)}
           {...props}
-          onResizeStart={start}
-          onResize={resize}
-          onResizeEnd={stop}
         />
       )}
     </>
   );
 }
 
+export function useGridResizeHandleState(
+  props: Parameters<typeof GridResizeHandle>[0],
+) {
+  const [overlayShown, setOverlayShown] = useState(false);
+  const handleRef = useRef<HTMLDivElement>(null);
+
+  return {
+    ...props,
+    overlayShown,
+    setOverlayShown,
+    handleRef,
+  };
+}
+
 export interface ResizeHandleProps {
   orientation: ResizeHandleOrientation;
-  grid: Grid;
-  gridRef: RefObject<HTMLDivElement | null>;
   position: WidgetPosition;
   neighbors: number[];
-  setSelected: Dispatch<SetStateAction<number[]>>;
-  setResize: Dispatch<SetStateAction<number | undefined>>;
-  onResizeEnd?: (handlePosition: WidgetPosition) => unknown;
 }
 
 export type ResizeHandleOrientation = "horizontal" | "vertical";
 
-interface ResizeHandleDependencies {
-  position: WidgetPosition;
-  orientation: ResizeHandleOrientation;
-  setSelected: Dispatch<SetStateAction<number[]>>;
-  setResize: Dispatch<SetStateAction<number | undefined>>;
-  onResizeEnd?: (position: WidgetPosition) => unknown;
-  setOverlayShown: Dispatch<SetStateAction<boolean>>;
-  neighbors: number[];
+function startResizing(state: ReturnType<typeof useGridResizeHandleState>) {
+  state.setSelected(state.neighbors);
 }
 
-function startResizing(dependencies: ResizeHandleDependencies) {
-  dependencies.setSelected(dependencies.neighbors);
+function resize(
+  state: ReturnType<typeof useGridResizeHandleState>,
+  move: number,
+) {
+  state.setResize(move);
 }
 
-function handleResize(dependencies: ResizeHandleDependencies, move: number) {
-  dependencies.setResize(move);
-}
-
-function stopResizing(dependencies: ResizeHandleDependencies) {
-  dependencies.setOverlayShown(false);
-  dependencies.onResizeEnd?.(dependencies.position);
+function stopResizing(state: ReturnType<typeof useGridResizeHandleState>) {
+  state.setOverlayShown(false);
+  state.onResizeEnd?.(state.position);
 }

@@ -1,31 +1,26 @@
-import Widget, { AbstractWidget, NonEmptyWidget } from "./widget";
+import Widget, { AbstractWidget, NonEmptyWidget } from "../widget";
+import Absolute from "./layouts/absolute";
+import Flex from "./layouts/flex";
+import Grid, { fillGridWithVoids } from "./layouts/grid";
 
 type Layout = Grid | Absolute | Flex;
+
 export default Layout;
 
-export interface Grid extends AbstractLayout {
-  layout: "grid";
-  rows: number;
-  columns: number;
+export function fillLayoutWithVoids(layout: Layout): Layout {
+  switch (layout.layout) {
+    case "grid":
+      return fillGridWithVoids(layout);
+    default:
+      return layout;
+  }
 }
-
-export interface Absolute extends AbstractLayout {
-  layout: "absolute";
-}
-
-export interface Flex extends AbstractLayout {
-  layout: "flex";
-  direction: FlexDirection;
-  gap?: number;
-}
-
-export type FlexDirection = "row" | "column";
 
 export interface AbstractLayout extends AbstractWidget {
   type: "layout";
   layout: LayoutType;
   parent?: NonEmptyWidget;
-  children: Widget[];
+  children?: Widget[];
 }
 
 export type LayoutType = "grid" | "flex" | "absolute";

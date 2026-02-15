@@ -1,9 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { v4 as uuid } from "uuid";
 
-import Widget, { NonEmptyWidget } from "@/lib/widgets/widget";
+import Widget, { NonEmptyWidget, prepareWidget } from "@/lib/widget";
 
 export const rootWidget: WidgetState = {
   value: {
+    id: uuid(),
+    type: "void",
     size: { colSpan: 1, rowSpan: 1 },
     position: { row: 1, column: 1 },
   },
@@ -26,7 +29,7 @@ export default slice.reducer;
 
 function handleWidgetUpsert(state: WidgetState, action: PayloadAction<Widget>) {
   const { value: root } = state;
-  const widget = action.payload;
+  const widget = prepareWidget(action.payload);
   const parent = findLeaf(root, widget.parent) as NonEmptyWidget | undefined;
 
   if (!parent) {
@@ -34,17 +37,21 @@ function handleWidgetUpsert(state: WidgetState, action: PayloadAction<Widget>) {
     return;
   }
 
-  widget.parent = { ...parent };
+  widget.parent = { ...parent, children: undefined };
 
-  parent.children = [
-    ...parent.children.filter((child) => child.id != widget.id),
-    widget,
-  ];
+  const index = parent.children!.findIndex((child) => child.id == widget.id);
+  parent.children![index] = widget;
 }
 
 function findLeaf(suspect: Widget, target?: Widget): Widget | undefined {
-  if (!suspect.type || !target) return;
-  if (suspect?.id == target.id) return suspect;
-  if (!suspect.children.length) return;
-  return suspect.children.find((child) => findLeaf(child, target));
+  if (!target) return undefined;
+  if (suspect.id === target.id) return suspect;
+  if (!suspect.children?.length) return undefined;
+
+  for (const child of suspect.children) {
+    const found = findLeaf(child, target);
+    if (found) return found;
+  }
+
+  return undefined;
 }
