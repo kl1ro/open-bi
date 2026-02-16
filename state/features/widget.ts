@@ -2,13 +2,23 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { v4 as uuid } from "uuid";
 
 import Widget, { NonEmptyWidget, prepareWidget } from "@/lib/widget";
+import { GridItem } from "@/lib/widgets/layouts/grid";
 
 export const rootWidget: WidgetState = {
   value: {
     id: uuid(),
-    type: "void",
-    size: { colSpan: 1, rowSpan: 1 },
-    position: { row: 1, column: 1 },
+    type: "layout",
+    layout: "grid",
+    rows: 1,
+    columns: 1,
+    children: [
+      {
+        id: uuid(),
+        type: "void",
+        position: { column: 1, row: 1 },
+        size: { colSpan: 1, rowSpan: 1 },
+      } as GridItem,
+    ],
   },
 };
 
@@ -29,8 +39,13 @@ export default slice.reducer;
 
 function handleWidgetUpsert(state: WidgetState, action: PayloadAction<Widget>) {
   const { value: root } = state;
-  const widget = prepareWidget(action.payload);
-  const parent = findLeaf(root, widget.parent) as NonEmptyWidget | undefined;
+
+  const widget =
+    action.payload.type != "void"
+      ? prepareWidget(action.payload)
+      : action.payload;
+
+  let parent = findLeaf(root, widget.parent) as NonEmptyWidget | undefined;
 
   if (!parent) {
     state.value = widget;
@@ -41,6 +56,7 @@ function handleWidgetUpsert(state: WidgetState, action: PayloadAction<Widget>) {
 
   const index = parent.children!.findIndex((child) => child.id == widget.id);
   parent.children![index] = widget;
+  parent = prepareWidget(parent);
 }
 
 function findLeaf(suspect: Widget, target?: Widget): Widget | undefined {

@@ -1,8 +1,7 @@
-import { useState, useRef } from "react";
+import { useContext, useState } from "react";
 
-import GridResizeOverlay from "./GridResizeOverlay";
+import { ResizeContext } from "./GridResizeOverlay";
 
-import { WidgetPosition } from "@/lib/widget";
 import { cn } from "@/lib/utils";
 
 export default function GridResizeHandle(props: ResizeHandleProps) {
@@ -11,31 +10,23 @@ export default function GridResizeHandle(props: ResizeHandleProps) {
   return (
     <>
       <div
-        className={`group ${props.orientation == "vertical" ? "h-full w-1.5 cursor-col-resize flex items-center" : "w-full h-1.5 cursor-row-resize flex justify-center"}`}
-        onMouseDown={() => state.setOverlayShown(true)}
-        style={{
-          gridColumnStart: props.position.column,
-          gridRowStart: props.position.row,
-        }}
-        ref={state.handleRef}
+        className={cn(
+          "absolute pointer-events-auto group",
+          state.orientation == "vertical"
+            ? "top-0 -right-4.75 h-full w-1.5 cursor-col-resize flex items-center"
+            : "-bottom-4.75 w-full h-1.5 cursor-row-resize flex justify-center",
+          state.resize?.selected && "pointer-events-none",
+        )}
+        onMouseDown={() => handleMouseDown(state)}
       >
         <div
           className={cn(
             "group-hover:bg-blue-700 bg-medium animated rounded-xs",
-            `${state.overlayShown ? "bg-blue-700" : ""}`,
-            `${props.orientation == "vertical" ? "h-2/5 w-full" : "w-3/5 h-full"}`,
+            `${state.resize?.selected && state.isDown ? "bg-blue-700" : ""}`,
+            `${state.orientation == "vertical" ? "h-2/5 w-full" : "w-3/5 h-full"}`,
           )}
         />
       </div>
-
-      {state.overlayShown && (
-        <GridResizeOverlay
-          onResizeStart={() => startResizing(state)}
-          onResize={() => resize(state)}
-          onResizeEnd={() => stopResizing(state)}
-          {...props}
-        />
-      )}
     </>
   );
 }
@@ -43,37 +34,25 @@ export default function GridResizeHandle(props: ResizeHandleProps) {
 export function useGridResizeHandleState(
   props: Parameters<typeof GridResizeHandle>[0],
 ) {
-  const [overlayShown, setOverlayShown] = useState(false);
-  const handleRef = useRef<HTMLDivElement>(null);
+  const resize = useContext(ResizeContext);
+  const [isDown, setIsDown] = useState(false);
 
   return {
     ...props,
-    overlayShown,
-    setOverlayShown,
-    handleRef,
+    resize,
+    isDown,
+    setIsDown,
   };
+}
+
+function handleMouseDown(state: ReturnType<typeof useGridResizeHandleState>) {
+  state.setIsDown(true);
+  state.onMouseDown();
 }
 
 export interface ResizeHandleProps {
   orientation: ResizeHandleOrientation;
-  position: WidgetPosition;
-  neighbors: number[];
+  onMouseDown: () => unknown;
 }
 
 export type ResizeHandleOrientation = "horizontal" | "vertical";
-
-function startResizing(state: ReturnType<typeof useGridResizeHandleState>) {
-  state.setSelected(state.neighbors);
-}
-
-function resize(
-  state: ReturnType<typeof useGridResizeHandleState>,
-  move: number,
-) {
-  state.setResize(move);
-}
-
-function stopResizing(state: ReturnType<typeof useGridResizeHandleState>) {
-  state.setOverlayShown(false);
-  state.onResizeEnd?.(state.position);
-}

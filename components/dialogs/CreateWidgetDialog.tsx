@@ -29,7 +29,7 @@ import {
 import { Button } from "../ui/button";
 
 import { NonEmptyWidgetType, WIDGET_TYPE } from "@/lib/widget";
-import { SPACING_OPTIONS } from "@/lib/widgets/layouts/grid";
+import { GridItem, SPACING_OPTIONS } from "@/lib/widgets/layouts/grid";
 import { upsertWidget } from "@/state/features/widget";
 import Void from "@/lib/widgets/void";
 import { useAppDispatch } from "@/state/hooks";
@@ -48,7 +48,7 @@ export default function CreateWidgetDialog(props: WidgetDialogProps) {
   });
 
   function onSubmit(values: FormValues) {
-    const grid: Grid = {
+    const grid: Grid & GridItem = {
       id: props.void.id,
       layout: "grid",
       type: values.type as NonEmptyWidgetType,
@@ -171,7 +171,7 @@ export default function CreateWidgetDialog(props: WidgetDialogProps) {
 export interface WidgetDialogProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  void: Void;
+  void: Void & GridItem;
 }
 
 const formSchema = z.object({

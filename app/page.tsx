@@ -18,6 +18,5 @@ export default function Home() {
 
 function RootWidget() {
   const widget = useAppSelector((state) => state.widget.value);
-  console.log(widget);
   return <Widget {...widget} />;
 }
