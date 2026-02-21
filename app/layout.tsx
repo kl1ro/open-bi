@@ -22,6 +22,7 @@ export default function RootLayout({
         className={`w-full h-full ${geistSans.variable} antialiased bg-dark text-secondary`}
       >
         {children}
+        <script src="https://api-maps.yandex.ru/2.1/?lang=en_US"></script>
       </body>
     </html>
   );

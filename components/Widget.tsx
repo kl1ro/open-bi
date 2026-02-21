@@ -1,5 +1,8 @@
+import Graph from "./widgets/Graph";
 import Layout from "./widgets/Layout";
+import Title from "./widgets/Title";
 import { Void } from "./widgets/Void";
+import Map from "./widgets/Map";
 
 import type Widget from "@/lib/widget";
 
@@ -15,6 +18,15 @@ function getWidgetByType(props: Widget) {
   switch (props.type) {
     case "layout":
       return <Layout {...props} />;
+
+    case "title":
+      return <Title {...props} />;
+
+    case "graph":
+      return <Graph {...props} />;
+
+    case "map":
+      return <Map {...props} />;
 
     default:
       return <Void {...props} />;

@@ -6,21 +6,11 @@ import { toast, Toaster } from "sonner";
 
 import Widget from "@/components/Widget";
 import type WidgetType from "@/lib/widget";
-import { useAppSelector } from "@/state/hooks";
+import { useAppDispatch, useAppSelector } from "@/state/hooks";
+import { upsertWidget } from "@/state/features/widget";
 import { store } from "@/state/store";
 
 export default function Home() {
-  useEffect(() => {
-    const rootWidget = localStorage.getItem("rootWidget");
-    if (!rootWidget) return;
-
-    toast.success("Дэшборд восстановлен из предыдущей сессии");
-    store.dispatch({
-      type: "widget/upsertWidget",
-      payload: JSON.parse(rootWidget) as WidgetType,
-    });
-  }, []);
-
   return (
     <div className="w-full h-full p-4">
       <Provider store={store}>
@@ -32,19 +22,28 @@ export default function Home() {
 }
 
 function RootWidget() {
+  const dispatch = useAppDispatch();
   const widget = useAppSelector((state) => state.widget.value);
 
   useEffect(() => {
     const keydown = (e: KeyboardEvent) => {
       if (e.key != "s" || !e.ctrlKey) return;
       e.preventDefault();
-      saveWidgetToLocalStorage(widget);
+      saveWidgetToLocalStorage(store.getState().widget.value);
       toast.success("Дэшборд сохранён между сессиями");
     };
 
     document.addEventListener("keydown", keydown);
 
     return () => document.removeEventListener("keydown", keydown);
+  }, []);
+
+  useEffect(() => {
+    const rootWidget = localStorage.getItem("rootWidget");
+    if (!rootWidget) return;
+
+    toast.success("Дэшборд восстановлен из предыдущей сессии");
+    dispatch(upsertWidget(JSON.parse(rootWidget) as WidgetType));
   }, []);
 
   return <Widget {...widget} />;

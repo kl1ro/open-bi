@@ -1,7 +1,10 @@
+import Graph from "./widgets/graph";
 import Layout, { prepareLayout } from "./widgets/layout";
+import { Title } from "./widgets/title";
 import Void from "./widgets/void";
+import Map from "./widgets/map";
 
-type Widget = Layout | Void;
+type Widget = Layout | Void | Title | Graph | Map;
 
 export default Widget;
 
@@ -25,6 +28,9 @@ export interface AbstractWidget {
 export const WIDGET_TYPE = {
   void: "void",
   layout: "layout",
+  title: "title",
+  graph: "graph",
+  map: "map",
 } as const;
 
 export type WidgetType = keyof typeof WIDGET_TYPE;
