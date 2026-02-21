@@ -1,0 +1,10 @@
+stages:
+  - test
+
+test:
+  stage: test
+  image: node:20
+  script:
+    - echo "Testing app..."
+    - npm ci
+    - npm run build
