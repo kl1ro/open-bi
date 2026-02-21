@@ -28,7 +28,7 @@ export default function GridItemResizeHighlight(
       style={styleFallback}
       className={cn(
         "absolute inset-0 z-20 h-full w-full rounded-xl pointer-events-none animated",
-        (state.focused || state.available) && "ring-2",
+        (state.focused || state.available) && "ring-2 ring-inset",
         state.focused ? "ring-blue-700" : state.available && "ring-blue-950",
       )}
     />
@@ -45,8 +45,10 @@ function useGridItemResizeHighlightState(
     areAtSamePosition(props.item, resize?.selected?.[1]);
 
   const available =
-    areAtSameRow(props.item, resize?.selected?.[0]) ||
-    areAtSameColumn(props.item, resize?.selected?.[0]);
+    (resize?.orientation.current == "row" &&
+      areAtSameRow(props.item, resize?.selected?.[0])) ||
+    (resize?.orientation.current == "column" &&
+      areAtSameColumn(props.item, resize?.selected?.[0]));
 
   return {
     ...props,
@@ -85,7 +87,17 @@ export function calculateHighlightPosition(
   }
 
   const style: CSSProperties = { zIndex: 30 };
-  const grow = `calc(100% + (100% + 2rem) * ${Math.abs(move)})`;
+  const containerRect =
+    state.resize.containerRef.current?.getBoundingClientRect();
+
+  const itemSize = Math.round(
+    state.resize.orientation.current == "row"
+      ? (containerRect?.width ?? 0) / state.resize.grid.columns
+      : (containerRect?.height ?? 0) / state.resize.grid.rows,
+  );
+
+  const grow = `calc(100% + (${itemSize}px + 0.5rem) * ${Math.abs(move)})`;
+
   if (resizingRow) {
     if (move > 0 && selectedIndex === 0) {
       style.width = grow;

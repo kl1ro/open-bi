@@ -1,10 +1,12 @@
 import { useRef, CSSProperties, useState, createContext } from "react";
+import { motion } from "framer-motion";
 
 import GridResizeHandle from "./GridResizeHandle";
 import GridItemResizeHighLight from "./GridItemResizeHighlight";
 
 import Grid, {
   areAtSameRow,
+  getOccupancyGrid,
   GridItem,
   takesSpace,
 } from "@/lib/widgets/layouts/grid";
@@ -22,7 +24,7 @@ export default function GridResizeOverlay(props: GridResizeProps) {
         onMouseMove={(e) => resize(state, e.nativeEvent)}
         onMouseUp={() => stopResizing(state)}
         className={cn(
-          "p-2 absolute inset-0 grid gap-8 grid-rows-(--rows) grid-cols-(--cols) pointer-events-none",
+          "absolute inset-0 grid gap-8 grid-rows-(--rows) grid-cols-(--cols) pointer-events-none overflow-visible",
           state.selected && "pointer-events-auto",
         )}
         style={
@@ -33,10 +35,11 @@ export default function GridResizeOverlay(props: GridResizeProps) {
         }
       >
         {state.grid.children
-          ?.filter((w) => takesSpace(w))
-          .map((widget, i) => (
-            <div
-              key={i}
+          ?.filter((widget) => takesSpace(widget))
+          .map((widget) => (
+            <motion.div
+              key={widget.id}
+              layout
               className="relative row-start-(--row-start) col-start-(--col-start) row-span-(--row-span) col-span-(--col-span)"
               style={
                 {
@@ -47,7 +50,8 @@ export default function GridResizeOverlay(props: GridResizeProps) {
                 } as CSSProperties
               }
             >
-              {widget.position.column < state.grid.columns && (
+              {widget.position.column + widget.size.colSpan - 1 <
+                state.grid.columns && (
                 <GridResizeHandle
                   orientation="vertical"
                   onMouseDown={() =>
@@ -59,7 +63,8 @@ export default function GridResizeOverlay(props: GridResizeProps) {
                 />
               )}
 
-              {widget.position.row < state.grid.rows && (
+              {widget.position.row + widget.size.rowSpan - 1 <
+                state.grid.rows && (
                 <GridResizeHandle
                   orientation="horizontal"
                   onMouseDown={() =>
@@ -72,7 +77,7 @@ export default function GridResizeOverlay(props: GridResizeProps) {
               )}
 
               <GridItemResizeHighLight item={widget} />
-            </div>
+            </motion.div>
           ))}
       </div>
     </ResizeContext.Provider>
@@ -114,10 +119,10 @@ function startResizing(
   state.setMove(0);
 
   state.startPoint.current = null;
-  state.orientation.current = areAtSameRow(...neighbors) ? "column" : "row";
+  state.orientation.current = areAtSameRow(...neighbors) ? "row" : "column";
 
   document.body.style.cursor =
-    state.orientation.current === "column" ? "col-resize" : "row-resize";
+    state.orientation.current === "column" ? "row-resize" : "col-resize";
 }
 
 function resize(
@@ -139,7 +144,7 @@ function resize(
 
   let nextMove = 0;
 
-  if (state.orientation.current === "row") {
+  if (state.orientation.current === "column") {
     const rowHeight = gridElement.clientHeight / state.grid.rows;
     nextMove = Math.round(dy / rowHeight);
   } else {
@@ -164,83 +169,69 @@ function resetResize(state: ReturnType<typeof useGridResizeOverlayState>) {
 }
 
 function updateWidget(state: ReturnType<typeof useGridResizeOverlayState>) {
-  if (!state.selected) return;
-
-  const expanded = getExpandedElement(state);
-  const shrunk = getShrunkElements(state);
-
-  setTimeout(() => {
-    state.dispatch(upsertWidget(expanded));
-    shrunk.forEach((widget) => state.dispatch(upsertWidget(widget)));
-  }, 200);
+  if (!state.selected || !state.move || !state.orientation.current) return;
+  const grid = getResizedGrid(state);
+  state.dispatch(upsertWidget(grid));
 }
 
-function getExpandedElement(
+function getResizedGrid(
   state: ReturnType<typeof useGridResizeOverlayState>,
-) {
-  const expanded = structuredClone(
-    state.move < 0 ? state.selected![1] : state.selected![0],
-  );
+): Grid {
+  const [[resizePosKey, resizeSpanKey], [depthPosKey, depthSpanKey]] =
+    state.orientation.current == "row"
+      ? ([
+          ["column", "colSpan"],
+          ["row", "rowSpan"],
+        ] as const)
+      : ([
+          ["row", "rowSpan"],
+          ["column", "colSpan"],
+        ] as const);
 
-  expanded.size[state.orientation.current == "row" ? "rowSpan" : "colSpan"] +=
-    Math.abs(state.move);
+  const [left, right] = structuredClone(state.selected!);
 
-  if (state.move < 0)
-    expanded.position[state.orientation.current == "row" ? "row" : "column"] +=
-      state.move;
+  const sweepStart = right.position[resizePosKey] - (state.move > 0 ? 0 : 1);
+  const sweepEnd = sweepStart + state.move;
+  const delta = Math.abs(state.move);
 
-  return expanded;
-}
+  const grid = structuredClone(state.grid);
+  const occupancyGrid = getOccupancyGrid(grid);
 
-function getShrunkElements(
-  state: ReturnType<typeof useGridResizeOverlayState>,
-): GridItem[] {
-  const { grid, selected, move, orientation } = state;
-  if (!selected || !orientation.current || !move) return [];
+  let expanded = state.move > 0 ? left : right;
+  expanded = grid.children!.find((item) => item.id === expanded.id) as GridItem;
+  expanded.size[resizeSpanKey] += delta;
+  if (state.move < 0) expanded.position[resizePosKey] -= delta;
 
-  const axis = orientation.current === "row" ? "row" : "column";
-  const spanKey = axis === "row" ? "rowSpan" : "colSpan";
+  for (
+    let i = sweepStart;
+    state.move > 0 ? i < sweepEnd : i > sweepEnd;
+    state.move > 0 ? i++ : i--
+  ) {
+    for (
+      let j = expanded.position[depthPosKey];
+      j < expanded.position[depthPosKey] + expanded.size[depthSpanKey];
+      j++
+    ) {
+      let current = (
+        resizePosKey == "row" ? occupancyGrid[j][i] : occupancyGrid[i][j]
+      ) as GridItem;
 
-  const [first, second] = selected;
-  const expanded = move < 0 ? second : first;
+      current = grid.children!.find(
+        (item) => item.id === current?.id,
+      ) as GridItem;
 
-  const delta = Math.abs(move);
-
-  const sweepStart =
-    move > 0
-      ? expanded.position[axis] + expanded.size[spanKey]
-      : expanded.position[axis] + delta;
-
-  const sweepEnd = sweepStart + delta;
-
-  const shrunk: Record<`${number},${number}`, GridItem> = {};
-
-  for (let i = sweepStart; i < sweepEnd; i++) {
-    const key: `${number},${number}` =
-      axis == "column"
-        ? `${i},${expanded.position.row}`
-        : `${expanded.position.column},${i}`;
-
-    const widget = structuredClone(grid.childrenMap![key]);
-
-    if (state.move > 0) {
-      if (widget.size[spanKey] > 1) {
-        const previousKey: `${number},${number}` =
-          axis == "column"
-            ? `${i - 1},${expanded.position.row}`
-            : `${expanded.position.column},${i - 1}`;
-
-        delete shrunk[previousKey];
+      if (current.size[resizeSpanKey] == 1)
+        grid.children = grid.children?.filter(
+          (child) => child.id !== current.id,
+        );
+      else {
+        current.size[resizeSpanKey] -= 1;
+        if (state.move > 0) current.position[resizePosKey] += 1;
       }
-
-      if (widget.size[spanKey] > 1) widget.position[axis] += 1;
-      widget.size[spanKey] -= 1;
-    } else widget.size[spanKey] -= 1;
-
-    shrunk[key] = widget;
+    }
   }
 
-  return Object.values(shrunk);
+  return grid;
 }
 
 function getVerticalNeighbors(
@@ -249,7 +240,12 @@ function getVerticalNeighbors(
 ): [GridItem, GridItem] {
   return [
     widget,
-    grid.childrenMap![`${widget.position.column},${widget.position.row + 1}`],
+    grid.children?.find((item) => {
+      return (
+        item.position.column === widget.position.column &&
+        item.position.row === widget.position.row + widget.size.rowSpan
+      );
+    }) as GridItem,
   ];
 }
 
@@ -259,7 +255,12 @@ function getHorizontalNeighbors(
 ): [GridItem, GridItem] {
   return [
     widget,
-    grid.childrenMap![`${widget.position.column + 1},${widget.position.row}`],
+    grid.children?.find((item) => {
+      return (
+        item.position.row === widget.position.row &&
+        item.position.column === widget.position.column + widget.size.colSpan
+      );
+    }) as GridItem,
   ];
 }
 

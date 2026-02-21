@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { ResizeContext } from "./GridResizeOverlay";
 
@@ -7,14 +7,18 @@ import { cn } from "@/lib/utils";
 export default function GridResizeHandle(props: ResizeHandleProps) {
   const state = useGridResizeHandleState(props);
 
+  useEffect(() => {
+    if (!state.resize?.selected) state.setIsDown(false);
+  }, [state.resize?.selected]);
+
   return (
     <>
       <div
         className={cn(
           "absolute pointer-events-auto group",
           state.orientation == "vertical"
-            ? "top-0 -right-4.75 h-full w-1.5 cursor-col-resize flex items-center"
-            : "-bottom-4.75 w-full h-1.5 cursor-row-resize flex justify-center",
+            ? "top-0 -right-4.5 h-full w-1.5 cursor-col-resize flex items-center"
+            : "-bottom-4.5 w-full h-1.5 cursor-row-resize flex justify-center",
           state.resize?.selected && "pointer-events-none",
         )}
         onMouseDown={() => handleMouseDown(state)}

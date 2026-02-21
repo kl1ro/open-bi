@@ -4,7 +4,7 @@ import { v4 as uuid } from "uuid";
 import Widget, { NonEmptyWidget, prepareWidget } from "@/lib/widget";
 import { GridItem } from "@/lib/widgets/layouts/grid";
 
-export const rootWidget: WidgetState = {
+const rootWidget: WidgetState = {
   value: {
     id: uuid(),
     type: "layout",
@@ -59,8 +59,8 @@ function handleWidgetUpsert(state: WidgetState, action: PayloadAction<Widget>) {
   parent = prepareWidget(parent);
 }
 
-function findLeaf(suspect: Widget, target?: Widget): Widget | undefined {
-  if (!target) return undefined;
+function findLeaf(suspect?: Widget, target?: Widget): Widget | undefined {
+  if (!target || !suspect) return undefined;
   if (suspect.id === target.id) return suspect;
   if (!suspect.children?.length) return undefined;
 

@@ -5,7 +5,7 @@ import type Widget from "@/lib/widget";
 
 export default function Widget(props: Widget) {
   return (
-    <div className="relative w-full h-full rounded-xl animated">
+    <div className="relative w-full h-full rounded-xl animated no-scrollbar overflow-auto">
       {getWidgetByType(props)}
     </div>
   );

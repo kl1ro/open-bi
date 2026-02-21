@@ -4,6 +4,7 @@ import CreateWidgetDialog from "../dialogs/CreateWidgetDialog";
 
 import { cn } from "@/lib/utils";
 import type Void from "@/lib/widgets/void";
+import { GridItem } from "@/lib/widgets/layouts/grid";
 
 export function Void(props: Void) {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -23,7 +24,7 @@ export function Void(props: Void) {
         +
       </button>
       <CreateWidgetDialog
-        void={props}
+        void={props as Void & GridItem}
         open={isFormOpen}
         setOpen={setIsFormOpen}
       />

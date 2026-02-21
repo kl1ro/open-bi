@@ -9,32 +9,19 @@ export default interface Grid extends AbstractLayout {
   rows: number;
   columns: number;
   children?: GridItem[];
-  childrenMap?: Record<`${number},${number}`, GridItem>;
-}
-
-export function generateGridMap(
-  grid: Grid,
-): Record<`${number},${number}`, GridItem> {
-  const map: Record<`${number},${number}`, GridItem> = {};
-
-  grid.children?.forEach((widget) => {
-    map[`${widget.position.column},${widget.position.row}`] = widget;
-  });
-
-  return map;
 }
 
 export function fillGridWithVoids(grid: Grid): Grid {
   const occupied = getOccupancyGrid(grid);
   grid.children = grid.children ?? [];
 
-  for (let c = 0; c < grid.columns; c++) {
-    for (let r = 0; r < grid.rows; r++) {
+  for (let c = 1; c <= grid.columns; c++) {
+    for (let r = 1; r <= grid.rows; r++) {
       if (!occupied[c][r]) {
         grid.children.push({
           id: uuid(),
           type: "void",
-          position: { column: c + 1, row: r + 1 },
+          position: { column: c, row: r },
           size: { colSpan: 1, rowSpan: 1 },
           parent: { ...grid, children: undefined },
         } as GridItem);
@@ -45,21 +32,22 @@ export function fillGridWithVoids(grid: Grid): Grid {
   return grid;
 }
 
-export function getOccupancyGrid(grid: Grid): boolean[][] {
-  const occupancyGrid: boolean[][] = Array.from({ length: grid.columns }).map(
-    () => Array.from({ length: grid.rows }).map(() => false),
+export function getOccupancyGrid(grid: Grid): (GridItem | undefined)[][] {
+  const occupancyGrid: (GridItem | undefined)[][] = Array.from(
+    { length: grid.columns + 1 },
+    () => Array.from({ length: grid.rows + 1 }, () => undefined),
   );
 
   grid.children?.forEach((widget) => {
-    const startRow = widget.position.row - 1;
-    const startCol = widget.position.column - 1;
+    const startRow = widget.position.row;
+    const startCol = widget.position.column;
     const rowSpan = widget.size.rowSpan;
     const colSpan = widget.size.colSpan;
 
     for (let c = startCol; c < startCol + colSpan; c++) {
       for (let r = startRow; r < startRow + rowSpan; r++) {
-        if (r >= 0 && r < grid.rows && c >= 0 && c < grid.columns) {
-          occupancyGrid[c][r] = true;
+        if (r >= 1 && r <= grid.rows && c >= 1 && c <= grid.columns) {
+          occupancyGrid[c][r] = widget;
         }
       }
     }

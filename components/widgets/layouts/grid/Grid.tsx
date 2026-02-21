@@ -10,7 +10,7 @@ import { takesSpace } from "@/lib/widgets/layouts/grid";
 export default function Grid(props: Grid) {
   return (
     <div
-      className="p-2 w-full h-full grid gap-8 grid-rows-(--rows) grid-cols-(--cols) relative overflow-hidden"
+      className="w-full h-full grid gap-8 grid-rows-(--rows) grid-cols-(--cols) relative"
       style={
         {
           "--rows": `repeat(${props.rows}, minmax(0, 1fr))`,
@@ -21,7 +21,7 @@ export default function Grid(props: Grid) {
       <AnimatePresence>
         {props.children
           ?.filter((widget) => takesSpace(widget))
-          .map((widget, i) => (
+          .map((widget) => (
             <motion.div
               layout
               style={
@@ -32,7 +32,7 @@ export default function Grid(props: Grid) {
                   "--col-start": widget.position.column,
                 } as CSSProperties
               }
-              key={i}
+              key={widget.id}
               className="relative row-start-(--row-start) col-start-(--col-start) row-span-(--row-span) col-span-(--col-span)"
             >
               <Widget {...widget} />
