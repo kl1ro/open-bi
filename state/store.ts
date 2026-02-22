@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import widget from "./features/widget";
+import dashboard from "./features/dashboard";
 
 export const store = configureStore({
   reducer: {
-    widget,
+    dashboard,
   },
 });
 

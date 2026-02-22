@@ -7,7 +7,7 @@ import { toast, Toaster } from "sonner";
 import Widget from "@/components/Widget";
 import type WidgetType from "@/lib/widget";
 import { useAppDispatch, useAppSelector } from "@/state/hooks";
-import { upsertWidget } from "@/state/features/widget";
+import { upsertWidget } from "@/state/features/dashboard";
 import { store } from "@/state/store";
 
 export default function Home() {
@@ -23,13 +23,13 @@ export default function Home() {
 
 function RootWidget() {
   const dispatch = useAppDispatch();
-  const widget = useAppSelector((state) => state.widget.value);
+  const widget = useAppSelector((state) => state.dashboard.value);
 
   useEffect(() => {
     const keydown = (e: KeyboardEvent) => {
       if (e.key != "s" || !e.ctrlKey) return;
       e.preventDefault();
-      saveWidgetToLocalStorage(store.getState().widget.value);
+      saveWidgetToLocalStorage(store.getState().dashboard.value);
       toast.success("Дэшборд сохранён между сессиями");
     };
 

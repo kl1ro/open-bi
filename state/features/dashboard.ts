@@ -4,7 +4,7 @@ import { v4 as uuid } from "uuid";
 import Widget, { NonEmptyWidget, prepareWidget } from "@/lib/widget";
 import { GridItem } from "@/lib/widgets/layouts/grid";
 
-const rootWidget: WidgetState = {
+const dashboard: DashboardState = {
   value: {
     id: uuid(),
     type: "layout",
@@ -22,13 +22,13 @@ const rootWidget: WidgetState = {
   },
 };
 
-interface WidgetState {
+interface DashboardState {
   value: Widget;
 }
 
 const slice = createSlice({
-  name: "widget",
-  initialState: rootWidget,
+  name: "dashboard",
+  initialState: dashboard,
   reducers: {
     upsertWidget: handleWidgetUpsert,
   },
@@ -37,7 +37,10 @@ const slice = createSlice({
 export const { upsertWidget } = slice.actions;
 export default slice.reducer;
 
-function handleWidgetUpsert(state: WidgetState, action: PayloadAction<Widget>) {
+function handleWidgetUpsert(
+  state: DashboardState,
+  action: PayloadAction<Widget>,
+) {
   const { value: root } = state;
 
   const widget =

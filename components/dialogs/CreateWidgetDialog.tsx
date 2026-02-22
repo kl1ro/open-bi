@@ -31,7 +31,7 @@ import { Input } from "../ui/input";
 
 import { WIDGET_TYPE } from "@/lib/widget";
 import Grid, { GridItem, SPACING_OPTIONS } from "@/lib/widgets/layouts/grid";
-import { upsertWidget } from "@/state/features/widget";
+import { upsertWidget } from "@/state/features/dashboard";
 import Void from "@/lib/widgets/void";
 import { useAppDispatch } from "@/state/hooks";
 import { Title } from "@/lib/widgets/title";

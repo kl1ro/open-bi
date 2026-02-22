@@ -12,7 +12,7 @@ import Grid, {
 } from "@/lib/widgets/layouts/grid";
 import { cn } from "@/lib/utils";
 import { useAppDispatch } from "@/state/hooks";
-import { upsertWidget } from "@/state/features/widget";
+import { upsertWidget } from "@/state/features/dashboard";
 
 export default function GridResizeOverlay(props: GridResizeProps) {
   const state = useGridResizeOverlayState(props);

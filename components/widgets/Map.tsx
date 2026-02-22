@@ -6,8 +6,10 @@ export default function Map() {
   const map = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    ymaps.ready(() => {
-      const smth = new ymaps.Map(map.current, {
+    void window.ymaps.ready(() => {
+      if (!map.current) return;
+
+      new window.ymaps.Map(map.current, {
         center: [55.751244, 37.618423],
         zoom: 13,
         type: "yandex#hybrid",
