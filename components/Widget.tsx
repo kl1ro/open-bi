@@ -26,7 +26,7 @@ function getWidgetByType(props: Widget) {
       return <Graph {...props} />;
 
     case "map":
-      return <Map {...props} />;
+      return <Map />;
 
     default:
       return <Void {...props} />;
