@@ -1,8 +1,7 @@
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
-import { useForm } from "react-hook-form";
-import type { UseFormReturn } from "react-hook-form";
+import { useForm, type UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -13,7 +12,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogTitle,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -21,22 +20,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type WidgetConfig from "@/lib/widget";
 import type { ItemConfig } from "@/lib/widget";
 import { SPACING_OPTIONS } from "@/lib/widgets/layouts/grid";
-import type { MapView } from "@/lib/widgets/map";
-import { MAP_VIEWS } from "@/lib/widgets/map";
+import { MAP_VIEWS, type MapView } from "@/lib/widgets/map";
 import { upsertWidget } from "@/state/features/dashboard";
 import { useAppDispatch } from "@/state/hooks";
 import type { AppDispatch } from "@/state/store";

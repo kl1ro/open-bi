@@ -1,4 +1,4 @@
-import type { AbstractWidgetConfig } from "../widget";
+import type { AbstractWidgetConfig } from "@/lib/widget";
 
 export default interface TitleConfig extends AbstractWidgetConfig {
   type: "title";

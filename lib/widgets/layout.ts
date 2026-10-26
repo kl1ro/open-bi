@@ -1,22 +1,22 @@
-import type { AbstractWidgetConfig, ItemConfig } from "../widget";
-import type WidgetConfig from "../widget";
-import type AbsoluteConfig from "./layouts/absolute";
+import type { AbstractWidgetConfig, ItemConfig } from "@/lib/widget";
+import type WidgetConfig from "@/lib/widget";
+import type AbsoluteConfig from "@/lib/widgets/layouts/absolute";
 import {
   getAbsoluteConfigWithAdoptedChild,
   getAbsoluteConfigWithDisownedChild,
-} from "./layouts/absolute";
-import type FlexConfig from "./layouts/flex";
+} from "@/lib/widgets/layouts/absolute";
+import type FlexConfig from "@/lib/widgets/layouts/flex";
 import {
   getFlexConfigWithAdoptedChild,
   getFlexConfigWithDisownedChild,
   isFlexChildRedundant,
-} from "./layouts/flex";
-import type GridConfig from "./layouts/grid";
+} from "@/lib/widgets/layouts/flex";
+import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getGridConfigWithAdoptedChild,
   getGridConfigWithDisownedChild,
   isGridChildRedundant,
-} from "./layouts/grid";
+} from "@/lib/widgets/layouts/grid";
 
 type LayoutConfig = GridConfig | AbsoluteConfig | FlexConfig;
 

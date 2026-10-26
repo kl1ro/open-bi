@@ -2,9 +2,8 @@
 import { useEffect } from "react";
 import { toast } from "sonner";
 
-import Widget from "./Widget";
-import VoidWidget from "./widgets/SlotWidget";
-
+import Widget from "@/components/Widget";
+import VoidWidget from "@/components/widgets/SlotWidget";
 import { findRootConfig, setDashboard } from "@/state/features/dashboard";
 import { useAppSelector, useAppStore } from "@/state/hooks";
 import type { AppStore } from "@/state/store";

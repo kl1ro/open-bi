@@ -1,6 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 
-import dashboard from "./features/dashboard";
+import dashboard from "@/state/features/dashboard";
 
 const rootReducer = combineReducers({
   dashboard,

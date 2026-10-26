@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-import CreateWidgetDialog from "../dialogs/CreateWidgetDialog";
-
+import CreateWidgetDialog from "@/components/dialogs/CreateWidgetDialog";
 import { cn } from "@/lib/utils";
 import type { ItemConfig } from "@/lib/widget";
 import type WidgetConfig from "@/lib/widget";

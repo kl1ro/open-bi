@@ -1,7 +1,5 @@
-import type { AbstractLayoutConfig } from "../layout";
-
+import type { AbstractLayoutConfig } from "@/lib/widgets/layout";
 import { getRecordWithoutKey } from "@/lib/utils";
-import type { ItemConfig } from "@/lib/widget";
 import type WidgetConfig from "@/lib/widget";
 import {
   getChildrenWithAdoptedChild,
@@ -9,6 +7,7 @@ import {
   hasChild,
   InvalidItemConfigTypeError,
   NoItemConfigError,
+  type ItemConfig,
 } from "@/lib/widget";
 
 export default interface AbsoluteConfig extends AbstractLayoutConfig {
@@ -27,11 +26,7 @@ export function getAbsoluteConfigWithAdoptedChild(
   const absoluteItemConfig = ensureItemConfigParentTypeIsAbsolute(itemConfig);
   const children = getChildrenWithAdoptedChild(parent, child);
 
-  const arrangement = getArrangementWithAdoptedChild(
-    parent,
-    child,
-    absoluteItemConfig,
-  );
+  const arrangement = getArrangementWithAdoptedChild(parent, child, absoluteItemConfig);
 
   return { ...parent, children, arrangement };
 }

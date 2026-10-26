@@ -1,8 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 import type WidgetConfig from "@/lib/widget";
-import type { ItemConfig, WidgetConfigsById } from "@/lib/widget";
 import {
   findWidgetConfig,
   getChildren,
@@ -16,6 +14,8 @@ import {
   isTurningToSlot,
   validateWidgetUpdate,
   widgetsHaveSameId,
+  type ItemConfig,
+  type WidgetConfigsById,
 } from "@/lib/widget";
 import type { WithRequired } from "@/lib/utils";
 

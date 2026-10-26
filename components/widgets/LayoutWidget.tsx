@@ -1,7 +1,6 @@
-import AbsoluteWidget from "./layouts/AbsoluteWidget";
-import FlexWidget from "./layouts/FlexWidget";
-import GridWidget from "./layouts/GridWidget";
-
+import AbsoluteWidget from "@/components/widgets/layouts/AbsoluteWidget";
+import FlexWidget from "@/components/widgets/layouts/FlexWidget";
+import GridWidget from "@/components/widgets/layouts/GridWidget";
 import { cn } from "@/lib/utils";
 import type LayoutConfig from "@/lib/widgets/layout";
 

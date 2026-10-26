@@ -1,5 +1,4 @@
-import type { AbstractLayoutConfig } from "../layout";
-
+import type { AbstractLayoutConfig } from "@/lib/widgets/layout";
 import type WidgetConfig from "@/lib/widget";
 import { getChildrenWithAdoptedChild, getChildrenWithDisownedChild } from "@/lib/widget";
 

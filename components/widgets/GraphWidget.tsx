@@ -1,5 +1,4 @@
-import LineGraph from "./graphs/LineGraph";
-
+import LineGraph from "@/components/widgets/graphs/LineGraph";
 import type GraphConfig from "@/lib/widgets/graph";
 
 export default function GraphWidget(props: GraphConfig) {

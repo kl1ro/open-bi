@@ -1,6 +1,4 @@
-import type { AbstractLayoutConfig } from "../layout";
-
-import type { ItemConfig } from "@/lib/widget";
+import type { AbstractLayoutConfig } from "@/lib/widgets/layout";
 import type WidgetConfig from "@/lib/widget";
 import {
   getChildrenWithAdoptedChild,
@@ -9,6 +7,7 @@ import {
   InvalidItemConfigTypeError,
   ItemConfigNotFoundError,
   NoItemConfigError,
+  type ItemConfig,
 } from "@/lib/widget";
 import { type CoordinateKey, getRecordWithoutKey } from "@/lib/utils";
 

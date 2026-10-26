@@ -1,15 +1,15 @@
-import type GraphConfig from "./widgets/graph";
-import type LayoutConfig from "./widgets/layout";
+import type GraphConfig from "@/lib/widgets/graph";
+import type LayoutConfig from "@/lib/widgets/layout";
 import {
   getLayoutConfigWithAdoptedChild,
   getLayoutConfigWithDisownedChild,
   isLayoutChildRedundant,
   validateLayoutUpdate,
-} from "./widgets/layout";
-import type TitleConfig from "./widgets/title";
-import type MapConfig from "./widgets/map";
-import type SlotConfig from "./widgets/slot";
-import { haveSameElements, type WithRequired } from "./utils";
+} from "@/lib/widgets/layout";
+import type TitleConfig from "@/lib/widgets/title";
+import type MapConfig from "@/lib/widgets/map";
+import type SlotConfig from "@/lib/widgets/slot";
+import { haveSameElements, type WithRequired } from "@/lib/utils";
 
 type WidgetConfig = LayoutConfig | TitleConfig | GraphConfig | MapConfig | SlotConfig;
 

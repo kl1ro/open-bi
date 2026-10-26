@@ -1,5 +1,5 @@
-import type { AbstractWidgetConfig } from "../widget";
-import LineGraphConfig from "./graphs/line-graph";
+import type { AbstractWidgetConfig } from "@/lib/widget";
+import type LineGraphConfig from "@/lib/widgets/graphs/line-graph";
 
 type GraphConfig = LineGraphConfig;
 export default GraphConfig;
