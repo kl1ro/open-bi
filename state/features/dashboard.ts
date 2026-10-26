@@ -146,7 +146,7 @@ function removeWidgetWithDescendants(
   removeWidgetFromState(widgetConfig, deps);
 }
 
-function isRootConfig(widgetConfig: WidgetConfig, deps: DashboardSliceDeps) {
+export function isRootConfig(widgetConfig: WidgetConfig, deps: DashboardSliceDeps) {
   const root = findRootConfig(deps);
   return widgetsHaveSameId(widgetConfig, root);
 }

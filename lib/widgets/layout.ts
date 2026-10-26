@@ -76,7 +76,7 @@ export function validateLayoutUpdate(oldLayout: LayoutConfig, newLayout: LayoutC
     });
 }
 
-function layoutsHaveSameType(first?: LayoutConfig, second?: LayoutConfig) {
+export function layoutsHaveSameType(first?: LayoutConfig, second?: LayoutConfig) {
   if (!first || !second) return false;
   return first.layout == second.layout;
 }

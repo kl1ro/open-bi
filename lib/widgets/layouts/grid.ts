@@ -47,7 +47,7 @@ export function isGridChildRedundant(parent: GridConfig, child: WidgetConfig) {
   );
 }
 
-function is1x1GridItem(itemConfig: GridItemConfig) {
+export function is1x1GridItem(itemConfig: GridItemConfig) {
   return itemConfig.size.rowSpan == 1 && itemConfig.size.colSpan == 1;
 }
 
@@ -287,7 +287,7 @@ function getAspectDeviation(item: GridItemConfig, reference: GridItemConfig) {
   );
 }
 
-function getCollapsedItem(item: GridItemConfig) {
+export function getCollapsedItem(item: GridItemConfig) {
   return {
     ...item,
     size: {
@@ -348,7 +348,7 @@ function getComputedGridSlots(grid: GridConfig): GridItemToRender[] {
     .map((cell) => ({ itemConfig: create1x1GridItemConfig(cell) }));
 }
 
-function getGridOccupancy(grid: GridConfig) {
+export function getGridOccupancy(grid: GridConfig) {
   const occupancy: Record<CoordinateKey, WidgetConfig["id"] | undefined> = {};
   if (!grid.arrangement) return occupancy;
 
@@ -370,7 +370,7 @@ function getGridCells(grid: GridConfig) {
   return cells;
 }
 
-function getGridCoordinateKey(cell: GridItemPosition): CoordinateKey {
+export function getGridCoordinateKey(cell: GridItemPosition): CoordinateKey {
   return `${cell.row}-${cell.column}`;
 }
 
