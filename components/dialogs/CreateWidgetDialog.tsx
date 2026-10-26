@@ -312,7 +312,7 @@ function getDefaultFormValues(type: FormValues["type"]): FormValues {
       };
 
     default:
-      return type satisfies never;
+      throw getUnexpectedFormTypeError(type);
   }
 }
 
@@ -356,13 +356,32 @@ function getWidgetConfigFromFormValues(
       };
 
     default:
-      return values satisfies never;
+      throw getUnexpectedFormValuesError(values);
   }
 }
 
 interface GetWidgetConfigFromFormValuesDeps {
   id?: WidgetConfig["id"];
   parentId?: WidgetConfig["id"];
+}
+
+function getUnexpectedFormTypeError(type: never) {
+  return new UnexpectedFormTypeError({ type });
+}
+
+function getUnexpectedFormValuesError(values: never) {
+  const type = (values as { type?: unknown })?.type;
+  return new UnexpectedFormTypeError({ type });
+}
+
+export class UnexpectedFormTypeError extends Error {
+  public name = UnexpectedFormTypeError.name;
+  public type: unknown;
+
+  public constructor(options: ErrorOptions & { type: unknown }) {
+    super(`Widget form type ${options.type as string} is unexpected`, options);
+    this.type = options.type;
+  }
 }
 
 interface FieldProps {

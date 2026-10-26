@@ -44,7 +44,7 @@ export function getLayoutConfigWithAdoptedChild(
       return getAbsoluteConfigWithAdoptedChild(parent, child, itemConfig);
 
     default:
-      return parent satisfies never;
+      throw getUnexpectedLayoutError(parent);
   }
 }
 
@@ -63,7 +63,7 @@ export function getLayoutConfigWithDisownedChild(
       return getAbsoluteConfigWithDisownedChild(parent, child);
 
     default:
-      return parent satisfies never;
+      throw getUnexpectedLayoutError(parent);
   }
 }
 
@@ -115,6 +115,21 @@ export function isLayoutChildRedundant(parent: LayoutConfig, child: WidgetConfig
       return false;
 
     default:
-      return parent satisfies never;
+      throw getUnexpectedLayoutError(parent);
+  }
+}
+
+export function getUnexpectedLayoutError(layout: never) {
+  const type = (layout as { layout?: unknown })?.layout;
+  return new UnexpectedLayoutTypeError({ type });
+}
+
+export class UnexpectedLayoutTypeError extends Error {
+  public name = UnexpectedLayoutTypeError.name;
+  public type: unknown;
+
+  public constructor(options: ErrorOptions & { type: unknown }) {
+    super(`Layout type ${options.type as string} is unexpected`, options);
+    this.type = options.type;
   }
 }

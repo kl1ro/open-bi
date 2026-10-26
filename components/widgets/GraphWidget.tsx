@@ -7,6 +7,20 @@ export default function GraphWidget(props: GraphConfig) {
       return <LineGraph />;
 
     default:
-      return props.graph satisfies never;
+      handleUnexpectedGraphType(props.graph);
+  }
+}
+
+function handleUnexpectedGraphType(graph: never) {
+  console.error(new UnexpectedGraphTypeError({ type: graph }));
+}
+
+export class UnexpectedGraphTypeError extends Error {
+  public name = UnexpectedGraphTypeError.name;
+  public type: unknown;
+
+  public constructor(options: ErrorOptions & { type: unknown }) {
+    super(`Graph type ${options.type as string} is unexpected`, options);
+    this.type = options.type;
   }
 }

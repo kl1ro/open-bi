@@ -342,7 +342,7 @@ function ResizeGrip(props: ResizeGripProps) {
       return <CornerGrip className={props.className} />;
 
     default:
-      return props.kind satisfies never;
+      handleUnexpectedResizeHandleKind(props.kind);
   }
 }
 
@@ -498,6 +498,20 @@ function CornerGrip(props: CornerGripProps) {
 
 interface CornerGripProps {
   className: string;
+}
+
+function handleUnexpectedResizeHandleKind(kind: never) {
+  console.error(new UnexpectedGridResizeHandleKindError({ kind }));
+}
+
+export class UnexpectedGridResizeHandleKindError extends Error {
+  public name = UnexpectedGridResizeHandleKindError.name;
+  public kind: unknown;
+
+  public constructor(options: ErrorOptions & { kind: unknown }) {
+    super(`Grid resize handle kind ${options.kind as string} is unexpected`, options);
+    this.kind = options.kind;
+  }
 }
 
 function getOutwardStepDelta(handle: GridResizeHandleConfig): GridResizeDelta {
