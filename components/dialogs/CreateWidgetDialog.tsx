@@ -152,7 +152,7 @@ function createWidgetFromFormValues(
   deps.close();
 }
 
-export interface CreateWidgetFromFormValuesDeps {
+interface CreateWidgetFromFormValuesDeps {
   dispatch: AppDispatch;
   id?: WidgetConfig["id"];
   parentId?: WidgetConfig["id"];
@@ -204,7 +204,7 @@ function getWidgetConfigFromFormValues(
   }
 }
 
-export interface GetWidgetConfigFromFormValuesDeps {
+interface GetWidgetConfigFromFormValuesDeps {
   id?: WidgetConfig["id"];
   parentId?: WidgetConfig["id"];
 }

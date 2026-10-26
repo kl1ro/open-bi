@@ -18,7 +18,7 @@ export default function Widget(props: WidgetProps) {
   );
 }
 
-interface WidgetProps {
+export interface WidgetProps {
   id: WidgetConfig["id"];
   itemConfig?: ItemConfig;
 }

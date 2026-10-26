@@ -16,7 +16,7 @@ function usePerProviderStore(preloadedState?: Partial<RootState>) {
   return storeRef.current;
 }
 
-type StoreProviderProps = {
+export type StoreProviderProps = {
   preloadedState?: Partial<RootState>;
   children: React.ReactNode;
 };

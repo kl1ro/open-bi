@@ -71,13 +71,13 @@ export class ParentIsNotContainerError extends Error {
   }
 }
 
-export function getWidgetConfig(id: WidgetConfig["id"], deps: GetWidgetConfigDeps) {
+function getWidgetConfig(id: WidgetConfig["id"], deps: GetWidgetConfigDeps) {
   const widgetConfig = findWidgetConfig(id, deps);
   if (!widgetConfig) throw new WidgetConfigNotFoundError({ id });
   return widgetConfig;
 }
 
-export interface GetWidgetConfigDeps {
+interface GetWidgetConfigDeps {
   widgetConfigs: WidgetConfigsById;
 }
 
@@ -149,7 +149,7 @@ export class ParentConfigNotFoundError extends WidgetConfigNotFoundError {
   }
 }
 
-export function findParentConfig(
+function findParentConfig(
   widgetConfig: WidgetConfig,
   deps: FindParentConfigDeps,
 ): WidgetConfig | undefined {
@@ -157,7 +157,7 @@ export function findParentConfig(
   return findWidgetConfig(widgetConfig.parentId, deps);
 }
 
-export interface FindParentConfigDeps {
+interface FindParentConfigDeps {
   widgetConfigs: WidgetConfigsById;
 }
 
@@ -178,7 +178,7 @@ export function hasMovedFromParent(
   );
 }
 
-export function widgetsHaveSameParentId(first?: WidgetConfig, second?: WidgetConfig) {
+function widgetsHaveSameParentId(first?: WidgetConfig, second?: WidgetConfig) {
   if (!first || !second) return false;
   return first.parentId == second.parentId;
 }
@@ -302,7 +302,7 @@ export class ImpossibleChildrenChangeError extends Error {
   }
 }
 
-export function isTurningThroughSlot(oldConfig: WidgetConfig, newConfig: WidgetConfig) {
+function isTurningThroughSlot(oldConfig: WidgetConfig, newConfig: WidgetConfig) {
   return isTurningFromSlot(oldConfig, newConfig) || isTurningToSlot(oldConfig, newConfig);
 }
 
@@ -320,21 +320,21 @@ export function isRedundant(widgetConfig: WidgetConfig, deps: IsRedundantDeps) {
   }
 }
 
-interface IsRedundantDeps {
+export interface IsRedundantDeps {
   widgetConfigs: WidgetConfigsById;
 }
 
-export function widgetsHaveSameType(first?: WidgetConfig, second?: WidgetConfig) {
+function widgetsHaveSameType(first?: WidgetConfig, second?: WidgetConfig) {
   if (!first || !second) return false;
   return first.type == second.type;
 }
 
-export function widgetsHaveSameChildren(first?: WidgetConfig, second?: WidgetConfig) {
+function widgetsHaveSameChildren(first?: WidgetConfig, second?: WidgetConfig) {
   if (!first || !second) return false;
   return haveSameElements(first.children, second.children);
 }
 
-export function isTurningFromSlot(oldConfig: WidgetConfig, newConfig: WidgetConfig) {
+function isTurningFromSlot(oldConfig: WidgetConfig, newConfig: WidgetConfig) {
   return oldConfig.type == "slot" && newConfig.type != "slot";
 }
 

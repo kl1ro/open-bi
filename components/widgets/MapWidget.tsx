@@ -20,7 +20,7 @@ function useMapWidgetEffects(deps: UseMapWidgetEffectsDeps) {
   useMountMapEffect(deps);
 }
 
-export interface UseMapWidgetEffectsDeps {
+interface UseMapWidgetEffectsDeps {
   container: RefObject<HTMLDivElement | null>;
   config: MapConfig;
 }
@@ -37,7 +37,7 @@ function useMountMapEffect(deps: UseMountMapEffectDeps) {
   );
 }
 
-export interface UseMountMapEffectDeps {
+interface UseMountMapEffectDeps {
   container: RefObject<HTMLDivElement | null>;
   config: MapConfig;
 }
@@ -64,7 +64,7 @@ function mountMapIntoContainer(
   };
 }
 
-export interface MountMapIntoContainerDeps {
+interface MountMapIntoContainerDeps {
   config: MapConfig;
 }
 

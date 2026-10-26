@@ -47,7 +47,7 @@ export function isGridChildRedundant(parent: GridConfig, child: WidgetConfig) {
   );
 }
 
-export function is1x1GridItem(itemConfig: GridItemConfig) {
+function is1x1GridItem(itemConfig: GridItemConfig) {
   return itemConfig.size.rowSpan == 1 && itemConfig.size.colSpan == 1;
 }
 
@@ -288,7 +288,7 @@ function getAspectDeviation(item: GridItemConfig, reference: GridItemConfig) {
   );
 }
 
-export function getCollapsedItem(item: GridItemConfig) {
+function getCollapsedItem(item: GridItemConfig) {
   return {
     ...item,
     size: {
@@ -349,7 +349,7 @@ function getComputedGridSlots(grid: GridConfig): GridItemToRender[] {
     .map((cell) => ({ itemConfig: create1x1GridItemConfig(cell) }));
 }
 
-export function getGridOccupancy(grid: GridConfig) {
+function getGridOccupancy(grid: GridConfig) {
   const occupancy: Record<CoordinateKey, WidgetConfig["id"] | undefined> = {};
   if (!grid.arrangement) return occupancy;
 
@@ -371,7 +371,7 @@ function getGridCells(grid: GridConfig) {
   return cells;
 }
 
-export function getGridCoordinateKey(cell: GridItemPosition): CoordinateKey {
+function getGridCoordinateKey(cell: GridItemPosition): CoordinateKey {
   return `${cell.row}-${cell.column}`;
 }
 
@@ -441,7 +441,7 @@ export interface GridItemSize {
 
 export type GridArrangement = Record<string, GridItemConfig>;
 
-export interface GridItemOverlap {
+interface GridItemOverlap {
   overlappedItemId: WidgetConfig["id"];
   overlappedItem: GridItemConfig;
   overlap: GridItemConfig;
@@ -452,7 +452,7 @@ export const DEFAULT_GRID_ITEM_POSITION = {
   column: 0,
 } as const satisfies GridItemPosition;
 
-export const DEFAULT_GRID_ITEM_SIZE = {
+const DEFAULT_GRID_ITEM_SIZE = {
   rowSpan: 1,
   colSpan: 1,
 } as const satisfies GridItemSize;

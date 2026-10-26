@@ -69,7 +69,7 @@ function useGridWidgetState(props: GridConfig) {
   };
 }
 
-export type GridWidgetState = ReturnType<typeof useGridWidgetState>;
+type GridWidgetState = ReturnType<typeof useGridWidgetState>;
 
 function getGridTemplateStyle(grid: GridConfig) {
   return {
