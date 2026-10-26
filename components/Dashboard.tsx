@@ -42,6 +42,21 @@ function useRestoreDashboardEffect() {
   }, []);
 }
 
+function useSaveDashboardEffect() {
+  const state = useSaveDashboardEffectState();
+
+  useEffect(() => {
+    const keydown = (e: KeyboardEvent) => {
+      if (!isSaveEvent(e)) return;
+      e.preventDefault();
+      trySaveDashboard(state);
+    };
+
+    document.addEventListener("keydown", keydown);
+    return () => document.removeEventListener("keydown", keydown);
+  }, []);
+}
+
 function useRestoreDashboardEffectState() {
   return {
     store: useAppStore(),
@@ -63,21 +78,6 @@ function tryRestoreDashboard(deps: TryRestoreDashboardDeps) {
 type TryRestoreDashboardDeps = {
   store: AppStore;
 };
-
-function useSaveDashboardEffect() {
-  const state = useSaveDashboardEffectState();
-
-  useEffect(() => {
-    const keydown = (e: KeyboardEvent) => {
-      if (!isSaveEvent(e)) return;
-      e.preventDefault();
-      trySaveDashboard(state);
-    };
-
-    document.addEventListener("keydown", keydown);
-    return () => document.removeEventListener("keydown", keydown);
-  }, []);
-}
 
 function useSaveDashboardEffectState() {
   return {

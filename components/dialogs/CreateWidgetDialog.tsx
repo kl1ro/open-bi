@@ -118,31 +118,6 @@ function useCreateWidgetDialogState(props: CreateWidgetDialogProps) {
   };
 }
 
-function getDefaultFormValues(type: FormValues["type"]): FormValues {
-  switch (type) {
-    case "layout":
-      return { type, columns: "4", rows: "1" };
-
-    case "title":
-      return { type, text: "" };
-
-    case "graph":
-      return { type };
-
-    case "map":
-      return {
-        type,
-        latitude: "55.751244",
-        longitude: "37.618423",
-        zoom: "13",
-        view: "hybrid",
-      };
-
-    default:
-      return type satisfies never;
-  }
-}
-
 function createWidgetFromFormValues(
   values: FormValues,
   deps: CreateWidgetFromFormValuesDeps,
@@ -158,55 +133,6 @@ interface CreateWidgetFromFormValuesDeps {
   parentId?: WidgetConfig["id"];
   itemConfig?: ItemConfig;
   close: () => void;
-}
-
-function getWidgetConfigFromFormValues(
-  values: FormValues,
-  deps: GetWidgetConfigFromFormValuesDeps,
-): WidgetConfig {
-  const id = deps.id ?? crypto.randomUUID();
-  const parentId = deps.parentId;
-
-  switch (values.type) {
-    case "layout":
-      return {
-        id,
-        parentId,
-        type: "layout",
-        layout: "grid",
-        columns: Number(values.columns),
-        rows: Number(values.rows),
-        children: [],
-        arrangement: {},
-      };
-
-    case "title":
-      return { id, parentId, type: "title", text: values.text };
-
-    case "graph":
-      return { id, parentId, type: "graph", graph: "line" };
-
-    case "map":
-      return {
-        id,
-        parentId,
-        type: "map",
-        center: {
-          latitude: Number(values.latitude),
-          longitude: Number(values.longitude),
-        },
-        zoom: Number(values.zoom),
-        view: values.view,
-      };
-
-    default:
-      return values satisfies never;
-  }
-}
-
-interface GetWidgetConfigFromFormValuesDeps {
-  id?: WidgetConfig["id"];
-  parentId?: WidgetConfig["id"];
 }
 
 function WidgetTypeField(props: FieldProps) {
@@ -364,6 +290,80 @@ const MAP_VIEW_LABELS = {
   satellite: "Спутник",
   hybrid: "Гибрид",
 } as const satisfies { [View in MapView]: string };
+
+function getDefaultFormValues(type: FormValues["type"]): FormValues {
+  switch (type) {
+    case "layout":
+      return { type, columns: "4", rows: "1" };
+
+    case "title":
+      return { type, text: "" };
+
+    case "graph":
+      return { type };
+
+    case "map":
+      return {
+        type,
+        latitude: "55.751244",
+        longitude: "37.618423",
+        zoom: "13",
+        view: "hybrid",
+      };
+
+    default:
+      return type satisfies never;
+  }
+}
+
+function getWidgetConfigFromFormValues(
+  values: FormValues,
+  deps: GetWidgetConfigFromFormValuesDeps,
+): WidgetConfig {
+  const id = deps.id ?? crypto.randomUUID();
+  const parentId = deps.parentId;
+
+  switch (values.type) {
+    case "layout":
+      return {
+        id,
+        parentId,
+        type: "layout",
+        layout: "grid",
+        columns: Number(values.columns),
+        rows: Number(values.rows),
+        children: [],
+        arrangement: {},
+      };
+
+    case "title":
+      return { id, parentId, type: "title", text: values.text };
+
+    case "graph":
+      return { id, parentId, type: "graph", graph: "line" };
+
+    case "map":
+      return {
+        id,
+        parentId,
+        type: "map",
+        center: {
+          latitude: Number(values.latitude),
+          longitude: Number(values.longitude),
+        },
+        zoom: Number(values.zoom),
+        view: values.view,
+      };
+
+    default:
+      return values satisfies never;
+  }
+}
+
+interface GetWidgetConfigFromFormValuesDeps {
+  id?: WidgetConfig["id"];
+  parentId?: WidgetConfig["id"];
+}
 
 interface FieldProps {
   form: UseFormReturn<FormValues>;
