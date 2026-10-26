@@ -45,7 +45,7 @@ function getWidgetByType(deps: GetWidgetByTypeDeps) {
       return <MapWidget {...deps.widgetConfig} />;
 
     case "slot":
-      return <SlotWidget itemConfig={deps.itemConfig} {...deps.widgetConfig} />;
+      return <SlotWidget {...deps.widgetConfig} />;
 
     default:
       handleUnexpectedWidgetType(deps.widgetConfig);
