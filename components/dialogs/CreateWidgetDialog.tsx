@@ -397,7 +397,7 @@ const formSchema = z.discriminatedUnion("type", [
 
 function isNumberInRange(value: string, min: number, max: number) {
   const number = Number(value);
-  return value.trim() !== "" && !Number.isNaN(number) && number >= min && number <= max;
+  return value.trim() != "" && !Number.isNaN(number) && number >= min && number <= max;
 }
 
 type FormValues = z.infer<typeof formSchema>;

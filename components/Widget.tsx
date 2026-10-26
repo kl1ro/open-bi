@@ -59,14 +59,7 @@ interface GetWidgetByTypeDeps {
 
 function handleUnexpectedWidgetType(widgetConfig: never) {
   const type = (widgetConfig as { type?: unknown })?.type;
-  let error: Error;
-
-  if (!type) {
-    error = new NoWidgetTypeError();
-  } else {
-    error = new UnexpectedWidgetTypeError({ type });
-  }
-
+  const error = type ? new UnexpectedWidgetTypeError({ type }) : new NoWidgetTypeError();
   console.error(error);
 }
 

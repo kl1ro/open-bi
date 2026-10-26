@@ -20,7 +20,7 @@ export function getRecordWithoutKey<Value>(
   if (!record) return;
 
   return Object.fromEntries(
-    Object.entries(record).filter(([recordKey]) => recordKey !== key),
+    Object.entries(record).filter(([recordKey]) => recordKey != key),
   );
 }
 

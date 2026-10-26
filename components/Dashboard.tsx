@@ -75,9 +75,9 @@ function tryRestoreDashboard(deps: TryRestoreDashboardDeps) {
   }
 }
 
-type TryRestoreDashboardDeps = {
+interface TryRestoreDashboardDeps {
   store: AppStore;
-};
+}
 
 function useSaveDashboardEffectState() {
   return {
@@ -95,6 +95,6 @@ function trySaveDashboard(deps: TrySaveDashboardDeps) {
   }
 }
 
-type TrySaveDashboardDeps = {
+interface TrySaveDashboardDeps {
   store: AppStore;
-};
+}

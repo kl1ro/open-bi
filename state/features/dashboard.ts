@@ -186,7 +186,7 @@ function removeWidgetFromState(widgetConfig: WidgetConfig, deps: DashboardSliceD
   delete deps.state.widgetConfigs[widgetConfig.id];
 }
 
-export function findRootConfig(deps: DashboardSliceDeps) {
+export function findRootConfig(deps: DashboardSliceDeps): WidgetConfig | undefined {
   if (!deps.state.rootId) return;
   const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
   return findWidgetConfig(deps.state.rootId, widgetConfigsDeps);

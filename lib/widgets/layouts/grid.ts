@@ -71,12 +71,10 @@ function rearrangeAroundItem(arrangement: GridArrangement, itemId: WidgetConfig[
   const overlaps = getOverlapsBetweenItemAndArrangement(itemId, arrangement);
   const resolved = overlaps.map(resolveOverlap);
 
-  const resolvedArrangement = resolved.reduce(
+  return resolved.reduce(
     (acc, cur) => upsertGridItemToArrangement(cur.id, cur.itemConfig, acc),
     arrangement,
   );
-
-  return resolvedArrangement;
 }
 
 function upsertGridItemToArrangement(
@@ -93,11 +91,9 @@ function getOverlapsBetweenItemAndArrangement(
 ): GridItemOverlap[] {
   const suspectIds = Object.keys(arrangement).filter((id) => id != itemId);
 
-  const overlaps = suspectIds.flatMap(
+  return suspectIds.flatMap(
     (id) => findOverlapInArrangement(itemId, id, arrangement) ?? [],
   );
-
-  return overlaps;
 }
 
 function findOverlapInArrangement(
@@ -112,7 +108,10 @@ function findOverlapInArrangement(
   return { overlappedItemId, overlappedItem, overlap };
 }
 
-export function findItemsOverlap(first: GridItemConfig, second: GridItemConfig) {
+export function findItemsOverlap(
+  first: GridItemConfig,
+  second: GridItemConfig,
+): GridItemConfig | undefined {
   const [firstRect, secondRect] = [convertItemToRect(first), convertItemToRect(second)];
   const overlapRect = findRectsOverlap(firstRect, secondRect);
   if (!overlapRect) return;
