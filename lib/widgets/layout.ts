@@ -1,27 +1,117 @@
-import { AbstractWidget, NonEmptyWidget } from "../widget";
-import Absolute from "./layouts/absolute";
-import Flex from "./layouts/flex";
-import Grid, { fillGridWithVoids } from "./layouts/grid";
+import type { AbstractWidgetConfig, ItemConfig } from "../widget";
+import type WidgetConfig from "../widget";
+import type AbsoluteConfig from "./layouts/absolute";
+import {
+  getAbsoluteConfigWithAdoptedChild,
+  getAbsoluteConfigWithDisownedChild,
+} from "./layouts/absolute";
+import type FlexConfig from "./layouts/flex";
+import {
+  getFlexConfigWithAdoptedChild,
+  getFlexConfigWithDisownedChild,
+  isFlexChildRedundant,
+} from "./layouts/flex";
+import type GridConfig from "./layouts/grid";
+import {
+  getGridConfigWithAdoptedChild,
+  getGridConfigWithDisownedChild,
+  isGridChildRedundant,
+} from "./layouts/grid";
 
-type Layout = Grid | Absolute | Flex;
+type LayoutConfig = GridConfig | AbsoluteConfig | FlexConfig;
 
-export default Layout;
+export default LayoutConfig;
 
-export function prepareLayout(layout: Layout): Layout {
-  switch (layout.layout) {
-    case "grid": {
-      fillGridWithVoids(layout);
-      return layout;
-    }
-    default:
-      return layout;
+export interface AbstractLayoutConfig extends AbstractWidgetConfig {
+  type: "layout";
+  layout: LayoutType;
+}
+
+export type LayoutType = LayoutConfig["layout"];
+
+export function getLayoutConfigWithAdoptedChild(
+  parent: LayoutConfig,
+  child: WidgetConfig,
+  itemConfig?: ItemConfig,
+) {
+  switch (parent.layout) {
+    case "grid":
+      return getGridConfigWithAdoptedChild(parent, child, itemConfig);
+
+    case "flex":
+      return getFlexConfigWithAdoptedChild(parent, child);
+
+    case "absolute":
+      return getAbsoluteConfigWithAdoptedChild(parent, child, itemConfig);
   }
 }
 
-export interface AbstractLayout extends AbstractWidget {
-  type: "layout";
-  layout: LayoutType;
-  parent?: NonEmptyWidget;
+export function getLayoutConfigWithDisownedChild(
+  parent: LayoutConfig,
+  child: WidgetConfig,
+) {
+  switch (parent.layout) {
+    case "grid":
+      return getGridConfigWithDisownedChild(parent, child);
+
+    case "flex":
+      return getFlexConfigWithDisownedChild(parent, child);
+
+    case "absolute":
+      return getAbsoluteConfigWithDisownedChild(parent, child);
+
+    default:
+      return parent satisfies never;
+  }
 }
 
-export type LayoutType = "grid" | "flex" | "absolute";
+export function validateLayoutUpdate(oldLayout: LayoutConfig, newLayout: LayoutConfig) {
+  if (!layoutsHaveSameType(oldLayout, newLayout))
+    throw new ImpossibleLayoutTypeChangeError({
+      id: oldLayout.id,
+      currentLayout: oldLayout.layout,
+      wantedLayout: newLayout.layout,
+    });
+}
+
+export function layoutsHaveSameType(first?: LayoutConfig, second?: LayoutConfig) {
+  if (!first || !second) return false;
+  return first.layout == second.layout;
+}
+
+export class ImpossibleLayoutTypeChangeError extends Error {
+  public name = ImpossibleLayoutTypeChangeError.name;
+  public id: WidgetConfig["id"];
+  public currentLayout: LayoutType;
+  public wantedLayout: LayoutType;
+
+  public constructor(
+    options: ErrorOptions & {
+      id: WidgetConfig["id"];
+      currentLayout: LayoutType;
+      wantedLayout: LayoutType;
+    },
+  ) {
+    super(
+      `Layout widget with id of ${options.id} can't be turned from ${options.currentLayout} into ${options.wantedLayout}`,
+      options,
+    );
+
+    this.id = options.id;
+    this.currentLayout = options.currentLayout;
+    this.wantedLayout = options.wantedLayout;
+  }
+}
+
+export function isLayoutChildRedundant(parent: LayoutConfig, child: WidgetConfig) {
+  switch (parent.layout) {
+    case "grid":
+      return isGridChildRedundant(parent, child);
+
+    case "flex":
+      return isFlexChildRedundant(parent, child);
+
+    default:
+      return false;
+  }
+}

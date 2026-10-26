@@ -1,7 +1,7 @@
-import { AbstractWidget } from "../widget";
+import type { AbstractWidgetConfig } from "../widget";
 
-export interface Title extends AbstractWidget {
-  text: string;
+export default interface TitleConfig extends AbstractWidgetConfig {
   type: "title";
+  text: string;
   children?: undefined;
 }

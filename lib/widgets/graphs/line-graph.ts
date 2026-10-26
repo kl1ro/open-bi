@@ -1,6 +1,6 @@
-import { AbstractGraph } from "../graph";
+import type { AbstractGraphConfig } from "../graph";
 
-export interface LineGraph extends AbstractGraph {
+export default interface LineGraphConfig extends AbstractGraphConfig {
   graph: "line";
   children?: undefined;
 }

@@ -1,13 +1,12 @@
-import { AbstractWidget } from "../widget";
-import { LineGraph } from "./graphs/line-graph";
+import type { AbstractWidgetConfig } from "../widget";
+import LineGraphConfig from "./graphs/line-graph";
 
-export type Graph = LineGraph;
-export default Graph;
+type GraphConfig = LineGraphConfig;
+export default GraphConfig;
 
-export interface AbstractGraph extends AbstractWidget {
+export interface AbstractGraphConfig extends AbstractWidgetConfig {
   type: "graph";
   graph: GraphType;
-  children?: undefined;
 }
 
 export type GraphType = "line";
