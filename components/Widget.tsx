@@ -5,7 +5,6 @@ import MapWidget from "@/components/widgets/MapWidget";
 import SlotWidget from "@/components/widgets/SlotWidget";
 import type WidgetConfig from "@/lib/widget";
 import { useAppSelector } from "@/state/hooks";
-import type { ItemConfig } from "@/lib/widget";
 
 export default function Widget(props: WidgetProps) {
   const state = useWidgetState(props);
@@ -20,13 +19,11 @@ export default function Widget(props: WidgetProps) {
 
 export interface WidgetProps {
   id: WidgetConfig["id"];
-  itemConfig?: ItemConfig;
 }
 
 function useWidgetState(props: WidgetProps) {
   return {
     widgetConfig: useAppSelector((state) => state.dashboard.widgetConfigs[props.id]),
-    itemConfig: props.itemConfig,
   };
 }
 
@@ -54,7 +51,6 @@ function getWidgetByType(deps: GetWidgetByTypeDeps) {
 
 interface GetWidgetByTypeDeps {
   widgetConfig: WidgetConfig;
-  itemConfig?: ItemConfig;
 }
 
 function handleUnexpectedWidgetType(widgetConfig: never) {

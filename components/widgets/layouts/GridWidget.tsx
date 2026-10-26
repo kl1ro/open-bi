@@ -160,7 +160,7 @@ function GridItemContent(props: GridItemContentProps) {
   if (!props.item.id)
     return <SlotWidget parentId={props.parentId} itemConfig={props.item.itemConfig} />;
 
-  return <Widget id={props.item.id} itemConfig={props.item.itemConfig} />;
+  return <Widget id={props.item.id} />;
 }
 
 interface GridItemContentProps {
