@@ -10,7 +10,7 @@ import { globalIgnores } from 'eslint/config';
 export default tseslint.config(
   globalIgnores(['node_modules/', 'dist/', 'build/']),
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: ['eslint.config.mjs', 'postcss.config.mjs'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
