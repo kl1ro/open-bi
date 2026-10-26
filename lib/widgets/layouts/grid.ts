@@ -400,26 +400,6 @@ function isCellInsideGridItem(cell: GridItemPosition, item: GridItemConfig) {
   );
 }
 
-export function areAtSamePosition(i1?: GridItemConfig, i2?: GridItemConfig): boolean {
-  if (!i1?.position || !i2?.position) return false;
-
-  return i1.position.row === i2.position.row && i1.position.column === i2.position.column;
-}
-
-export function areAtSameRow(i1?: GridItemConfig, i2?: GridItemConfig): boolean {
-  if (!i1?.position || !i2?.position) return false;
-  return i1.position.row === i2.position.row;
-}
-
-export function areAtSameColumn(i1?: GridItemConfig, i2?: GridItemConfig): boolean {
-  if (!i1?.position || !i2?.position) return false;
-  return i1.position.column === i2.position.column;
-}
-
-export function takesSpace(widget: GridItemConfig): boolean {
-  return widget.size.colSpan > 0 && widget.size.rowSpan > 0;
-}
-
 export const SPACING_OPTIONS = ["1", "2", "3", "4", "5", "6", "8", "9", "12"] as const;
 
 export interface GridItemConfig {
@@ -445,11 +425,6 @@ interface GridItemOverlap {
   overlappedItem: GridItemConfig;
   overlap: GridItemConfig;
 }
-
-export const DEFAULT_GRID_ITEM_POSITION = {
-  row: 0,
-  column: 0,
-} as const satisfies GridItemPosition;
 
 const DEFAULT_GRID_ITEM_SIZE = {
   rowSpan: 1,
