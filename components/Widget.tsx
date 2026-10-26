@@ -21,7 +21,7 @@ export default function Widget(props: WidgetProps) {
 
 interface WidgetProps {
   id: WidgetConfig["id"];
-  itemConfig: ItemConfig;
+  itemConfig?: ItemConfig;
 }
 
 function useWidgetState(props: WidgetProps) {
@@ -55,7 +55,7 @@ function getWidgetByType(deps: GetWidgetByTypeDeps) {
 
 interface GetWidgetByTypeDeps {
   widgetConfig: WidgetConfig;
-  itemConfig: ItemConfig;
+  itemConfig?: ItemConfig;
 }
 
 function handleUnexpectedWidgetType(widgetConfig: never) {
