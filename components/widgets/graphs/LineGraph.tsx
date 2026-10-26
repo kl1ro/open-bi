@@ -1,8 +1,6 @@
 import { useMemo } from "react";
-import { ApexOptions } from "apexcharts";
+import type { ApexOptions } from "apexcharts";
 import dynamic from "next/dynamic";
-
-import { type LineGraph } from "@/lib/widgets/graphs/line-graph";
 
 const ApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
@@ -42,7 +40,7 @@ export default function LineGraph() {
   ];
 
   return (
-    <div className="h-full w-full grid bg-medium">
+    <div className="size-full grid bg-medium">
       <ApexChart options={options} series={series} type="line" height="100%" />
     </div>
   );

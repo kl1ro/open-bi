@@ -1,34 +1,94 @@
-import Graph from "./widgets/Graph";
-import Layout from "./widgets/Layout";
-import Title from "./widgets/Title";
-import { Void } from "./widgets/Void";
-import Map from "./widgets/Map";
+import GraphWidget from "./widgets/GraphWidget";
+import LayoutWidget from "./widgets/LayoutWidget";
+import TitleWidget from "./widgets/TitleWidget";
+import MapWidget from "./widgets/MapWidget";
+import VoidWidget from "./widgets/SlotWidget";
 
-import type Widget from "@/lib/widget";
+import type WidgetConfig from "@/lib/widget";
+import { useAppSelector } from "@/state/hooks";
+import type { ItemConfig } from "@/lib/widget";
 
-export default function Widget(props: Widget) {
+export default function Widget(props: WidgetProps) {
+  const state = useWidgetState(props);
+  if (!state.widgetConfig) return;
+
   return (
-    <div className="relative w-full h-full rounded-xl animated no-scrollbar overflow-auto">
-      {getWidgetByType(props)}
+    <div className="relative size-full rounded-xl animated no-scrollbar overflow-auto">
+      {getWidgetByType(state)}
     </div>
   );
 }
 
-function getWidgetByType(props: Widget) {
-  switch (props.type) {
+interface WidgetProps {
+  id: WidgetConfig["id"];
+  itemConfig: ItemConfig;
+}
+
+function useWidgetState(props: WidgetProps) {
+  return {
+    widgetConfig: useAppSelector((state) => state.dashboard.widgetConfigs[props.id]),
+    itemConfig: props.itemConfig,
+  };
+}
+
+function getWidgetByType(deps: GetWidgetByTypeDeps) {
+  switch (deps.widgetConfig.type) {
     case "layout":
-      return <Layout {...props} />;
+      return <LayoutWidget {...deps.widgetConfig} />;
 
     case "title":
-      return <Title {...props} />;
+      return <TitleWidget {...deps.widgetConfig} />;
 
     case "graph":
-      return <Graph {...props} />;
+      return <GraphWidget {...deps.widgetConfig} />;
 
     case "map":
-      return <Map />;
+      return <MapWidget {...deps.widgetConfig} />;
+
+    case "slot":
+      return <VoidWidget itemConfig={deps.itemConfig} {...deps.widgetConfig} />;
 
     default:
-      return <Void {...props} />;
+      handleUnexpectedWidgetType(deps.widgetConfig);
+  }
+}
+
+interface GetWidgetByTypeDeps {
+  widgetConfig: WidgetConfig;
+  itemConfig: ItemConfig;
+}
+
+function handleUnexpectedWidgetType(widgetConfig: never) {
+  const type = (widgetConfig as { type?: unknown })?.type;
+  let error: Error;
+
+  if (!type) {
+    error = new NoWidgetTypeError();
+  } else {
+    error = new UnexpectedWidgetTypeError({ type });
+  }
+
+  console.error(error);
+}
+
+export class NoWidgetTypeError extends Error {
+  public name = NoWidgetTypeError.name;
+
+  public constructor(options?: ErrorOptions) {
+    super(`Error while trying to handle the widget with no type`, options);
+  }
+}
+
+export class UnexpectedWidgetTypeError extends Error {
+  public name = UnexpectedWidgetTypeError.name;
+  public type: unknown;
+
+  public constructor(options: ErrorOptions & { type: unknown }) {
+    super(
+      `Error while trying to handle the widget: type ${options.type as string} is unexpected`,
+      options,
+    );
+
+    this.type = options.type;
   }
 }

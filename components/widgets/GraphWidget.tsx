@@ -1,8 +1,8 @@
 import LineGraph from "./graphs/LineGraph";
 
-import type Graph from "@/lib/widgets/graph";
+import type GraphConfig from "@/lib/widgets/graph";
 
-export default function Graph(props: Graph) {
+export default function GraphWidget(props: GraphConfig) {
   switch (props.graph) {
     case "line":
       return <LineGraph />;
