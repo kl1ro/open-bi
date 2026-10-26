@@ -22,6 +22,9 @@ function getLayoutByType(deps: GetLayoutByTypeDeps) {
 
     case "absolute":
       return <AbsoluteWidget />;
+
+    default:
+      return deps.layout satisfies never;
   }
 }
 

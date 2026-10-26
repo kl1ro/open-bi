@@ -9,7 +9,6 @@ import type FlexConfig from "@/lib/widgets/layouts/flex";
 import {
   getFlexConfigWithAdoptedChild,
   getFlexConfigWithDisownedChild,
-  isFlexChildRedundant,
 } from "@/lib/widgets/layouts/flex";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
@@ -43,6 +42,9 @@ export function getLayoutConfigWithAdoptedChild(
 
     case "absolute":
       return getAbsoluteConfigWithAdoptedChild(parent, child, itemConfig);
+
+    default:
+      return parent satisfies never;
   }
 }
 
@@ -109,9 +111,10 @@ export function isLayoutChildRedundant(parent: LayoutConfig, child: WidgetConfig
       return isGridChildRedundant(parent, child);
 
     case "flex":
-      return isFlexChildRedundant(parent, child);
+    case "absolute":
+      return false;
 
     default:
-      return false;
+      return parent satisfies never;
   }
 }

@@ -21,10 +21,6 @@ export function getFlexConfigWithDisownedChild(parent: FlexConfig, child: Widget
   return { ...parent, children };
 }
 
-export function isFlexChildRedundant(parent: FlexConfig, child: WidgetConfig) {
-  return false;
-}
-
 export type FlexDirection = "row" | "column";
 
 export type FlexJustify = "start" | "end" | "center" | "between" | "around" | "evenly";

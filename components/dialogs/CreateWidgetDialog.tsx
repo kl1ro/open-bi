@@ -248,7 +248,7 @@ const WIDGET_TYPE_LABELS = {
   title: "Заголовок",
   graph: "График",
   map: "Карта",
-} as const;
+} as const satisfies { [Type in FormValues["type"]]: string };
 
 function SpacingField(props: SpacingFieldProps) {
   return (
