@@ -2,7 +2,7 @@ import GraphWidget from "@/components/widgets/GraphWidget";
 import LayoutWidget from "@/components/widgets/LayoutWidget";
 import TitleWidget from "@/components/widgets/TitleWidget";
 import MapWidget from "@/components/widgets/MapWidget";
-import VoidWidget from "@/components/widgets/SlotWidget";
+import SlotWidget from "@/components/widgets/SlotWidget";
 import type WidgetConfig from "@/lib/widget";
 import { useAppSelector } from "@/state/hooks";
 import type { ItemConfig } from "@/lib/widget";
@@ -45,7 +45,7 @@ function getWidgetByType(deps: GetWidgetByTypeDeps) {
       return <MapWidget {...deps.widgetConfig} />;
 
     case "slot":
-      return <VoidWidget itemConfig={deps.itemConfig} {...deps.widgetConfig} />;
+      return <SlotWidget itemConfig={deps.itemConfig} {...deps.widgetConfig} />;
 
     default:
       handleUnexpectedWidgetType(deps.widgetConfig);

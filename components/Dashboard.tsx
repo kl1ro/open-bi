@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 import Widget from "@/components/Widget";
-import VoidWidget from "@/components/widgets/SlotWidget";
+import SlotWidget from "@/components/widgets/SlotWidget";
 import { findRootConfig, setDashboard } from "@/state/features/dashboard";
 import { useAppSelector, useAppStore } from "@/state/hooks";
 import type { AppStore } from "@/state/store";
@@ -16,7 +16,7 @@ import {
 export default function Dashboard() {
   const state = useDashboardState();
   useDashboardEffects();
-  if (!state.rootConfig) return <VoidWidget />;
+  if (!state.rootConfig) return <SlotWidget />;
   return <Widget {...state.rootConfig} />;
 }
 

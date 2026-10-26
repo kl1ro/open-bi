@@ -49,7 +49,9 @@ export default function CreateWidgetDialog(props: CreateWidgetDialogProps) {
 
         <Form {...state.form}>
           <form
-            onSubmit={state.form.handleSubmit((values) => createWidget(values, state))}
+            onSubmit={state.form.handleSubmit((values) =>
+              createWidgetFromFormValues(values, state),
+            )}
             className="space-y-4 mt-4"
           >
             <WidgetTypeField form={state.form} />
@@ -141,13 +143,16 @@ function getDefaultFormValues(type: FormValues["type"]): FormValues {
   }
 }
 
-function createWidget(values: FormValues, deps: CreateWidgetDeps) {
+function createWidgetFromFormValues(
+  values: FormValues,
+  deps: CreateWidgetFromFormValuesDeps,
+) {
   const widgetConfig = getWidgetConfigFromFormValues(values, deps);
   deps.dispatch(upsertWidget({ widgetConfig, itemConfig: deps.itemConfig }));
   deps.close();
 }
 
-export interface CreateWidgetDeps {
+export interface CreateWidgetFromFormValuesDeps {
   dispatch: AppDispatch;
   id?: WidgetConfig["id"];
   parentId?: WidgetConfig["id"];

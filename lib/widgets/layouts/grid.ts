@@ -25,13 +25,13 @@ export function getGridConfigWithAdoptedChild(
   itemConfig?: ItemConfig,
 ) {
   if (hasChild(parent, child) && !itemConfig) return parent;
-  const validItemConfig = ensureItemConfigParentIsGrid(itemConfig);
+  const gridItemConfig = ensureItemConfigParentTypeIsGrid(itemConfig);
 
   const children = getChildrenWithAdoptedChild(parent, child);
 
   const arrangementWithUpsertedChild = upsertGridItemToArrangement(
     child.id,
-    validItemConfig,
+    gridItemConfig,
     parent.arrangement,
   );
 
@@ -55,7 +55,7 @@ export function isGridItemCollapsed(itemConfig: GridItemConfig) {
   return itemConfig.size.rowSpan == 0 || itemConfig.size.colSpan == 0;
 }
 
-function ensureItemConfigParentIsGrid(itemConfig?: ItemConfig) {
+function ensureItemConfigParentTypeIsGrid(itemConfig?: ItemConfig) {
   if (!itemConfig) throw new NoItemConfigError({ requiredType: "grid" });
 
   if (itemConfig.parentType != "grid")
@@ -180,7 +180,7 @@ function resolveOverlap(overlap: GridItemOverlap): {
   id: WidgetConfig["id"];
   itemConfig: GridItemConfig;
 } {
-  const options = findOverlapResolutionOptions(overlap);
+  const options = getOverlapResolutionOptions(overlap);
 
   if (!options.length)
     return {
@@ -203,7 +203,7 @@ function resolveOverlap(overlap: GridItemOverlap): {
   };
 }
 
-function findOverlapResolutionOptions(overlap: GridItemOverlap): GridItemConfig[] {
+function getOverlapResolutionOptions(overlap: GridItemOverlap): GridItemConfig[] {
   const itemRect = convertItemToRect(overlap.overlappedItem);
   const overlapRect = convertItemToRect(overlap.overlap);
 

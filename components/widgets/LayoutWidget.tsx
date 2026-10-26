@@ -4,7 +4,7 @@ import GridWidget from "@/components/widgets/layouts/GridWidget";
 import { cn } from "@/lib/utils";
 import type LayoutConfig from "@/lib/widgets/layout";
 
-export default function Layout(props: LayoutConfig) {
+export default function LayoutWidget(props: LayoutConfig) {
   return (
     <div className={cn("size-full", props.parentId && "p-5")}>
       {getLayoutByType({ layout: props })}
@@ -12,7 +12,7 @@ export default function Layout(props: LayoutConfig) {
   );
 }
 
-function getLayoutByType(deps: GetLayoutTypeDeps) {
+function getLayoutByType(deps: GetLayoutByTypeDeps) {
   switch (deps.layout.layout) {
     case "grid":
       return <GridWidget {...deps.layout} />;
@@ -25,6 +25,6 @@ function getLayoutByType(deps: GetLayoutTypeDeps) {
   }
 }
 
-interface GetLayoutTypeDeps {
+interface GetLayoutByTypeDeps {
   layout: LayoutConfig;
 }
