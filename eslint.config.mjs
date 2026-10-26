@@ -41,11 +41,45 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-argument': 'warn',
       '@typescript-eslint/no-unsafe-assignment': 'warn',
       '@typescript-eslint/no-unsafe-return': 'warn',
+			'@typescript-eslint/explicit-member-accessibility': 'warn',
+
+			"@typescript-eslint/consistent-type-imports": [
+				"warn",
+				{ prefer: "type-imports", fixStyle: "inline-type-imports" },
+			],
+
+			"@typescript-eslint/no-import-type-side-effects": "warn",
+			"import/no-duplicates": ["warn"],
+			
       '@typescript-eslint/no-unused-vars': [
         'error',
         { ignoreRestSiblings: true, argsIgnorePattern: '^_' },
       ],
 			'@typescript-eslint/no-misused-promises': "off",
+			
+			"@typescript-eslint/naming-convention": [
+				"error",
+				{ selector: "import", format: ["camelCase", "PascalCase"] },
+				{ selector: "default", format: ["camelCase"] },
+				{ selector: "typeLike", format: ["PascalCase"] },
+				{ selector: "function", format: ["camelCase", "PascalCase"] },
+				{ selector: "variable", format: ["camelCase", "PascalCase", "UPPER_CASE"] },
+				{
+					selector: "variable",
+					modifiers: ["const", "global"],
+					types: ["boolean", "string", "number"],
+					format: ["UPPER_CASE"],
+				},
+				{ selector: ["objectLiteralProperty", "typeProperty"], format: null },
+			],
+
+			"no-restricted-syntax": [
+				"error",
+				{
+					selector: "ClassDeclaration[superClass.name=/Error$/][id.name!=/Error$/]",
+					message: "Error class names should end with 'Error'",
+				},
+			],
 
       // React
       'react/react-in-jsx-scope': 'off',
