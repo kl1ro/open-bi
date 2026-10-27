@@ -144,6 +144,7 @@ export class ParentConfigNotFoundError extends WidgetConfigNotFoundError {
       message: `Parent config with id of (${options.parentId}) of child config with id of (${options.childId}) is not found on the dashboard`,
       id: options.parentId,
     });
+
     this.childId = options.childId;
     this.parentId = options.parentId;
   }
