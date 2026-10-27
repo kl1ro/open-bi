@@ -1,12 +1,12 @@
 import type { GridWidgetState } from "@/components/widgets/layouts/GridWidget";
-import { isGestureOwner } from "@/components/widgets/layouts/grid/gesture";
+import { isGestureOwner } from "@/hooks/grid/gesture";
 import {
   continueResize,
   resetResize,
   startResize,
   tryFinishResize,
   type GridResizeSide,
-} from "@/components/widgets/layouts/grid/resize";
+} from "@/hooks/grid/resize";
 import type { GridItemToRender } from "@/lib/widgets/layouts/grid";
 import { cn } from "@/lib/utils";
 

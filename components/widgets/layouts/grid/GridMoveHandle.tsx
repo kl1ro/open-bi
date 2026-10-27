@@ -1,13 +1,8 @@
 import { GripHorizontalIcon } from "lucide-react";
 
 import type { GridWidgetState } from "@/components/widgets/layouts/GridWidget";
-import { isGestureOwner } from "@/components/widgets/layouts/grid/gesture";
-import {
-  continueMove,
-  resetMove,
-  startMove,
-  tryFinishMove,
-} from "@/components/widgets/layouts/grid/move";
+import { isGestureOwner } from "@/hooks/grid/gesture";
+import { continueMove, resetMove, startMove, tryFinishMove } from "@/hooks/grid/move";
 import type { GridItemToRender } from "@/lib/widgets/layouts/grid";
 import { cn } from "@/lib/utils";
 

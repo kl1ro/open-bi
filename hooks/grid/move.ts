@@ -2,7 +2,7 @@ import { useState, type PointerEvent } from "react";
 import { toast } from "sonner";
 
 import type { GridWidgetState } from "@/components/widgets/layouts/GridWidget";
-import type GridGesture from "@/components/widgets/layouts/grid/gesture";
+import type GridGesture from "@/hooks/grid/gesture";
 import {
   findNewGesture,
   getDragPreview,
@@ -11,7 +11,7 @@ import {
   takeOverPointerEvent,
   type GridPreviewArea,
   type GridPreviewRole,
-} from "@/components/widgets/layouts/grid/gesture";
+} from "@/hooks/grid/gesture";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getRenderedGridItemKey,
