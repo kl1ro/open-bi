@@ -20,8 +20,20 @@ export default function Widget(props: WidgetProps) {
   );
 }
 
-interface WidgetProps {
+export interface WidgetProps {
   id: WidgetConfig["id"];
+}
+
+function WidgetErrorBoundary(props: WidgetErrorBoundaryProps) {
+  return (
+    <ErrorBoundary FallbackComponent={BrokenWidget} onError={reportWidgetRenderError}>
+      {props.children}
+    </ErrorBoundary>
+  );
+}
+
+interface WidgetErrorBoundaryProps {
+  children: ReactNode;
 }
 
 function WidgetContent(props: WidgetContentProps) {
@@ -36,6 +48,11 @@ function WidgetContent(props: WidgetContentProps) {
 }
 
 type WidgetContentProps = WidgetProps;
+
+function reportWidgetRenderError(error: unknown) {
+  console.error(error);
+  toast.error("Не удалось отобразить виджет");
+}
 
 function useWidgetContentState(props: WidgetContentProps) {
   return {
@@ -67,21 +84,4 @@ function getWidgetByType(deps: GetWidgetByTypeDeps) {
 
 interface GetWidgetByTypeDeps {
   widgetConfig: WidgetConfig;
-}
-
-function WidgetErrorBoundary(props: WidgetErrorBoundaryProps) {
-  return (
-    <ErrorBoundary FallbackComponent={BrokenWidget} onError={reportWidgetRenderError}>
-      {props.children}
-    </ErrorBoundary>
-  );
-}
-
-export interface WidgetErrorBoundaryProps {
-  children?: ReactNode;
-}
-
-function reportWidgetRenderError(error: unknown) {
-  console.error(error);
-  toast.error("Не удалось отобразить виджет");
 }
