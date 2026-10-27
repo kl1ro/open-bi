@@ -13,7 +13,7 @@ import { useAppSelector } from "@/state/hooks";
 
 export default function Widget(props: WidgetProps) {
   return (
-    <ErrorBoundary FallbackComponent={BrokenWidget} onError={reportWidgetError}>
+    <ErrorBoundary FallbackComponent={BrokenWidget} onError={reportWidgetRenderError}>
       <WidgetContent {...props} />
     </ErrorBoundary>
   );
@@ -23,7 +23,7 @@ export interface WidgetProps {
   id: WidgetConfig["id"];
 }
 
-function reportWidgetError(error: unknown) {
+function reportWidgetRenderError(error: unknown) {
   console.error(error);
   toast.error("Не удалось отобразить виджет");
 }
