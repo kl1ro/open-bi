@@ -411,7 +411,8 @@ function getGridCellOccupancyInArrangement(
     isCellInsideGridItem(cell, itemConfig),
   );
 
-  return occupyingEntry?.[0];
+  const occupyingId = occupyingEntry?.[0];
+  return occupyingId;
 }
 
 function isCellInsideGridItem(cell: GridItemPosition, item: GridItemConfig) {
