@@ -1,8 +1,5 @@
 import type { PointerEvent, RefObject } from "react";
 
-import type { GridGestureState } from "@/components/widgets/layouts/GridWidget";
-import type { GridMove } from "@/hooks/grid/move";
-import type { GridResize } from "@/hooks/grid/resize";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   findItemsOverlap,
@@ -15,24 +12,25 @@ import {
   type GridItemConfig,
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
+import type GridMove from "@/lib/widgets/layouts/grid/move";
+import type GridResize from "@/lib/widgets/layouts/grid/resize";
 import type WidgetConfig from "@/lib/widget";
-import { getWidgetConfig } from "@/lib/widget";
+import { getWidgetConfig, type WidgetConfigsById } from "@/lib/widget";
 import { createSlotConfig } from "@/lib/widgets/slot";
-import type { AppStore } from "@/state/store";
+
+type GridGesture = GridResize | GridMove;
+
+export default GridGesture;
+
+export function isGestureInProgress(gesture: GridGesture | undefined) {
+  return Boolean(gesture);
+}
 
 export function isGestureOwner(
   item: GridItemToRender,
   gesture: AbstractGridGesture | undefined,
 ) {
   return gesture?.owner.key === getRenderedGridItemKey(item);
-}
-
-export function isGestureInProgress(deps: IsGestureInProgressDeps) {
-  return Boolean(deps.gesture.value);
-}
-
-export interface IsGestureInProgressDeps {
-  gesture: GridGestureState;
 }
 
 export function createGesture(deps: CreateGestureDeps): AbstractGridGesture {
@@ -53,12 +51,7 @@ export interface CreateGestureDeps {
   item: GridItemToRender;
   grid: GridConfig;
   container: RefObject<HTMLDivElement | null>;
-  store: AppStore;
-}
-
-export function takeOverPointerEvent(event: PointerEvent<HTMLElement>) {
-  event.preventDefault();
-  event.currentTarget.setPointerCapture(event.pointerId);
+  widgetConfigs: WidgetConfigsById;
 }
 
 export function getGridGestureDelta(
@@ -109,18 +102,11 @@ function getGestureOwner(
   item: GridItemToRender,
   deps: GetGestureOwnerDeps,
 ): GridGestureOwner {
-  const widgetConfigsDeps = {
-    widgetConfigs: deps.store.getState().dashboard.widgetConfigs,
-  };
-
-  const child = item.id
-    ? getWidgetConfig(item.id, widgetConfigsDeps)
-    : createSlotConfig(deps.grid.id);
-
+  const child = item.id ? getWidgetConfig(item.id, deps) : createSlotConfig(deps.grid.id);
   return { key: getRenderedGridItemKey(item), child, itemConfig: item.itemConfig };
 }
 
-type GetGestureOwnerDeps = Pick<CreateGestureDeps, "grid" | "store">;
+type GetGestureOwnerDeps = Pick<CreateGestureDeps, "grid" | "widgetConfigs">;
 
 function getGridContainer(deps: GetGridContainerDeps) {
   const container = deps.container.current;
@@ -220,8 +206,6 @@ function getOwnerPreviewItemConfig(deps: GetOwnerPreviewItemConfigDeps) {
 }
 
 type GetOwnerPreviewItemConfigDeps = FindItemAreaOnDragDeps;
-
-export type GridGesture = GridResize | GridMove;
 
 export interface AbstractGridGesture {
   owner: GridGestureOwner;

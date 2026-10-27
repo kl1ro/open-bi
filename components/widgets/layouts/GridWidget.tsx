@@ -5,9 +5,8 @@ import Widget from "@/components/Widget";
 import SlotWidget from "@/components/widgets/SlotWidget";
 import GridMoveHandle from "@/components/widgets/layouts/grid/GridMoveHandle";
 import GridResizeHandles from "@/components/widgets/layouts/grid/GridResizeHandles";
-import type { GridGesture, GridPreviewArea, GridPreviewRole } from "@/hooks/grid/gesture";
-import useGridMove from "@/hooks/grid/move";
-import useGridResize from "@/hooks/grid/resize";
+import useGridMove from "@/hooks/grid/useGridMove";
+import useGridResize from "@/hooks/grid/useGridResize";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getGridItemsToRender,
@@ -15,6 +14,11 @@ import {
   type GridItemConfig,
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
+import type GridGesture from "@/lib/widgets/layouts/grid/gesture";
+import type {
+  GridPreviewArea,
+  GridPreviewRole,
+} from "@/lib/widgets/layouts/grid/gesture";
 import type WidgetConfig from "@/lib/widget";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/hooks";

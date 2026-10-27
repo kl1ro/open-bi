@@ -2,27 +2,20 @@ import type { PointerEvent, RefObject } from "react";
 import { toast } from "sonner";
 
 import type { GridGestureState } from "@/components/widgets/layouts/GridWidget";
+import type GridConfig from "@/lib/widgets/layouts/grid";
+import {
+  haveSameDelta,
+  occupySameCells,
+  type GridItemToRender,
+} from "@/lib/widgets/layouts/grid";
 import {
   createGesture,
   isGestureInProgress,
-  getDragPreview,
   getGridGestureDelta,
-  isGestureOwner,
-  takeOverPointerEvent,
-  type AbstractGridGesture,
-  type GridPreviewArea,
-  type GridPreviewRole,
-} from "@/hooks/grid/gesture";
-import type GridConfig from "@/lib/widgets/layouts/grid";
-import {
-  getRenderedGridItemKey,
-  hasDelta,
-  haveSameDelta,
-  occupySameCells,
-  type GridItemConfig,
-  type GridItemToRender,
-} from "@/lib/widgets/layouts/grid";
-import { clamp } from "@/lib/utils";
+} from "@/lib/widgets/layouts/grid/gesture";
+import type GridMove from "@/lib/widgets/layouts/grid/move";
+import { getMovedItemConfig, getMovePreview } from "@/lib/widgets/layouts/grid/move";
+import { takeOverPointerEvent } from "@/lib/pointer";
 import { upsertWidget } from "@/state/features/dashboard";
 import type { AppStore } from "@/state/store";
 
@@ -61,22 +54,16 @@ function findOngoingMove(deps: FindOngoingMoveDeps): GridMove | undefined {
 
 type FindOngoingMoveDeps = Pick<UseGridMoveDeps, "gesture">;
 
-function getMovePreview(
-  move: GridMove | undefined,
-  deps: GetMovePreviewDeps,
-): GridPreviewArea[] {
-  if (!move) return [];
-  if (!hasDelta(move.delta)) return getMovePressPreview(move, deps);
-  return getMoveDragPreview(move, deps);
-}
-
-type GetMovePreviewDeps = UseGridMoveDeps;
-
 function tryStartMove(deps: TryStartMoveDeps) {
-  if (isGestureInProgress(deps)) return;
+  if (isGestureInProgress(deps.gesture.value)) return;
 
   try {
-    const gesture = createGesture(deps);
+    const creationDeps = {
+      ...deps,
+      widgetConfigs: deps.store.getState().dashboard.widgetConfigs,
+    };
+
+    const gesture = createGesture(creationDeps);
     takeOverPointerEvent(deps.event);
     deps.gesture.set({ ...gesture, kind: "move" });
   } catch (error) {
@@ -125,38 +112,6 @@ function resetMove(deps: ResetMoveDeps) {
 
 type ResetMoveDeps = Pick<UseGridMoveDeps, "gesture">;
 
-function getMovePressPreview(
-  move: GridMove,
-  deps: GetMovePressPreviewDeps,
-): GridPreviewArea[] {
-  const itemAreaDeps = { move };
-
-  const pressPreview = deps.itemsToRender.map((item) =>
-    getItemAreaOnMovePress(item, itemAreaDeps),
-  );
-
-  return pressPreview;
-}
-
-type GetMovePressPreviewDeps = GetMovePreviewDeps;
-
-function getMoveDragPreview(
-  move: GridMove,
-  deps: GetMoveDragPreviewDeps,
-): GridPreviewArea[] {
-  const movedItemConfig = getMovedItemConfig(move, deps);
-
-  const dragDeps = {
-    ...deps,
-    targetItemConfig: movedItemConfig,
-    ownerRole: "moved" as const,
-  };
-
-  return getDragPreview(move, dragDeps);
-}
-
-type GetMoveDragPreviewDeps = GetMovePreviewDeps;
-
 function applyMove(move: GridMove, deps: ApplyMoveDeps) {
   const itemConfig = getMovedItemConfig(move, deps);
   if (occupySameCells(move.owner.itemConfig, itemConfig)) return;
@@ -164,51 +119,3 @@ function applyMove(move: GridMove, deps: ApplyMoveDeps) {
 }
 
 type ApplyMoveDeps = Pick<UseGridMoveDeps, "grid" | "store">;
-
-function getItemAreaOnMovePress(
-  item: GridItemToRender,
-  deps: GetItemAreaOnMovePressDeps,
-): GridPreviewArea {
-  return {
-    key: getRenderedGridItemKey(item),
-    itemConfig: item.itemConfig,
-    role: getItemRoleOnMovePress(item, deps),
-  };
-}
-
-interface GetItemAreaOnMovePressDeps {
-  move: GridMove;
-}
-
-function getMovedItemConfig(
-  move: GridMove,
-  deps: GetMovedItemConfigDeps,
-): GridItemConfig {
-  const { position, size } = move.owner.itemConfig;
-  const { delta } = move;
-  const { grid } = deps;
-
-  const movedPosition = {
-    row: clamp(position.row + delta.rows, 1, grid.rows - size.rowSpan + 1),
-    column: clamp(position.column + delta.columns, 1, grid.columns - size.colSpan + 1),
-  };
-
-  return { ...move.owner.itemConfig, position: movedPosition };
-}
-
-interface GetMovedItemConfigDeps {
-  grid: GridConfig;
-}
-
-function getItemRoleOnMovePress(
-  item: GridItemToRender,
-  deps: GetItemRoleOnMovePressDeps,
-): GridPreviewRole {
-  return isGestureOwner(item, deps.move) ? "focused" : "unaffected";
-}
-
-type GetItemRoleOnMovePressDeps = GetItemAreaOnMovePressDeps;
-
-export interface GridMove extends AbstractGridGesture {
-  kind: "move";
-}
