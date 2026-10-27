@@ -127,15 +127,15 @@ export function findItemsOverlap(
   return convertRectToItem(overlapRect);
 }
 
-export function hasDelta(delta: GridResizeDelta) {
+export function hasDelta(delta: GridDelta) {
   return delta.rows !== 0 || delta.columns !== 0;
 }
 
-export function haveSameDelta(first: GridResizeDelta, second: GridResizeDelta) {
+export function haveSameDelta(first: GridDelta, second: GridDelta) {
   return first.rows === second.rows && first.columns === second.columns;
 }
 
-export interface GridResizeDelta {
+export interface GridDelta {
   rows: number;
   columns: number;
 }
