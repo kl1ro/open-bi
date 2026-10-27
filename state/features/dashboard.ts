@@ -3,7 +3,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type WidgetConfig from "@/lib/widget";
 import {
   findWidgetConfig,
-  getChildren,
+  getChildConfigs,
   getDescendantConfigs,
   getParentConfig,
   getParentConfigWithAdoptedChild,
@@ -112,7 +112,7 @@ function linkWidgetToParent(
 
 function removeWidgetDescendants(widgetConfig: WidgetConfig, deps: DashboardSliceDeps) {
   const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
-  const children = getChildren(widgetConfig, widgetConfigsDeps);
+  const children = getChildConfigs(widgetConfig, widgetConfigsDeps);
   children.forEach((child) => removeWidgetWithDescendants(child, deps));
 }
 
@@ -158,7 +158,7 @@ function updateWidgetInState(widgetConfig: WidgetConfig, deps: DashboardSliceDep
 
 function removeRedundantChildren(parent: WidgetConfig, deps: DashboardSliceDeps) {
   const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
-  const children = getChildren(parent, widgetConfigsDeps);
+  const children = getChildConfigs(parent, widgetConfigsDeps);
   const redundant = children.filter((child) => isRedundant(child, widgetConfigsDeps));
   redundant.forEach((child) => removeWidgetWithDescendants(child, deps));
 }

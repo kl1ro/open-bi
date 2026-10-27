@@ -183,14 +183,14 @@ export function widgetsHaveSameParentId(first?: WidgetConfig, second?: WidgetCon
   return first.parentId === second.parentId;
 }
 
-export function getChildren(
+export function getChildConfigs(
   widgetConfig: WidgetConfig,
-  deps: GetChildrenDeps,
+  deps: GetChildConfigsDeps,
 ): WidgetConfig[] {
   return widgetConfig.children?.map((id) => getWidgetConfig(id, deps)) ?? [];
 }
 
-export interface GetChildrenDeps {
+export interface GetChildConfigsDeps {
   widgetConfigs: WidgetConfigsById;
 }
 
