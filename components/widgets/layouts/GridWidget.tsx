@@ -244,6 +244,7 @@ function getPressPreview(
 ): GridResizePreviewArea[] {
   const firstStep = getFirstStepItemConfig(resize, deps);
   const itemAreaDeps = { resize, firstStep };
+
   const pressPreview = deps.itemsToRender.map((item) =>
     getItemAreaOnPress(item, itemAreaDeps),
   );
