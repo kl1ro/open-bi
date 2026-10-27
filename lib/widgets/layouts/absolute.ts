@@ -36,7 +36,7 @@ function ensureItemConfigParentTypeIsAbsolute(
 ): AbsoluteItemConfig {
   if (!itemConfig) throw new NoItemConfigError({ requiredType: "absolute" });
 
-  if (itemConfig.parentType != "absolute")
+  if (itemConfig.parentType !== "absolute")
     throw new InvalidItemConfigTypeError({
       requiredType: "absolute",
       gotType: itemConfig.parentType,

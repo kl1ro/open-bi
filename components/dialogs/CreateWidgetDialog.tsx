@@ -56,7 +56,7 @@ export default function CreateWidgetDialog(props: CreateWidgetDialogProps) {
           >
             <WidgetTypeField form={state.form} />
 
-            {state.type == "layout" && (
+            {state.type === "layout" && (
               <>
                 <SpacingField
                   form={state.form}
@@ -67,9 +67,9 @@ export default function CreateWidgetDialog(props: CreateWidgetDialogProps) {
               </>
             )}
 
-            {state.type == "title" && <TitleTextField form={state.form} />}
+            {state.type === "title" && <TitleTextField form={state.form} />}
 
-            {state.type == "map" && (
+            {state.type === "map" && (
               <>
                 <NumberTextField form={state.form} name="latitude" label="Широта" />
                 <NumberTextField form={state.form} name="longitude" label="Долгота" />
@@ -424,7 +424,7 @@ const formSchema = z.discriminatedUnion("type", [
 
 function isNumberInRange(value: string, min: number, max: number) {
   const number = Number(value);
-  return value.trim() != "" && !Number.isNaN(number) && number >= min && number <= max;
+  return value.trim() !== "" && !Number.isNaN(number) && number >= min && number <= max;
 }
 
 type FormValues = z.infer<typeof formSchema>;

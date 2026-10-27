@@ -43,22 +43,23 @@ export function isGridChildRedundant(parent: GridConfig, child: WidgetConfig) {
   const itemConfig = getGridItemConfig(parent, child);
 
   return (
-    (child.type == "slot" && is1x1GridItem(itemConfig)) || isGridItemCollapsed(itemConfig)
+    (child.type === "slot" && is1x1GridItem(itemConfig)) ||
+    isGridItemCollapsed(itemConfig)
   );
 }
 
 export function is1x1GridItem(itemConfig: GridItemConfig) {
-  return itemConfig.size.rowSpan == 1 && itemConfig.size.colSpan == 1;
+  return itemConfig.size.rowSpan === 1 && itemConfig.size.colSpan === 1;
 }
 
 export function isGridItemCollapsed(itemConfig: GridItemConfig) {
-  return itemConfig.size.rowSpan == 0 || itemConfig.size.colSpan == 0;
+  return itemConfig.size.rowSpan === 0 || itemConfig.size.colSpan === 0;
 }
 
 function ensureItemConfigParentTypeIsGrid(itemConfig?: ItemConfig) {
   if (!itemConfig) throw new NoItemConfigError({ requiredType: "grid" });
 
-  if (itemConfig.parentType != "grid")
+  if (itemConfig.parentType !== "grid")
     throw new InvalidItemConfigTypeError({
       requiredType: "grid",
       gotType: itemConfig.parentType,
@@ -89,7 +90,7 @@ function getOverlapsBetweenItemAndArrangement(
   itemId: WidgetConfig["id"],
   arrangement: GridArrangement,
 ): GridItemOverlap[] {
-  const suspectIds = Object.keys(arrangement).filter((id) => id != itemId);
+  const suspectIds = Object.keys(arrangement).filter((id) => id !== itemId);
 
   return suspectIds.flatMap(
     (id) => findOverlapInArrangement(itemId, id, arrangement) ?? [],
@@ -119,11 +120,11 @@ export function findItemsOverlap(
 }
 
 export function hasDelta(delta: GridResizeDelta) {
-  return delta.rows != 0 || delta.columns != 0;
+  return delta.rows !== 0 || delta.columns !== 0;
 }
 
 export function haveSameDelta(first: GridResizeDelta, second: GridResizeDelta) {
-  return first.rows == second.rows && first.columns == second.columns;
+  return first.rows === second.rows && first.columns === second.columns;
 }
 
 export interface GridResizeDelta {
@@ -189,7 +190,7 @@ function resolveOverlap(overlap: GridItemOverlap): {
 
   const orderedByArea = options.toSorted((a, b) => getItemArea(b) - getItemArea(a));
   const maxArea = getItemArea(orderedByArea[0]);
-  const withMaxArea = orderedByArea.filter((option) => getItemArea(option) == maxArea);
+  const withMaxArea = orderedByArea.filter((option) => getItemArea(option) === maxArea);
   const reference = overlap.overlappedItem;
 
   const orderedByAspectDeviation = withMaxArea.toSorted(
@@ -273,10 +274,10 @@ function getItemArea(item: GridItemConfig) {
 
 export function occupySameCells(first: GridItemConfig, second: GridItemConfig) {
   return (
-    first.position.row == second.position.row &&
-    first.position.column == second.position.column &&
-    first.size.rowSpan == second.size.rowSpan &&
-    first.size.colSpan == second.size.colSpan
+    first.position.row === second.position.row &&
+    first.position.column === second.position.column &&
+    first.size.rowSpan === second.size.rowSpan &&
+    first.size.colSpan === second.size.colSpan
   );
 }
 

@@ -271,7 +271,7 @@ function getDragPreview(
 type GetDragPreviewDeps = GetResizePreviewDeps;
 
 function isResizeOwner(item: GridItemToRender, resize: GridResize | undefined) {
-  return resize?.owner.key == getRenderedGridItemKey(item);
+  return resize?.owner.key === getRenderedGridItemKey(item);
 }
 
 function startResize(deps: StartResizeDeps) {
@@ -528,7 +528,7 @@ function getOutwardStepDelta(handle: GridResizeHandleConfig): GridResizeDelta {
   return handle.sides.reduce<GridResizeDelta>(
     (delta, side) => {
       const geometry = RESIZE_SIDES[side];
-      return { ...delta, [geometry.axis]: geometry.direction == "forward" ? 1 : -1 };
+      return { ...delta, [geometry.axis]: geometry.direction === "forward" ? 1 : -1 };
     },
     { rows: 0, columns: 0 },
   );
@@ -553,7 +553,7 @@ function getItemConfigResizedAtSide(
   const delta = deps.resize.delta[geometry.axis];
   const sideDeps = { geometry, delta, grid: deps.grid };
 
-  return geometry.direction == "forward"
+  return geometry.direction === "forward"
     ? getItemConfigResizedForward(itemConfig, sideDeps)
     : getItemConfigResizedBackward(itemConfig, sideDeps);
 }

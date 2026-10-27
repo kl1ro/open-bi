@@ -20,12 +20,12 @@ export function getRecordWithoutKey<Value>(
   if (!record) return;
 
   return Object.fromEntries(
-    Object.entries(record).filter(([recordKey]) => recordKey != key),
+    Object.entries(record).filter(([recordKey]) => recordKey !== key),
   );
 }
 
 export function haveSameElements<Value>(first?: Value[], second?: Value[]) {
-  if (!first || !second) return first == second;
+  if (!first || !second) return first === second;
 
   return (
     first.every((value) => second.includes(value)) &&

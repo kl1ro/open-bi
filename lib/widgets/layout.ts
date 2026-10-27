@@ -78,7 +78,7 @@ export function validateLayoutUpdate(oldLayout: LayoutConfig, newLayout: LayoutC
 
 export function layoutsHaveSameType(first?: LayoutConfig, second?: LayoutConfig) {
   if (!first || !second) return false;
-  return first.layout == second.layout;
+  return first.layout === second.layout;
 }
 
 export class ImpossibleLayoutTypeChangeError extends Error {
