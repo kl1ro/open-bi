@@ -64,6 +64,7 @@ export default function CreateWidgetDialog(props: CreateWidgetDialogProps) {
                   name="columns"
                   label="Количество столбцов"
                 />
+
                 <SpacingField form={state.form} name="rows" label="Количество строк" />
               </>
             )}
@@ -149,6 +150,7 @@ function WidgetTypeField(props: FieldProps) {
       render={({ field }) => (
         <FormItem className="flex gap-4">
           <FormLabel>Тип виджета: </FormLabel>
+
           <Select
             value={field.value}
             onValueChange={(type) =>
@@ -160,6 +162,7 @@ function WidgetTypeField(props: FieldProps) {
                 <SelectValue className="text-center w-full" placeholder="Выберите тип" />
               </SelectTrigger>
             </FormControl>
+
             <SelectContent>
               {Object.entries(WIDGET_TYPE_LABELS).map(([type, label]) => (
                 <SelectItem key={type} value={type}>
@@ -168,6 +171,7 @@ function WidgetTypeField(props: FieldProps) {
               ))}
             </SelectContent>
           </Select>
+
           <FormMessage />
         </FormItem>
       )}
@@ -190,12 +194,14 @@ function SpacingField(props: SpacingFieldProps) {
       render={({ field }) => (
         <FormItem className="flex gap-4">
           <FormLabel>{props.label}</FormLabel>
+
           <Select value={field.value} onValueChange={field.onChange}>
             <FormControl>
               <SelectTrigger className="flex-1">
                 <SelectValue />
               </SelectTrigger>
             </FormControl>
+
             <SelectContent>
               {SPACING_OPTIONS.map((option) => (
                 <SelectItem key={option} value={option}>
@@ -204,6 +210,7 @@ function SpacingField(props: SpacingFieldProps) {
               ))}
             </SelectContent>
           </Select>
+
           <FormMessage />
         </FormItem>
       )}
@@ -224,9 +231,11 @@ function TitleTextField(props: FieldProps) {
       render={({ field }) => (
         <FormItem className="flex gap-4">
           <FormLabel>Текст</FormLabel>
+
           <FormControl>
             <Input {...field} placeholder="Введите заголовок" className="flex-1" />
           </FormControl>
+
           <FormMessage />
         </FormItem>
       )}
@@ -242,6 +251,7 @@ function NumberTextField(props: NumberTextFieldProps) {
       render={({ field }) => (
         <FormItem className="flex gap-4">
           <FormLabel>{props.label}</FormLabel>
+
           <FormControl>
             <Input
               {...field}
@@ -250,6 +260,7 @@ function NumberTextField(props: NumberTextFieldProps) {
               className="flex-1"
             />
           </FormControl>
+
           <FormMessage />
         </FormItem>
       )}
@@ -270,12 +281,14 @@ function MapViewField(props: FieldProps) {
       render={({ field }) => (
         <FormItem className="flex gap-4">
           <FormLabel>Вид карты</FormLabel>
+
           <Select value={field.value} onValueChange={field.onChange}>
             <FormControl>
               <SelectTrigger className="flex-1">
                 <SelectValue />
               </SelectTrigger>
             </FormControl>
+
             <SelectContent>
               {MAP_VIEWS.map((view) => (
                 <SelectItem key={view} value={view}>
@@ -284,6 +297,7 @@ function MapViewField(props: FieldProps) {
               ))}
             </SelectContent>
           </Select>
+
           <FormMessage />
         </FormItem>
       )}
