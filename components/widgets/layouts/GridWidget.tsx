@@ -257,10 +257,12 @@ function getDragPreview(
 ): GridResizePreviewArea[] {
   const resizedItemConfig = getResizedItemConfig(resize, deps);
 
+  const adoptionDeps = { itemConfig: resizedItemConfig };
+
   const previewGrid = getGridConfigWithAdoptedChild(
     deps.grid,
     resize.owner.child,
-    resizedItemConfig,
+    adoptionDeps,
   );
 
   const itemAreaDeps = { resize, previewGrid };

@@ -20,11 +20,11 @@ export type WidgetConfigsById = Record<WidgetConfig["id"], WidgetConfig>;
 export function getParentConfigWithAdoptedChild(
   parent: WidgetConfig,
   child: WidgetConfig,
-  itemConfig?: ItemConfig,
+  deps: GetParentConfigWithAdoptedChildDeps,
 ) {
   switch (parent.type) {
     case "layout":
-      return getLayoutConfigWithAdoptedChild(parent, child, itemConfig);
+      return getLayoutConfigWithAdoptedChild(parent, child, deps);
 
     default:
       throw new ParentIsNotContainerError({
@@ -32,6 +32,10 @@ export function getParentConfigWithAdoptedChild(
         childId: child.id,
       });
   }
+}
+
+export interface GetParentConfigWithAdoptedChildDeps {
+  itemConfig?: ItemConfig;
 }
 
 export function getParentConfigWithDisownedChild(

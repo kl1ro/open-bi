@@ -48,7 +48,7 @@ function handleWidgetUpsert(
   action: PayloadAction<WidgetUpsertPayload>,
 ) {
   const { itemConfig, widgetConfig } = action.payload;
-  const deps = { state, widgetConfigs: state.widgetConfigs };
+  const deps = { state, widgetConfigs: state.widgetConfigs, itemConfig };
 
   const oldWidgetConfig = findWidgetConfig(widgetConfig.id, deps);
   validateWidgetUpdate(oldWidgetConfig, widgetConfig);
@@ -56,7 +56,7 @@ function handleWidgetUpsert(
   if (hasMovedFromParent(oldWidgetConfig, widgetConfig))
     unlinkWidgetFromParent(oldWidgetConfig, deps);
 
-  linkWidgetToParent(widgetConfig, itemConfig, deps);
+  linkWidgetToParent(widgetConfig, deps);
 
   if (oldWidgetConfig && isTurningToSlot(oldWidgetConfig, widgetConfig))
     removeWidgetDescendants(oldWidgetConfig, deps);
@@ -97,18 +97,17 @@ function unlinkWidgetFromParent(
   upsertWidgetToState(updatedParent, deps);
 }
 
-function linkWidgetToParent(
-  child: WidgetConfig,
-  itemConfig: ItemConfig | undefined,
-  deps: DashboardSliceDeps,
-) {
+function linkWidgetToParent(child: WidgetConfig, deps: LinkWidgetToParentDeps) {
   if (!hasParentId(child)) return;
 
   const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
   const parent = getParentConfig(child, widgetConfigsDeps);
-  const updatedParent = getParentConfigWithAdoptedChild(parent, child, itemConfig);
+  const updatedParent = getParentConfigWithAdoptedChild(parent, child, deps);
   upsertWidgetToState(updatedParent, deps);
 }
+
+type LinkWidgetToParentDeps = DashboardSliceDeps &
+  Pick<WidgetUpsertPayload, "itemConfig">;
 
 function removeWidgetDescendants(widgetConfig: WidgetConfig, deps: DashboardSliceDeps) {
   const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };

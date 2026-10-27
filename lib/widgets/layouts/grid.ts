@@ -22,10 +22,10 @@ export default interface GridConfig extends AbstractLayoutConfig {
 export function getGridConfigWithAdoptedChild(
   parent: GridConfig,
   child: WidgetConfig,
-  itemConfig?: ItemConfig,
+  deps: GetGridConfigWithAdoptedChildDeps,
 ) {
-  if (hasChild(parent, child) && !itemConfig) return parent;
-  const gridItemConfig = ensureItemConfigParentTypeIsGrid(itemConfig);
+  if (hasChild(parent, child) && !deps.itemConfig) return parent;
+  const gridItemConfig = ensureItemConfigParentTypeIsGrid(deps.itemConfig);
 
   const children = getChildrenWithAdoptedChild(parent, child);
 
@@ -37,6 +37,10 @@ export function getGridConfigWithAdoptedChild(
 
   const rearranged = rearrangeAroundItem(arrangementWithUpsertedChild, child.id);
   return { ...parent, children, arrangement: rearranged };
+}
+
+export interface GetGridConfigWithAdoptedChildDeps {
+  itemConfig?: ItemConfig;
 }
 
 export function isGridChildRedundant(parent: GridConfig, child: WidgetConfig) {
