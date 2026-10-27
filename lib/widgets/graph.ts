@@ -28,7 +28,7 @@ export class NonexistentGraphTypeError extends Error {
   public type: unknown;
 
   public constructor(options: ErrorOptions & { type: unknown }) {
-    super(`Graph type ${options.type as string} does not exist`, options);
+    super(`Graph type ${String(options.type)} does not exist`, options);
     this.type = options.type;
   }
 }

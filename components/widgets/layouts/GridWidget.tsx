@@ -193,10 +193,7 @@ function getResizePreview(
   return getDragPreview(resize, deps);
 }
 
-interface GetResizePreviewDeps {
-  grid: GridConfig;
-  itemsToRender: GridItemToRender[];
-}
+type GetResizePreviewDeps = UseGridResizeDeps;
 
 function getGridAreaStyle(itemConfig: GridItemConfig) {
   return {
@@ -528,7 +525,7 @@ export class NonexistentGridResizeHandleKindError extends Error {
   public kind: unknown;
 
   public constructor(options: ErrorOptions & { kind: unknown }) {
-    super(`Grid resize handle kind ${options.kind as string} does not exist`, options);
+    super(`Grid resize handle kind ${String(options.kind)} does not exist`, options);
     this.kind = options.kind;
   }
 }

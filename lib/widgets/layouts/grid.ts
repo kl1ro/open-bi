@@ -192,18 +192,9 @@ function resolveOverlap(overlap: GridItemOverlap): {
       itemConfig: getCollapsedItem(overlap.overlappedItem),
     };
 
-  const orderedByArea = options.toSorted((a, b) => getItemArea(b) - getItemArea(a));
-  const maxArea = getItemArea(orderedByArea[0]);
-  const withMaxArea = orderedByArea.filter((option) => getItemArea(option) === maxArea);
-  const reference = overlap.overlappedItem;
-
-  const orderedByAspectDeviation = withMaxArea.toSorted(
-    (a, b) => getAspectDeviation(a, reference) - getAspectDeviation(b, reference),
-  );
-
   return {
     id: overlap.overlappedItemId,
-    itemConfig: orderedByAspectDeviation[0],
+    itemConfig: pickBestResolutionOption(options, overlap),
   };
 }
 
@@ -217,6 +208,25 @@ function getOverlapResolutionOptions(overlap: GridItemOverlap): GridItemConfig[]
 
   return resolutionOptions;
 }
+
+function pickBestResolutionOption(
+  options: GridItemConfig[],
+  deps: PickBestResolutionOptionDeps,
+): GridItemConfig {
+  const orderedByArea = options.toSorted((a, b) => getItemArea(b) - getItemArea(a));
+  const maxArea = getItemArea(orderedByArea[0]);
+  const withMaxArea = orderedByArea.filter((option) => getItemArea(option) === maxArea);
+  const reference = deps.overlappedItem;
+
+  const orderedByAspectDeviation = withMaxArea.toSorted(
+    (a, b) => getAspectDeviation(a, reference) - getAspectDeviation(b, reference),
+  );
+
+  const bestOption = orderedByAspectDeviation[0];
+  return bestOption;
+}
+
+type PickBestResolutionOptionDeps = Pick<GridItemOverlap, "overlappedItem">;
 
 function getStripsAroundOverlap(itemRect: GridRect, overlapRect: GridRect): GridRect[] {
   return [
@@ -401,7 +411,8 @@ function getGridCellOccupancyInArrangement(
     isCellInsideGridItem(cell, itemConfig),
   );
 
-  return occupyingEntry?.[0];
+  const occupyingId = occupyingEntry?.[0];
+  return occupyingId;
 }
 
 function isCellInsideGridItem(cell: GridItemPosition, item: GridItemConfig) {

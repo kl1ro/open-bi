@@ -16,18 +16,17 @@ function useMapWidgetState(props: MapConfig) {
   };
 }
 
+type MapWidgetState = ReturnType<typeof useMapWidgetState>;
+
 function useMapWidgetEffects(deps: UseMapWidgetEffectsDeps) {
   useMountMapEffect(deps);
 }
 
-interface UseMapWidgetEffectsDeps {
-  container: RefObject<HTMLDivElement | null>;
-  config: MapConfig;
-}
+type UseMapWidgetEffectsDeps = MapWidgetState;
 
 function useMountMapEffect(deps: UseMountMapEffectDeps) {
   useEffect(
-    () => mountMapIntoContainer(deps.container, deps),
+    () => mountMapIntoContainer(deps.config, deps.container),
     [
       deps.config.center.latitude,
       deps.config.center.longitude,
@@ -37,14 +36,11 @@ function useMountMapEffect(deps: UseMountMapEffectDeps) {
   );
 }
 
-interface UseMountMapEffectDeps {
-  container: RefObject<HTMLDivElement | null>;
-  config: MapConfig;
-}
+type UseMountMapEffectDeps = UseMapWidgetEffectsDeps;
 
 function mountMapIntoContainer(
+  config: MapConfig,
   container: RefObject<HTMLDivElement | null>,
-  deps: MountMapIntoContainerDeps,
 ) {
   let map: ymaps.Map | undefined;
   let isUnmounted = false;
@@ -53,7 +49,7 @@ function mountMapIntoContainer(
 
   void window.ymaps.ready(() => {
     if (isUnmounted || !container.current) return;
-    map = createMap(container.current, deps.config);
+    map = createMapInContainer(config, container.current);
     resizeObserver.observe(container.current);
   });
 
@@ -64,15 +60,11 @@ function mountMapIntoContainer(
   };
 }
 
-interface MountMapIntoContainerDeps {
-  config: MapConfig;
-}
-
 function fitMapToContainer(map: ymaps.Map | undefined) {
   map?.container.fitToViewport();
 }
 
-function createMap(container: HTMLDivElement, config: MapConfig) {
+function createMapInContainer(config: MapConfig, container: HTMLDivElement) {
   return new window.ymaps.Map(container, {
     center: [config.center.latitude, config.center.longitude],
     zoom: config.zoom,

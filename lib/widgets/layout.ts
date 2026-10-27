@@ -76,11 +76,6 @@ export function validateLayoutUpdate(oldLayout: LayoutConfig, newLayout: LayoutC
     });
 }
 
-export function layoutsHaveSameType(first?: LayoutConfig, second?: LayoutConfig) {
-  if (!first || !second) return false;
-  return first.layout === second.layout;
-}
-
 export class ImpossibleLayoutTypeChangeError extends Error {
   public name = ImpossibleLayoutTypeChangeError.name;
   public id: WidgetConfig["id"];
@@ -103,6 +98,11 @@ export class ImpossibleLayoutTypeChangeError extends Error {
     this.currentLayout = options.currentLayout;
     this.wantedLayout = options.wantedLayout;
   }
+}
+
+export function layoutsHaveSameType(first?: LayoutConfig, second?: LayoutConfig) {
+  if (!first || !second) return false;
+  return first.layout === second.layout;
 }
 
 export function isLayoutChildRedundant(parent: LayoutConfig, child: WidgetConfig) {
@@ -137,7 +137,7 @@ export class NonexistentLayoutTypeError extends Error {
   public type: unknown;
 
   public constructor(options: ErrorOptions & { type: unknown }) {
-    super(`Layout type ${options.type as string} does not exist`, options);
+    super(`Layout type ${String(options.type)} does not exist`, options);
     this.type = options.type;
   }
 }
