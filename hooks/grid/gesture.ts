@@ -15,7 +15,7 @@ import {
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
 import type WidgetConfig from "@/lib/widget";
-import { findWidgetConfig } from "@/lib/widget";
+import { getWidgetConfig } from "@/lib/widget";
 import { createSlotConfig } from "@/lib/widgets/slot";
 import type { AppStore } from "@/state/store";
 
@@ -33,13 +33,17 @@ export function isGestureOwner(
   return gesture?.owner.key === getRenderedGridItemKey(item);
 }
 
-export function findNewGesture(
-  deps: FindNewGestureDeps,
-): AbstractGridGesture | undefined {
-  if (isGestureInProgress(deps)) return;
-  const owner = findGestureOwner(deps.item, deps);
-  const container = deps.container.current;
-  if (!owner || !container) return;
+export function isGestureInProgress(deps: IsGestureInProgressDeps) {
+  return Boolean(deps.gesture.value);
+}
+
+export interface IsGestureInProgressDeps {
+  gesture: GridGestureState;
+}
+
+export function createGesture(deps: CreateGestureDeps): AbstractGridGesture {
+  const owner = getGestureOwner(deps.item, deps);
+  const container = getGridContainer(deps);
   const cellPitchDeps = { container, grid: deps.grid };
 
   return {
@@ -50,13 +54,12 @@ export function findNewGesture(
   };
 }
 
-export interface FindNewGestureDeps {
+export interface CreateGestureDeps {
   event: PointerEvent<HTMLElement>;
   item: GridItemToRender;
   grid: GridConfig;
   container: RefObject<HTMLDivElement | null>;
   store: AppStore;
-  gesture: GridGestureState;
 }
 
 export function takeOverPointerEvent(event: PointerEvent<HTMLElement>) {
@@ -108,29 +111,38 @@ export interface GetDragPreviewDeps {
   ownerRole: GridPreviewRole;
 }
 
-function isGestureInProgress(deps: IsGestureInProgressDeps) {
-  return Boolean(deps.gesture.value);
-}
-
-type IsGestureInProgressDeps = Pick<FindNewGestureDeps, "gesture">;
-
-function findGestureOwner(
+function getGestureOwner(
   item: GridItemToRender,
-  deps: FindGestureOwnerDeps,
-): GridGestureOwner | undefined {
+  deps: GetGestureOwnerDeps,
+): GridGestureOwner {
   const widgetConfigsDeps = {
     widgetConfigs: deps.store.getState().dashboard.widgetConfigs,
   };
 
   const child = item.id
-    ? findWidgetConfig(item.id, widgetConfigsDeps)
+    ? getWidgetConfig(item.id, widgetConfigsDeps)
     : createSlotConfig(deps.grid.id);
 
-  if (!child) return;
   return { key: getRenderedGridItemKey(item), child, itemConfig: item.itemConfig };
 }
 
-type FindGestureOwnerDeps = Pick<FindNewGestureDeps, "grid" | "store">;
+type GetGestureOwnerDeps = Pick<CreateGestureDeps, "grid" | "store">;
+
+function getGridContainer(deps: GetGridContainerDeps) {
+  const container = deps.container.current;
+  if (!container) throw new GridContainerNotMountedError();
+  return container;
+}
+
+type GetGridContainerDeps = Pick<CreateGestureDeps, "container">;
+
+export class GridContainerNotMountedError extends Error {
+  public name = GridContainerNotMountedError.name;
+
+  public constructor(options?: ErrorOptions) {
+    super("Grid container is not mounted", options);
+  }
+}
 
 function measureCellPitch(deps: MeasureCellPitchDeps): GridCellPitch {
   const style = getComputedStyle(deps.container);

@@ -3,7 +3,8 @@ import { toast } from "sonner";
 
 import type { GridResizeHandleConfig } from "@/components/widgets/layouts/grid/GridResizeHandles";
 import {
-  findNewGesture,
+  createGesture,
+  isGestureInProgress,
   getDragPreview,
   getGridGestureDelta,
   isGestureOwner,
@@ -34,7 +35,7 @@ export default function useGridResize(deps: UseGridResizeDeps) {
   return {
     value: resize,
     preview: getResizePreview(resize, deps),
-    start: (startDeps: GridResizeStartDeps) => startResize({ ...deps, ...startDeps }),
+    start: (startDeps: GridResizeStartDeps) => tryStartResize({ ...deps, ...startDeps }),
     continue: (event: PointerEvent<HTMLElement>) =>
       continueResize({ ...resizeDeps, event }),
     finish: (event: PointerEvent<HTMLElement>) =>
@@ -75,14 +76,20 @@ function getResizePreview(
 
 type GetResizePreviewDeps = UseGridResizeDeps;
 
-function startResize(deps: StartResizeDeps) {
-  const gesture = findNewGesture(deps);
-  if (!gesture) return;
-  takeOverPointerEvent(deps.event);
-  deps.gesture.set({ ...gesture, kind: "resize", handle: deps.handle });
+function tryStartResize(deps: TryStartResizeDeps) {
+  if (isGestureInProgress(deps)) return;
+
+  try {
+    const gesture = createGesture(deps);
+    takeOverPointerEvent(deps.event);
+    deps.gesture.set({ ...gesture, kind: "resize", handle: deps.handle });
+  } catch (error) {
+    console.error(error);
+    toast.error("Не удалось начать изменение размера виджета");
+  }
 }
 
-type StartResizeDeps = UseGridResizeDeps & GridResizeStartDeps;
+type TryStartResizeDeps = UseGridResizeDeps & GridResizeStartDeps;
 
 function continueResize(deps: ContinueResizeDeps) {
   if (!deps.resize) return;

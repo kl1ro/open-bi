@@ -2,7 +2,8 @@ import type { PointerEvent, RefObject } from "react";
 import { toast } from "sonner";
 
 import {
-  findNewGesture,
+  createGesture,
+  isGestureInProgress,
   getDragPreview,
   getGridGestureDelta,
   isGestureOwner,
@@ -32,7 +33,7 @@ export default function useGridMove(deps: UseGridMoveDeps) {
   return {
     value: move,
     preview: getMovePreview(move, deps),
-    start: (startDeps: GridMoveStartDeps) => startMove({ ...deps, ...startDeps }),
+    start: (startDeps: GridMoveStartDeps) => tryStartMove({ ...deps, ...startDeps }),
     continue: (event: PointerEvent<HTMLElement>) => continueMove({ ...moveDeps, event }),
     finish: (event: PointerEvent<HTMLElement>) => tryFinishMove({ ...moveDeps, event }),
     reset: () => resetMove(deps),
@@ -70,14 +71,20 @@ function getMovePreview(
 
 type GetMovePreviewDeps = UseGridMoveDeps;
 
-function startMove(deps: StartMoveDeps) {
-  const move = findNewGesture(deps);
-  if (!move) return;
-  takeOverPointerEvent(deps.event);
-  deps.gesture.set({ ...move, kind: "move" });
+function tryStartMove(deps: TryStartMoveDeps) {
+  if (isGestureInProgress(deps)) return;
+
+  try {
+    const gesture = createGesture(deps);
+    takeOverPointerEvent(deps.event);
+    deps.gesture.set({ ...gesture, kind: "move" });
+  } catch (error) {
+    console.error(error);
+    toast.error("Не удалось начать перемещение виджета");
+  }
 }
 
-type StartMoveDeps = UseGridMoveDeps & GridMoveStartDeps;
+type TryStartMoveDeps = UseGridMoveDeps & GridMoveStartDeps;
 
 function continueMove(deps: ContinueMoveDeps) {
   if (!deps.move) return;
