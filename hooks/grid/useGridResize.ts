@@ -2,6 +2,7 @@ import type { PointerEvent, RefObject } from "react";
 import { toast } from "sonner";
 
 import type { GridGestureState } from "@/components/widgets/layouts/GridWidget";
+import type { GridResizeHandleConfig } from "@/components/widgets/layouts/grid/GridResizeHandles";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   haveSameDelta,
@@ -46,7 +47,7 @@ export interface UseGridResizeDeps {
 
 export interface GridResizeStartDeps {
   event: PointerEvent<HTMLElement>;
-  handle: Pick<GridResize, "sides">;
+  handle: GridResizeHandleConfig;
   item: GridItemToRender;
 }
 
