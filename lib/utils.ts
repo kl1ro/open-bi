@@ -10,7 +10,7 @@ export function clamp(value: number, min: number, max: number) {
 }
 
 export function isNumber(suspect: unknown) {
-  return !Number.isNaN(suspect);
+  return typeof suspect === "number" && !Number.isNaN(suspect);
 }
 
 export function getRecordWithoutKey<Value>(
