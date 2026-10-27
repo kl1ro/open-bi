@@ -4,6 +4,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 import {
   Dialog,
@@ -50,7 +51,7 @@ export default function CreateWidgetDialog(props: CreateWidgetDialogProps) {
         <Form {...state.form}>
           <form
             onSubmit={state.form.handleSubmit((values) =>
-              createWidgetFromFormValues(values, state),
+              tryCreateWidgetFromFormValues(values, state),
             )}
             className="space-y-4 mt-4"
           >
@@ -118,16 +119,21 @@ function useCreateWidgetDialogState(props: CreateWidgetDialogProps) {
   };
 }
 
-function createWidgetFromFormValues(
+function tryCreateWidgetFromFormValues(
   values: FormValues,
-  deps: CreateWidgetFromFormValuesDeps,
+  deps: TryCreateWidgetFromFormValuesDeps,
 ) {
-  const widgetConfig = getWidgetConfigFromFormValues(values, deps);
-  deps.dispatch(upsertWidget({ widgetConfig, itemConfig: deps.itemConfig }));
-  deps.close();
+  try {
+    const widgetConfig = getWidgetConfigFromFormValues(values, deps);
+    deps.dispatch(upsertWidget({ widgetConfig, itemConfig: deps.itemConfig }));
+    deps.close();
+  } catch (error) {
+    console.error(error);
+    toast.error("Не удалось создать виджет");
+  }
 }
 
-interface CreateWidgetFromFormValuesDeps {
+interface TryCreateWidgetFromFormValuesDeps {
   dispatch: AppDispatch;
   id?: WidgetConfig["id"];
   parentId?: WidgetConfig["id"];
