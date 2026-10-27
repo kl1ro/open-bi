@@ -72,10 +72,12 @@ function rearrangeAroundItem(arrangement: GridArrangement, itemId: WidgetConfig[
   const overlaps = getOverlapsBetweenItemAndArrangement(itemId, arrangement);
   const resolved = overlaps.map(resolveOverlap);
 
-  return resolved.reduce(
+  const resolvedArrangement = resolved.reduce(
     (acc, cur) => upsertGridItemToArrangement(cur.id, cur.itemConfig, acc),
     arrangement,
   );
+
+  return resolvedArrangement;
 }
 
 function upsertGridItemToArrangement(
