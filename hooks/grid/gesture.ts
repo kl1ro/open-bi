@@ -1,7 +1,7 @@
 import { useState, type PointerEvent, type RefObject } from "react";
 
-import type GridMove from "@/hooks/grid/move";
-import type GridResize from "@/hooks/grid/resize";
+import type { GridMove } from "@/hooks/grid/move";
+import type { GridResize } from "@/hooks/grid/resize";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   findItemsOverlap,
@@ -19,11 +19,7 @@ import { findWidgetConfig } from "@/lib/widget";
 import { createSlotConfig } from "@/lib/widgets/slot";
 import type { AppStore } from "@/state/store";
 
-type GridGesture = GridResize | GridMove;
-
-export default GridGesture;
-
-export function useGridGesture() {
+export default function useGridGesture() {
   const [value, set] = useState<GridGesture>();
   return { value, set };
 }
@@ -218,6 +214,8 @@ function getOwnerPreviewItemConfig(deps: GetOwnerPreviewItemConfigDeps) {
 }
 
 type GetOwnerPreviewItemConfigDeps = FindItemAreaOnDragDeps;
+
+export type GridGesture = GridResize | GridMove;
 
 export interface AbstractGridGesture {
   owner: GridGestureOwner;

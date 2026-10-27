@@ -5,13 +5,10 @@ import Widget from "@/components/Widget";
 import SlotWidget from "@/components/widgets/SlotWidget";
 import GridMoveHandle from "@/components/widgets/layouts/grid/GridMoveHandle";
 import GridResizeHandles from "@/components/widgets/layouts/grid/GridResizeHandles";
-import {
-  useGridGesture,
-  type GridPreviewArea,
-  type GridPreviewRole,
-} from "@/hooks/grid/gesture";
-import { useGridMove } from "@/hooks/grid/move";
-import { useGridResize } from "@/hooks/grid/resize";
+import useGridGesture from "@/hooks/grid/gesture";
+import type { GridPreviewArea, GridPreviewRole } from "@/hooks/grid/gesture";
+import useGridMove from "@/hooks/grid/move";
+import useGridResize from "@/hooks/grid/resize";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getGridItemsToRender,

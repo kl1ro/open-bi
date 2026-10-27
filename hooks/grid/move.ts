@@ -25,11 +25,7 @@ import { clamp } from "@/lib/utils";
 import { upsertWidget } from "@/state/features/dashboard";
 import type { AppStore } from "@/state/store";
 
-export default interface GridMove extends AbstractGridGesture {
-  kind: "move";
-}
-
-export function useGridMove(deps: UseGridMoveDeps) {
+export default function useGridMove(deps: UseGridMoveDeps) {
   const move = findOngoingMove(deps);
   const moveDeps = { ...deps, move };
 
@@ -204,3 +200,7 @@ function getItemRoleOnMovePress(
 }
 
 type GetItemRoleOnMovePressDeps = GetItemAreaOnMovePressDeps;
+
+export interface GridMove extends AbstractGridGesture {
+  kind: "move";
+}

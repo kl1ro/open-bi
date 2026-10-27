@@ -27,12 +27,7 @@ import { clamp } from "@/lib/utils";
 import { upsertWidget } from "@/state/features/dashboard";
 import type { AppStore } from "@/state/store";
 
-export default interface GridResize extends AbstractGridGesture {
-  kind: "resize";
-  handle: GridResizeHandleConfig;
-}
-
-export function useGridResize(deps: UseGridResizeDeps) {
+export default function useGridResize(deps: UseGridResizeDeps) {
   const resize = findOngoingResize(deps);
   const resizeDeps = { ...deps, resize };
 
@@ -307,6 +302,11 @@ function getItemConfigResizedBackward(
 interface GetItemConfigResizedBackwardDeps {
   geometry: GridResizeSideGeometry;
   delta: number;
+}
+
+export interface GridResize extends AbstractGridGesture {
+  kind: "resize";
+  handle: GridResizeHandleConfig;
 }
 
 export type GridResizeSide = "top" | "bottom" | "left" | "right";
