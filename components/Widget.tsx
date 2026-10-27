@@ -4,6 +4,7 @@ import TitleWidget from "@/components/widgets/TitleWidget";
 import MapWidget from "@/components/widgets/MapWidget";
 import SlotWidget from "@/components/widgets/SlotWidget";
 import type WidgetConfig from "@/lib/widget";
+import { getUnexpectedWidgetTypeError } from "@/lib/widget";
 import { useAppSelector } from "@/state/hooks";
 
 export default function Widget(props: WidgetProps) {
@@ -54,29 +55,5 @@ interface GetWidgetByTypeDeps {
 }
 
 function handleUnexpectedWidgetType(widgetConfig: never) {
-  const type = (widgetConfig as { type?: unknown })?.type;
-  const error = type ? new UnexpectedWidgetTypeError({ type }) : new NoWidgetTypeError();
-  console.error(error);
-}
-
-export class NoWidgetTypeError extends Error {
-  public name = NoWidgetTypeError.name;
-
-  public constructor(options?: ErrorOptions) {
-    super(`Error while trying to handle the widget with no type`, options);
-  }
-}
-
-export class UnexpectedWidgetTypeError extends Error {
-  public name = UnexpectedWidgetTypeError.name;
-  public type: unknown;
-
-  public constructor(options: ErrorOptions & { type: unknown }) {
-    super(
-      `Error while trying to handle the widget: type ${options.type as string} is unexpected`,
-      options,
-    );
-
-    this.type = options.type;
-  }
+  console.error(getUnexpectedWidgetTypeError(widgetConfig));
 }

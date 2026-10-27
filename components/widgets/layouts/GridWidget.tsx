@@ -501,17 +501,7 @@ interface CornerGripProps {
 }
 
 function handleUnexpectedResizeHandleKind(kind: never) {
-  console.error(new UnexpectedGridResizeHandleKindError({ kind }));
-}
-
-export class UnexpectedGridResizeHandleKindError extends Error {
-  public name = UnexpectedGridResizeHandleKindError.name;
-  public kind: unknown;
-
-  public constructor(options: ErrorOptions & { kind: unknown }) {
-    super(`Grid resize handle kind ${options.kind as string} is unexpected`, options);
-    this.kind = options.kind;
-  }
+  console.error(getUnexpectedGridResizeHandleKindError(kind));
 }
 
 function getOutwardStepDelta(handle: GridResizeHandleConfig): GridResizeDelta {
@@ -589,6 +579,30 @@ function findComputedSlotAreaOnDrag(
 }
 
 type FindComputedSlotAreaOnDragDeps = FindItemAreaOnDragDeps;
+
+function getUnexpectedGridResizeHandleKindError(kind: never) {
+  return kind
+    ? new NonexistentGridResizeHandleKindError({ kind })
+    : new NoGridResizeHandleKindError();
+}
+
+export class NoGridResizeHandleKindError extends Error {
+  public name = NoGridResizeHandleKindError.name;
+
+  public constructor(options?: ErrorOptions) {
+    super(`Grid resize handle has no kind`, options);
+  }
+}
+
+export class NonexistentGridResizeHandleKindError extends Error {
+  public name = NonexistentGridResizeHandleKindError.name;
+  public kind: unknown;
+
+  public constructor(options: ErrorOptions & { kind: unknown }) {
+    super(`Grid resize handle kind ${options.kind as string} does not exist`, options);
+    this.kind = options.kind;
+  }
+}
 
 function isTouchedByFirstStep(item: GridItemToRender, deps: IsTouchedByFirstStepDeps) {
   return Boolean(findItemsOverlap(item.itemConfig, deps.firstStep));

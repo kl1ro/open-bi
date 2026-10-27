@@ -10,3 +10,25 @@ export interface AbstractGraphConfig extends AbstractWidgetConfig {
 }
 
 export type GraphType = "line";
+
+export function getUnexpectedGraphTypeError(graph: never) {
+  return graph ? new NonexistentGraphTypeError({ type: graph }) : new NoGraphTypeError();
+}
+
+export class NoGraphTypeError extends Error {
+  public name = NoGraphTypeError.name;
+
+  public constructor(options?: ErrorOptions) {
+    super(`Graph has no type`, options);
+  }
+}
+
+export class NonexistentGraphTypeError extends Error {
+  public name = NonexistentGraphTypeError.name;
+  public type: unknown;
+
+  public constructor(options: ErrorOptions & { type: unknown }) {
+    super(`Graph type ${options.type as string} does not exist`, options);
+    this.type = options.type;
+  }
+}

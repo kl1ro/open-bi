@@ -44,7 +44,7 @@ export function getLayoutConfigWithAdoptedChild(
       return getAbsoluteConfigWithAdoptedChild(parent, child, itemConfig);
 
     default:
-      throw getUnexpectedLayoutError(parent);
+      throw getUnexpectedLayoutTypeError(parent);
   }
 }
 
@@ -63,7 +63,7 @@ export function getLayoutConfigWithDisownedChild(
       return getAbsoluteConfigWithDisownedChild(parent, child);
 
     default:
-      throw getUnexpectedLayoutError(parent);
+      throw getUnexpectedLayoutTypeError(parent);
   }
 }
 
@@ -115,21 +115,29 @@ export function isLayoutChildRedundant(parent: LayoutConfig, child: WidgetConfig
       return false;
 
     default:
-      throw getUnexpectedLayoutError(parent);
+      throw getUnexpectedLayoutTypeError(parent);
   }
 }
 
-export function getUnexpectedLayoutError(layout: never) {
+export function getUnexpectedLayoutTypeError(layout: never) {
   const type = (layout as { layout?: unknown })?.layout;
-  return new UnexpectedLayoutTypeError({ type });
+  return type ? new NonexistentLayoutTypeError({ type }) : new NoLayoutTypeError();
 }
 
-export class UnexpectedLayoutTypeError extends Error {
-  public name = UnexpectedLayoutTypeError.name;
+export class NoLayoutTypeError extends Error {
+  public name = NoLayoutTypeError.name;
+
+  public constructor(options?: ErrorOptions) {
+    super(`Layout has no type`, options);
+  }
+}
+
+export class NonexistentLayoutTypeError extends Error {
+  public name = NonexistentLayoutTypeError.name;
   public type: unknown;
 
   public constructor(options: ErrorOptions & { type: unknown }) {
-    super(`Layout type ${options.type as string} is unexpected`, options);
+    super(`Layout type ${options.type as string} does not exist`, options);
     this.type = options.type;
   }
 }

@@ -3,7 +3,7 @@ import FlexWidget from "@/components/widgets/layouts/FlexWidget";
 import GridWidget from "@/components/widgets/layouts/GridWidget";
 import { cn } from "@/lib/utils";
 import type LayoutConfig from "@/lib/widgets/layout";
-import { getUnexpectedLayoutError } from "@/lib/widgets/layout";
+import { getUnexpectedLayoutTypeError } from "@/lib/widgets/layout";
 
 export default function LayoutWidget(props: LayoutConfig) {
   return (
@@ -34,5 +34,5 @@ interface GetLayoutByTypeDeps {
 }
 
 function handleUnexpectedLayoutType(layout: never) {
-  console.error(getUnexpectedLayoutError(layout));
+  console.error(getUnexpectedLayoutTypeError(layout));
 }

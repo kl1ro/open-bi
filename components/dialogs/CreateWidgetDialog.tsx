@@ -356,7 +356,7 @@ function getWidgetConfigFromFormValues(
       };
 
     default:
-      throw getUnexpectedFormValuesError(values);
+      throw getUnexpectedFormValuesTypeError(values);
   }
 }
 
@@ -366,20 +366,28 @@ interface GetWidgetConfigFromFormValuesDeps {
 }
 
 function getUnexpectedFormTypeError(type: never) {
-  return new UnexpectedFormTypeError({ type });
+  return type ? new NonexistentFormTypeError({ type }) : new NoFormTypeError();
 }
 
-function getUnexpectedFormValuesError(values: never) {
+function getUnexpectedFormValuesTypeError(values: never) {
   const type = (values as { type?: unknown })?.type;
-  return new UnexpectedFormTypeError({ type });
+  return type ? new NonexistentFormTypeError({ type }) : new NoFormTypeError();
 }
 
-export class UnexpectedFormTypeError extends Error {
-  public name = UnexpectedFormTypeError.name;
+export class NoFormTypeError extends Error {
+  public name = NoFormTypeError.name;
+
+  public constructor(options?: ErrorOptions) {
+    super(`Widget form has no type`, options);
+  }
+}
+
+export class NonexistentFormTypeError extends Error {
+  public name = NonexistentFormTypeError.name;
   public type: unknown;
 
   public constructor(options: ErrorOptions & { type: unknown }) {
-    super(`Widget form type ${options.type as string} is unexpected`, options);
+    super(`Widget form type ${options.type as string} does not exist`, options);
     this.type = options.type;
   }
 }
