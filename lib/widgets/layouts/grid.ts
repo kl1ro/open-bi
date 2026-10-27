@@ -435,7 +435,7 @@ interface GridItemOverlap {
   overlap: GridItemConfig;
 }
 
-const DEFAULT_GRID_ITEM_SIZE = {
+export const DEFAULT_GRID_ITEM_SIZE = {
   rowSpan: 1,
   colSpan: 1,
 } as const satisfies GridItemSize;
