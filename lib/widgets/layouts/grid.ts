@@ -211,9 +211,11 @@ function getOverlapResolutionOptions(overlap: GridItemOverlap): GridItemConfig[]
   const itemRect = convertItemToRect(overlap.overlappedItem);
   const overlapRect = convertItemToRect(overlap.overlap);
 
-  return getStripsAroundOverlap(itemRect, overlapRect)
+  const resolutionOptions = getStripsAroundOverlap(itemRect, overlapRect)
     .filter((strip) => !isEmptyRect(strip))
     .map((strip) => convertRectToItem(strip));
+
+  return resolutionOptions;
 }
 
 function getStripsAroundOverlap(itemRect: GridRect, overlapRect: GridRect): GridRect[] {
@@ -348,9 +350,11 @@ function getGridItemsFromArrangement(arrangement: GridArrangement): GridItemToRe
 function getComputedGridSlots(grid: GridConfig): GridItemToRender[] {
   const occupancy = getGridOccupancy(grid);
 
-  return getGridCells(grid)
+  const computedSlots = getGridCells(grid)
     .filter((cell) => !occupancy[getGridCoordinateKey(cell)])
     .map((cell) => ({ itemConfig: create1x1GridItemConfig(cell) }));
+
+  return computedSlots;
 }
 
 export function getGridOccupancy(grid: GridConfig) {
