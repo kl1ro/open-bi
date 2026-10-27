@@ -410,7 +410,7 @@ export class NonexistentFormTypeError extends Error {
   public type: unknown;
 
   public constructor(options: ErrorOptions & { type: unknown }) {
-    super(`Widget form type ${options.type as string} does not exist`, options);
+    super(`Widget form type ${String(options.type)} does not exist`, options);
     this.type = options.type;
   }
 }

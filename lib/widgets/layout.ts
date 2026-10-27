@@ -137,7 +137,7 @@ export class NonexistentLayoutTypeError extends Error {
   public type: unknown;
 
   public constructor(options: ErrorOptions & { type: unknown }) {
-    super(`Layout type ${options.type as string} does not exist`, options);
+    super(`Layout type ${String(options.type)} does not exist`, options);
     this.type = options.type;
   }
 }

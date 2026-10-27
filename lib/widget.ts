@@ -454,7 +454,7 @@ export class NonexistentWidgetTypeError extends Error {
   public type: unknown;
 
   public constructor(options: ErrorOptions & { type: unknown }) {
-    super(`Widget type ${options.type as string} does not exist`, options);
+    super(`Widget type ${String(options.type)} does not exist`, options);
     this.type = options.type;
   }
 }
