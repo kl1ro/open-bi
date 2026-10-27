@@ -100,6 +100,7 @@ export default tseslint.config(
 
       // JS
       'no-var': 'off',
+      eqeqeq: ['error', 'always'],
 
       // Prettier
       'prettier/prettier': 'error',
