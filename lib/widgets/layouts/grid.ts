@@ -222,7 +222,8 @@ function pickBestResolutionOption(
     (a, b) => getAspectDeviation(a, reference) - getAspectDeviation(b, reference),
   );
 
-  return orderedByAspectDeviation[0];
+  const bestOption = orderedByAspectDeviation[0];
+  return bestOption;
 }
 
 type PickBestResolutionOptionDeps = Pick<GridItemOverlap, "overlappedItem">;
