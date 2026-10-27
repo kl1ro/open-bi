@@ -37,20 +37,20 @@ export default function SlotWidget(props: SlotWidgetProps) {
 
 export type SlotWidgetProps =
   | StoredSlotWidgetProps
-  | CalculatedRootSlotWidgetProps
-  | CalculatedChildSlotWidgetProps;
+  | ComputedRootSlotWidgetProps
+  | ComputedChildSlotWidgetProps;
 
 export interface StoredSlotWidgetProps extends SlotConfig {
   itemConfig?: undefined;
 }
 
-export interface CalculatedRootSlotWidgetProps {
+export interface ComputedRootSlotWidgetProps {
   id?: undefined;
   parentId?: undefined;
   itemConfig?: undefined;
 }
 
-export interface CalculatedChildSlotWidgetProps {
+export interface ComputedChildSlotWidgetProps {
   id?: undefined;
   parentId: WidgetConfig["id"];
   itemConfig: ItemConfig;
