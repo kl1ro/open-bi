@@ -1,15 +1,15 @@
-import { useState, type PointerEvent } from "react";
+import type { PointerEvent, RefObject } from "react";
 import { toast } from "sonner";
 
-import type { GridWidgetState } from "@/components/widgets/layouts/GridWidget";
 import type { GridResizeHandleConfig } from "@/components/widgets/layouts/grid/GridResizeHandles";
-import type GridGesture from "@/hooks/grid/gesture";
 import {
   findNewGesture,
   getDragPreview,
   getGridGestureDelta,
   isGestureOwner,
   takeOverPointerEvent,
+  type AbstractGridGesture,
+  type GridGestureState,
   type GridPreviewArea,
   type GridPreviewRole,
 } from "@/hooks/grid/gesture";
@@ -25,70 +25,49 @@ import {
 } from "@/lib/widgets/layouts/grid";
 import { clamp } from "@/lib/utils";
 import { upsertWidget } from "@/state/features/dashboard";
+import type { AppStore } from "@/state/store";
 
-export default interface GridResize extends GridGesture {
+export default interface GridResize extends AbstractGridGesture {
+  kind: "resize";
   handle: GridResizeHandleConfig;
 }
 
 export function useGridResize(deps: UseGridResizeDeps) {
-  const [value, set] = useState<GridResize>();
-  return { value, set, preview: getResizePreview(value, deps) };
+  const resize = findOngoingResize(deps);
+  const resizeDeps = { ...deps, resize };
+
+  return {
+    value: resize,
+    preview: getResizePreview(resize, deps),
+    start: (startDeps: GridResizeStartDeps) => startResize({ ...deps, ...startDeps }),
+    continue: (event: PointerEvent<HTMLElement>) =>
+      continueResize({ ...resizeDeps, event }),
+    finish: (event: PointerEvent<HTMLElement>) =>
+      tryFinishResize({ ...resizeDeps, event }),
+    reset: () => resetResize(deps),
+  };
 }
 
 export interface UseGridResizeDeps {
   grid: GridConfig;
   itemsToRender: GridItemToRender[];
+  container: RefObject<HTMLDivElement | null>;
+  store: AppStore;
+  gesture: GridGestureState;
 }
 
-export function startResize(deps: StartResizeDeps) {
-  const gesture = findNewGesture(deps);
-  if (!gesture) return;
-  takeOverPointerEvent(deps.event);
-  deps.gridState.resize.set({ ...gesture, handle: deps.handle });
-}
-
-export interface StartResizeDeps {
+export interface GridResizeStartDeps {
   event: PointerEvent<HTMLElement>;
   handle: GridResizeHandleConfig;
   item: GridItemToRender;
-  gridState: GridWidgetState;
 }
 
-export function continueResize(deps: ContinueResizeDeps) {
-  if (!deps.resize.value) return;
-  const delta = getGridResizeDelta(deps.resize.value, deps);
-  if (haveSameDelta(delta, deps.resize.value.delta)) return;
-  deps.resize.set({ ...deps.resize.value, delta });
+function findOngoingResize(deps: FindOngoingResizeDeps): GridResize | undefined {
+  if (deps.gesture.value?.kind !== "resize") return;
+  return deps.gesture.value;
 }
 
-export type ContinueResizeDeps = Pick<GridWidgetState, "resize"> & {
-  event: PointerEvent<HTMLElement>;
-};
-
-export function tryFinishResize(deps: TryFinishResizeDeps) {
-  if (!deps.resize.value) return;
-
-  try {
-    const delta = getGridResizeDelta(deps.resize.value, deps);
-    const updatedResize = { ...deps.resize.value, delta };
-    applyResize(updatedResize, deps);
-  } catch (error) {
-    console.error(error);
-    toast.error("Не удалось изменить размер виджета");
-  }
-
-  resetResize(deps);
-}
-
-export type TryFinishResizeDeps = Pick<GridWidgetState, "resize" | "grid" | "store"> & {
-  event: PointerEvent<HTMLElement>;
-};
-
-export function resetResize(deps: ResetResizeDeps) {
-  deps.resize.set(undefined);
-}
-
-export type ResetResizeDeps = Pick<GridWidgetState, "resize">;
+type FindOngoingResizeDeps = Pick<UseGridResizeDeps, "gesture">;
 
 function getResizePreview(
   resize: GridResize | undefined,
@@ -101,27 +80,52 @@ function getResizePreview(
 
 type GetResizePreviewDeps = UseGridResizeDeps;
 
-function getGridResizeDelta(resize: GridResize, deps: GetGridResizeDeltaDeps): GridDelta {
-  const axes = new Set(resize.handle.sides.map((side) => RESIZE_SIDES[side].axis));
-  const gestureDelta = getGridGestureDelta(resize, deps);
-
-  return {
-    rows: axes.has("rows") ? gestureDelta.rows : 0,
-    columns: axes.has("columns") ? gestureDelta.columns : 0,
-  };
+function startResize(deps: StartResizeDeps) {
+  const gesture = findNewGesture(deps);
+  if (!gesture) return;
+  takeOverPointerEvent(deps.event);
+  deps.gesture.set({ ...gesture, kind: "resize", handle: deps.handle });
 }
 
-interface GetGridResizeDeltaDeps {
+type StartResizeDeps = UseGridResizeDeps & GridResizeStartDeps;
+
+function continueResize(deps: ContinueResizeDeps) {
+  if (!deps.resize) return;
+  const delta = getGridResizeDelta(deps.resize, deps);
+  if (haveSameDelta(delta, deps.resize.delta)) return;
+  deps.gesture.set({ ...deps.resize, delta });
+}
+
+type ContinueResizeDeps = Pick<UseGridResizeDeps, "gesture"> & {
+  resize?: GridResize;
   event: PointerEvent<HTMLElement>;
+};
+
+function tryFinishResize(deps: TryFinishResizeDeps) {
+  if (!deps.resize) return;
+
+  try {
+    const delta = getGridResizeDelta(deps.resize, deps);
+    const updatedResize = { ...deps.resize, delta };
+    applyResize(updatedResize, deps);
+  } catch (error) {
+    console.error(error);
+    toast.error("Не удалось изменить размер виджета");
+  }
+
+  resetResize(deps);
 }
 
-function applyResize(resize: GridResize, deps: ApplyResizeDeps) {
-  if (!hasDelta(resize.delta)) return;
-  const itemConfig = getResizedItemConfig(resize, deps);
-  deps.store.dispatch(upsertWidget({ widgetConfig: resize.owner.child, itemConfig }));
+type TryFinishResizeDeps = Pick<UseGridResizeDeps, "gesture" | "grid" | "store"> & {
+  resize?: GridResize;
+  event: PointerEvent<HTMLElement>;
+};
+
+function resetResize(deps: ResetResizeDeps) {
+  deps.gesture.set(undefined);
 }
 
-type ApplyResizeDeps = Pick<GridWidgetState, "grid" | "store">;
+type ResetResizeDeps = Pick<UseGridResizeDeps, "gesture">;
 
 function getResizePressPreview(
   resize: GridResize,
@@ -156,22 +160,27 @@ function getResizeDragPreview(
 
 type GetResizeDragPreviewDeps = GetResizePreviewDeps;
 
-function getResizedItemConfig(
-  resize: GridResize,
-  deps: GetResizedItemConfigDeps,
-): GridItemConfig {
-  const resizedItemConfig = resize.handle.sides.reduce(
-    (itemConfig, side) =>
-      getItemConfigResizedAtSide(itemConfig, side, { resize, grid: deps.grid }),
-    resize.owner.itemConfig,
-  );
+function getGridResizeDelta(resize: GridResize, deps: GetGridResizeDeltaDeps): GridDelta {
+  const axes = new Set(resize.handle.sides.map((side) => RESIZE_SIDES[side].axis));
+  const gestureDelta = getGridGestureDelta(resize, deps);
 
-  return resizedItemConfig;
+  return {
+    rows: axes.has("rows") ? gestureDelta.rows : 0,
+    columns: axes.has("columns") ? gestureDelta.columns : 0,
+  };
 }
 
-interface GetResizedItemConfigDeps {
-  grid: GridConfig;
+interface GetGridResizeDeltaDeps {
+  event: PointerEvent<HTMLElement>;
 }
+
+function applyResize(resize: GridResize, deps: ApplyResizeDeps) {
+  if (!hasDelta(resize.delta)) return;
+  const itemConfig = getResizedItemConfig(resize, deps);
+  deps.store.dispatch(upsertWidget({ widgetConfig: resize.owner.child, itemConfig }));
+}
+
+type ApplyResizeDeps = Pick<UseGridResizeDeps, "grid" | "store">;
 
 function getFirstStepItemConfig(
   resize: GridResize,
@@ -199,22 +208,20 @@ interface GetItemAreaOnResizePressDeps {
   firstStep: GridItemConfig;
 }
 
-function getItemConfigResizedAtSide(
-  itemConfig: GridItemConfig,
-  side: GridResizeSide,
-  deps: GetItemConfigResizedAtSideDeps,
-) {
-  const geometry = RESIZE_SIDES[side];
-  const delta = deps.resize.delta[geometry.axis];
-  const sideDeps = { geometry, delta, grid: deps.grid };
+function getResizedItemConfig(
+  resize: GridResize,
+  deps: GetResizedItemConfigDeps,
+): GridItemConfig {
+  const resizedItemConfig = resize.handle.sides.reduce(
+    (itemConfig, side) =>
+      getItemConfigResizedAtSide(itemConfig, side, { resize, grid: deps.grid }),
+    resize.owner.itemConfig,
+  );
 
-  return geometry.direction === "forward"
-    ? getItemConfigResizedForward(itemConfig, sideDeps)
-    : getItemConfigResizedBackward(itemConfig, sideDeps);
+  return resizedItemConfig;
 }
 
-interface GetItemConfigResizedAtSideDeps {
-  resize: GridResize;
+interface GetResizedItemConfigDeps {
   grid: GridConfig;
 }
 
@@ -239,6 +246,31 @@ function getItemRoleOnResizePress(
 }
 
 type GetItemRoleOnResizePressDeps = GetItemAreaOnResizePressDeps;
+
+function getItemConfigResizedAtSide(
+  itemConfig: GridItemConfig,
+  side: GridResizeSide,
+  deps: GetItemConfigResizedAtSideDeps,
+) {
+  const geometry = RESIZE_SIDES[side];
+  const delta = deps.resize.delta[geometry.axis];
+  const sideDeps = { geometry, delta, grid: deps.grid };
+
+  return geometry.direction === "forward"
+    ? getItemConfigResizedForward(itemConfig, sideDeps)
+    : getItemConfigResizedBackward(itemConfig, sideDeps);
+}
+
+interface GetItemConfigResizedAtSideDeps {
+  resize: GridResize;
+  grid: GridConfig;
+}
+
+function isTouchedByFirstStep(item: GridItemToRender, deps: IsTouchedByFirstStepDeps) {
+  return Boolean(findItemsOverlap(item.itemConfig, deps.firstStep));
+}
+
+type IsTouchedByFirstStepDeps = Pick<GetItemRoleOnResizePressDeps, "firstStep">;
 
 function getItemConfigResizedForward(
   itemConfig: GridItemConfig,
@@ -276,12 +308,6 @@ interface GetItemConfigResizedBackwardDeps {
   geometry: GridResizeSideGeometry;
   delta: number;
 }
-
-function isTouchedByFirstStep(item: GridItemToRender, deps: IsTouchedByFirstStepDeps) {
-  return Boolean(findItemsOverlap(item.itemConfig, deps.firstStep));
-}
-
-type IsTouchedByFirstStepDeps = Pick<GetItemRoleOnResizePressDeps, "firstStep">;
 
 export type GridResizeSide = "top" | "bottom" | "left" | "right";
 

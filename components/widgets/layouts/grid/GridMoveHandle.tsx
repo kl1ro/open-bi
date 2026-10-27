@@ -2,7 +2,6 @@ import { GripHorizontalIcon } from "lucide-react";
 
 import type { GridWidgetState } from "@/components/widgets/layouts/GridWidget";
 import { isGestureOwner } from "@/hooks/grid/gesture";
-import { continueMove, resetMove, startMove, tryFinishMove } from "@/hooks/grid/move";
 import type { GridItemToRender } from "@/lib/widgets/layouts/grid";
 import { cn } from "@/lib/utils";
 
@@ -18,10 +17,10 @@ export default function GridMoveHandle(props: GridMoveHandleProps) {
         "opacity-0 group-hover/item:opacity-100 animated",
         isActive && "opacity-100 cursor-grabbing",
       )}
-      onPointerDown={(event) => startMove({ ...props, event })}
-      onPointerMove={(event) => continueMove({ ...props.gridState, event })}
-      onPointerUp={(event) => tryFinishMove({ ...props.gridState, event })}
-      onPointerCancel={() => resetMove(props.gridState)}
+      onPointerDown={(event) => props.gridState.move.start({ ...props, event })}
+      onPointerMove={props.gridState.move.continue}
+      onPointerUp={props.gridState.move.finish}
+      onPointerCancel={props.gridState.move.reset}
     >
       <GripHorizontalIcon
         className={cn(MOVE_GRIP_CLASS, isActive && MOVE_ACTIVE_GRIP_CLASS)}

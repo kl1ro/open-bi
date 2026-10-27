@@ -1,14 +1,14 @@
-import { useState, type PointerEvent } from "react";
+import type { PointerEvent, RefObject } from "react";
 import { toast } from "sonner";
 
-import type { GridWidgetState } from "@/components/widgets/layouts/GridWidget";
-import type GridGesture from "@/hooks/grid/gesture";
 import {
   findNewGesture,
   getDragPreview,
   getGridGestureDelta,
   isGestureOwner,
   takeOverPointerEvent,
+  type AbstractGridGesture,
+  type GridGestureState,
   type GridPreviewArea,
   type GridPreviewRole,
 } from "@/hooks/grid/gesture";
@@ -23,69 +23,45 @@ import {
 } from "@/lib/widgets/layouts/grid";
 import { clamp } from "@/lib/utils";
 import { upsertWidget } from "@/state/features/dashboard";
+import type { AppStore } from "@/state/store";
 
-type GridMove = GridGesture;
-
-export default GridMove;
+export default interface GridMove extends AbstractGridGesture {
+  kind: "move";
+}
 
 export function useGridMove(deps: UseGridMoveDeps) {
-  const [value, set] = useState<GridMove>();
-  return { value, set, preview: getMovePreview(value, deps) };
+  const move = findOngoingMove(deps);
+  const moveDeps = { ...deps, move };
+
+  return {
+    value: move,
+    preview: getMovePreview(move, deps),
+    start: (startDeps: GridMoveStartDeps) => startMove({ ...deps, ...startDeps }),
+    continue: (event: PointerEvent<HTMLElement>) => continueMove({ ...moveDeps, event }),
+    finish: (event: PointerEvent<HTMLElement>) => tryFinishMove({ ...moveDeps, event }),
+    reset: () => resetMove(deps),
+  };
 }
 
 export interface UseGridMoveDeps {
   grid: GridConfig;
   itemsToRender: GridItemToRender[];
+  container: RefObject<HTMLDivElement | null>;
+  store: AppStore;
+  gesture: GridGestureState;
 }
 
-export function startMove(deps: StartMoveDeps) {
-  const move = findNewGesture(deps);
-  if (!move) return;
-  takeOverPointerEvent(deps.event);
-  deps.gridState.move.set(move);
-}
-
-export interface StartMoveDeps {
+export interface GridMoveStartDeps {
   event: PointerEvent<HTMLElement>;
   item: GridItemToRender;
-  gridState: GridWidgetState;
 }
 
-export function continueMove(deps: ContinueMoveDeps) {
-  if (!deps.move.value) return;
-  const delta = getGridGestureDelta(deps.move.value, deps);
-  if (haveSameDelta(delta, deps.move.value.delta)) return;
-  deps.move.set({ ...deps.move.value, delta });
+function findOngoingMove(deps: FindOngoingMoveDeps): GridMove | undefined {
+  if (deps.gesture.value?.kind !== "move") return;
+  return deps.gesture.value;
 }
 
-export type ContinueMoveDeps = Pick<GridWidgetState, "move"> & {
-  event: PointerEvent<HTMLElement>;
-};
-
-export function tryFinishMove(deps: TryFinishMoveDeps) {
-  if (!deps.move.value) return;
-
-  try {
-    const delta = getGridGestureDelta(deps.move.value, deps);
-    const updatedMove = { ...deps.move.value, delta };
-    applyMove(updatedMove, deps);
-  } catch (error) {
-    console.error(error);
-    toast.error("Не удалось переместить виджет");
-  }
-
-  resetMove(deps);
-}
-
-export type TryFinishMoveDeps = Pick<GridWidgetState, "move" | "grid" | "store"> & {
-  event: PointerEvent<HTMLElement>;
-};
-
-export function resetMove(deps: ResetMoveDeps) {
-  deps.move.set(undefined);
-}
-
-export type ResetMoveDeps = Pick<GridWidgetState, "move">;
+type FindOngoingMoveDeps = Pick<UseGridMoveDeps, "gesture">;
 
 function getMovePreview(
   move: GridMove | undefined,
@@ -98,13 +74,52 @@ function getMovePreview(
 
 type GetMovePreviewDeps = UseGridMoveDeps;
 
-function applyMove(move: GridMove, deps: ApplyMoveDeps) {
-  const itemConfig = getMovedItemConfig(move, deps);
-  if (occupySameCells(move.owner.itemConfig, itemConfig)) return;
-  deps.store.dispatch(upsertWidget({ widgetConfig: move.owner.child, itemConfig }));
+function startMove(deps: StartMoveDeps) {
+  const move = findNewGesture(deps);
+  if (!move) return;
+  takeOverPointerEvent(deps.event);
+  deps.gesture.set({ ...move, kind: "move" });
 }
 
-type ApplyMoveDeps = Pick<GridWidgetState, "grid" | "store">;
+type StartMoveDeps = UseGridMoveDeps & GridMoveStartDeps;
+
+function continueMove(deps: ContinueMoveDeps) {
+  if (!deps.move) return;
+  const delta = getGridGestureDelta(deps.move, deps);
+  if (haveSameDelta(delta, deps.move.delta)) return;
+  deps.gesture.set({ ...deps.move, delta });
+}
+
+type ContinueMoveDeps = Pick<UseGridMoveDeps, "gesture"> & {
+  move?: GridMove;
+  event: PointerEvent<HTMLElement>;
+};
+
+function tryFinishMove(deps: TryFinishMoveDeps) {
+  if (!deps.move) return;
+
+  try {
+    const delta = getGridGestureDelta(deps.move, deps);
+    const updatedMove = { ...deps.move, delta };
+    applyMove(updatedMove, deps);
+  } catch (error) {
+    console.error(error);
+    toast.error("Не удалось переместить виджет");
+  }
+
+  resetMove(deps);
+}
+
+type TryFinishMoveDeps = Pick<UseGridMoveDeps, "gesture" | "grid" | "store"> & {
+  move?: GridMove;
+  event: PointerEvent<HTMLElement>;
+};
+
+function resetMove(deps: ResetMoveDeps) {
+  deps.gesture.set(undefined);
+}
+
+type ResetMoveDeps = Pick<UseGridMoveDeps, "gesture">;
 
 function getMovePressPreview(
   move: GridMove,
@@ -138,6 +153,29 @@ function getMoveDragPreview(
 
 type GetMoveDragPreviewDeps = GetMovePreviewDeps;
 
+function applyMove(move: GridMove, deps: ApplyMoveDeps) {
+  const itemConfig = getMovedItemConfig(move, deps);
+  if (occupySameCells(move.owner.itemConfig, itemConfig)) return;
+  deps.store.dispatch(upsertWidget({ widgetConfig: move.owner.child, itemConfig }));
+}
+
+type ApplyMoveDeps = Pick<UseGridMoveDeps, "grid" | "store">;
+
+function getItemAreaOnMovePress(
+  item: GridItemToRender,
+  deps: GetItemAreaOnMovePressDeps,
+): GridPreviewArea {
+  return {
+    key: getRenderedGridItemKey(item),
+    itemConfig: item.itemConfig,
+    role: getItemRoleOnMovePress(item, deps),
+  };
+}
+
+interface GetItemAreaOnMovePressDeps {
+  move: GridMove;
+}
+
 function getMovedItemConfig(
   move: GridMove,
   deps: GetMovedItemConfigDeps,
@@ -156,21 +194,6 @@ function getMovedItemConfig(
 
 interface GetMovedItemConfigDeps {
   grid: GridConfig;
-}
-
-function getItemAreaOnMovePress(
-  item: GridItemToRender,
-  deps: GetItemAreaOnMovePressDeps,
-): GridPreviewArea {
-  return {
-    key: getRenderedGridItemKey(item),
-    itemConfig: item.itemConfig,
-    role: getItemRoleOnMovePress(item, deps),
-  };
-}
-
-interface GetItemAreaOnMovePressDeps {
-  move: GridMove;
 }
 
 function getItemRoleOnMovePress(

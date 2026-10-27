@@ -1,12 +1,6 @@
 import type { GridWidgetState } from "@/components/widgets/layouts/GridWidget";
 import { isGestureOwner } from "@/hooks/grid/gesture";
-import {
-  continueResize,
-  resetResize,
-  startResize,
-  tryFinishResize,
-  type GridResizeSide,
-} from "@/hooks/grid/resize";
+import type { GridResizeSide } from "@/hooks/grid/resize";
 import type { GridItemToRender } from "@/lib/widgets/layouts/grid";
 import { cn } from "@/lib/utils";
 
@@ -38,10 +32,10 @@ function GridResizeHandle(props: GridResizeHandleProps) {
         props.handle.cursor,
         isActive && "opacity-100",
       )}
-      onPointerDown={(event) => startResize({ ...props, event })}
-      onPointerMove={(event) => continueResize({ ...props.gridState, event })}
-      onPointerUp={(event) => tryFinishResize({ ...props.gridState, event })}
-      onPointerCancel={() => resetResize(props.gridState)}
+      onPointerDown={(event) => props.gridState.resize.start({ ...props, event })}
+      onPointerMove={props.gridState.resize.continue}
+      onPointerUp={props.gridState.resize.finish}
+      onPointerCancel={props.gridState.resize.reset}
     >
       <ResizeGrip
         kind={props.handle.kind}

@@ -5,7 +5,11 @@ import Widget from "@/components/Widget";
 import SlotWidget from "@/components/widgets/SlotWidget";
 import GridMoveHandle from "@/components/widgets/layouts/grid/GridMoveHandle";
 import GridResizeHandles from "@/components/widgets/layouts/grid/GridResizeHandles";
-import type { GridPreviewArea, GridPreviewRole } from "@/hooks/grid/gesture";
+import {
+  useGridGesture,
+  type GridPreviewArea,
+  type GridPreviewRole,
+} from "@/hooks/grid/gesture";
 import { useGridMove } from "@/hooks/grid/move";
 import { useGridResize } from "@/hooks/grid/resize";
 import type GridConfig from "@/lib/widgets/layouts/grid";
@@ -52,15 +56,18 @@ export default function GridWidget(props: GridConfig) {
 }
 
 function useGridWidgetState(props: GridConfig) {
-  const itemsToRender = getGridItemsToRender(props);
-
-  return {
+  const deps = {
     grid: props,
-    itemsToRender,
+    itemsToRender: getGridItemsToRender(props),
     container: useRef<HTMLDivElement>(null),
     store: useAppStore(),
-    resize: useGridResize({ grid: props, itemsToRender }),
-    move: useGridMove({ grid: props, itemsToRender }),
+    gesture: useGridGesture(),
+  };
+
+  return {
+    ...deps,
+    resize: useGridResize(deps),
+    move: useGridMove(deps),
   };
 }
 

@@ -1,6 +1,7 @@
-import type { PointerEvent } from "react";
+import { useState, type PointerEvent, type RefObject } from "react";
 
-import type { GridWidgetState } from "@/components/widgets/layouts/GridWidget";
+import type GridMove from "@/hooks/grid/move";
+import type GridResize from "@/hooks/grid/resize";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   findItemsOverlap,
@@ -16,24 +17,34 @@ import {
 import type WidgetConfig from "@/lib/widget";
 import { findWidgetConfig } from "@/lib/widget";
 import { createSlotConfig } from "@/lib/widgets/slot";
+import type { AppStore } from "@/state/store";
 
-export default interface GridGesture {
-  owner: GridGestureOwner;
-  startPoint: { clientX: number; clientY: number };
-  cellPitch: GridCellPitch;
-  delta: GridDelta;
+type GridGesture = GridResize | GridMove;
+
+export default GridGesture;
+
+export function useGridGesture() {
+  const [value, set] = useState<GridGesture>();
+  return { value, set };
 }
 
-export function isGestureOwner(item: GridItemToRender, gesture: GridGesture | undefined) {
+export type GridGestureState = ReturnType<typeof useGridGesture>;
+
+export function isGestureOwner(
+  item: GridItemToRender,
+  gesture: AbstractGridGesture | undefined,
+) {
   return gesture?.owner.key === getRenderedGridItemKey(item);
 }
 
-export function findNewGesture(deps: FindNewGestureDeps): GridGesture | undefined {
-  if (isGestureInProgress(deps.gridState)) return;
-  const owner = findGestureOwner(deps.item, deps.gridState);
-  const container = deps.gridState.container.current;
+export function findNewGesture(
+  deps: FindNewGestureDeps,
+): AbstractGridGesture | undefined {
+  if (isGestureInProgress(deps)) return;
+  const owner = findGestureOwner(deps.item, deps);
+  const container = deps.container.current;
   if (!owner || !container) return;
-  const cellPitchDeps = { container, grid: deps.gridState.grid };
+  const cellPitchDeps = { container, grid: deps.grid };
 
   return {
     owner,
@@ -46,7 +57,10 @@ export function findNewGesture(deps: FindNewGestureDeps): GridGesture | undefine
 export interface FindNewGestureDeps {
   event: PointerEvent<HTMLElement>;
   item: GridItemToRender;
-  gridState: GridWidgetState;
+  grid: GridConfig;
+  container: RefObject<HTMLDivElement | null>;
+  store: AppStore;
+  gesture: GridGestureState;
 }
 
 export function takeOverPointerEvent(event: PointerEvent<HTMLElement>) {
@@ -55,7 +69,7 @@ export function takeOverPointerEvent(event: PointerEvent<HTMLElement>) {
 }
 
 export function getGridGestureDelta(
-  gesture: GridGesture,
+  gesture: AbstractGridGesture,
   deps: GetGridGestureDeltaDeps,
 ): GridDelta {
   const [rows, columns] = [
@@ -71,7 +85,7 @@ export interface GetGridGestureDeltaDeps {
 }
 
 export function getDragPreview(
-  gesture: GridGesture,
+  gesture: AbstractGridGesture,
   deps: GetDragPreviewDeps,
 ): GridPreviewArea[] {
   const adoptionDeps = { itemConfig: deps.targetItemConfig };
@@ -99,10 +113,10 @@ export interface GetDragPreviewDeps {
 }
 
 function isGestureInProgress(deps: IsGestureInProgressDeps) {
-  return Boolean(deps.resize.value || deps.move.value);
+  return Boolean(deps.gesture.value);
 }
 
-type IsGestureInProgressDeps = Pick<GridWidgetState, "resize" | "move">;
+type IsGestureInProgressDeps = Pick<FindNewGestureDeps, "gesture">;
 
 function findGestureOwner(
   item: GridItemToRender,
@@ -120,7 +134,7 @@ function findGestureOwner(
   return { key: getRenderedGridItemKey(item), child, itemConfig: item.itemConfig };
 }
 
-type FindGestureOwnerDeps = Pick<GridWidgetState, "grid" | "store">;
+type FindGestureOwnerDeps = Pick<FindNewGestureDeps, "grid" | "store">;
 
 function measureCellPitch(deps: MeasureCellPitchDeps): GridCellPitch {
   const style = getComputedStyle(deps.container);
@@ -157,7 +171,7 @@ function findItemAreaOnDrag(
 }
 
 interface FindItemAreaOnDragDeps {
-  gesture: GridGesture;
+  gesture: AbstractGridGesture;
   previewGrid: GridConfig;
   ownerRole: GridPreviewRole;
 }
@@ -204,6 +218,13 @@ function getOwnerPreviewItemConfig(deps: GetOwnerPreviewItemConfigDeps) {
 }
 
 type GetOwnerPreviewItemConfigDeps = FindItemAreaOnDragDeps;
+
+export interface AbstractGridGesture {
+  owner: GridGestureOwner;
+  startPoint: { clientX: number; clientY: number };
+  cellPitch: GridCellPitch;
+  delta: GridDelta;
+}
 
 export interface GridGestureOwner {
   key: string;
