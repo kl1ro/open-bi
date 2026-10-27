@@ -14,7 +14,6 @@ import {
   getGridResizeDelta,
   getResizedItemConfig,
   getResizePreview,
-  type GridResizeHandleConfig,
 } from "@/lib/widgets/layouts/grid/resize";
 import { takeOverPointerEvent } from "@/lib/pointer";
 import { upsertWidget } from "@/state/features/dashboard";
@@ -47,7 +46,7 @@ export interface UseGridResizeDeps {
 
 export interface GridResizeStartDeps {
   event: PointerEvent<HTMLElement>;
-  handle: GridResizeHandleConfig;
+  handle: Pick<GridResize, "sides">;
   item: GridItemToRender;
 }
 
@@ -69,7 +68,7 @@ function tryStartResize(deps: TryStartResizeDeps) {
 
     const gesture = createGesture(creationDeps);
     takeOverPointerEvent(deps.event);
-    deps.gesture.set({ ...gesture, kind: "resize", handle: deps.handle });
+    deps.gesture.set({ ...gesture, kind: "resize", sides: deps.handle.sides });
   } catch (error) {
     console.error(error);
     toast.error("Не удалось начать изменение размера виджета");

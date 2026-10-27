@@ -20,7 +20,7 @@ import { clamp } from "@/lib/utils";
 
 export default interface GridResize extends AbstractGridGesture {
   kind: "resize";
-  handle: GridResizeHandleConfig;
+  sides: readonly GridResizeSide[];
 }
 
 export function getResizePreview(
@@ -41,7 +41,7 @@ export function getGridResizeDelta(
   resize: GridResize,
   deps: GetGridResizeDeltaDeps,
 ): GridDelta {
-  const axes = new Set(resize.handle.sides.map((side) => RESIZE_SIDES[side].axis));
+  const axes = new Set(resize.sides.map((side) => RESIZE_SIDES[side].axis));
   const gestureDelta = getGridGestureDelta(resize, deps);
 
   return {
@@ -58,7 +58,7 @@ export function getResizedItemConfig(
   resize: GridResize,
   deps: GetResizedItemConfigDeps,
 ): GridItemConfig {
-  const resizedItemConfig = resize.handle.sides.reduce(
+  const resizedItemConfig = resize.sides.reduce(
     (itemConfig, side) =>
       getItemConfigResizedAtSide(itemConfig, side, { resize, grid: deps.grid }),
     resize.owner.itemConfig,
@@ -127,7 +127,7 @@ function getFirstStepItemConfig(
   resize: GridResize,
   deps: GetFirstStepItemConfigDeps,
 ): GridItemConfig {
-  const firstStepResize = { ...resize, delta: getOutwardStepDelta(resize.handle) };
+  const firstStepResize = { ...resize, delta: getOutwardStepDelta(resize) };
   return getResizedItemConfig(firstStepResize, deps);
 }
 
@@ -186,8 +186,8 @@ interface GetItemConfigResizedBackwardDeps {
   delta: number;
 }
 
-function getOutwardStepDelta(handle: GridResizeHandleConfig): GridDelta {
-  const outwardStepDelta = handle.sides.reduce<GridDelta>(
+function getOutwardStepDelta(resize: GridResize): GridDelta {
+  const outwardStepDelta = resize.sides.reduce<GridDelta>(
     (delta, side) => {
       const geometry = RESIZE_SIDES[side];
       return { ...delta, [geometry.axis]: geometry.direction === "forward" ? 1 : -1 };
@@ -228,16 +228,4 @@ interface GridResizeSideGeometry {
   direction: "forward" | "backward";
   position: keyof GridItemConfig["position"];
   span: keyof GridItemConfig["size"];
-}
-
-export type GridResizeHandleKind = "edge" | "corner";
-
-export interface GridResizeHandleConfig {
-  name: string;
-  kind: GridResizeHandleKind;
-  sides: readonly GridResizeSide[];
-  cursor: string;
-  handleClass: string;
-  gripClass: string;
-  activeGripClass: string;
 }
