@@ -114,6 +114,7 @@ function useCreateWidgetDialogState(props: CreateWidgetDialogProps) {
     form,
     type: form.watch("type"),
     dispatch: useAppDispatch(),
+    id: props.id,
     parentId: props.parentId,
     itemConfig: props.itemConfig,
     close: () => props.setOpen(false),
