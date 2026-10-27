@@ -19,9 +19,11 @@ export function getRecordWithoutKey<Value>(
 ): Record<string, Value> | undefined {
   if (!record) return;
 
-  return Object.fromEntries(
+  const recordWithoutKey = Object.fromEntries(
     Object.entries(record).filter(([recordKey]) => recordKey !== key),
   );
+
+  return recordWithoutKey;
 }
 
 export function haveSameElements<Value>(first?: Value[], second?: Value[]) {

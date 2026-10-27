@@ -208,13 +208,12 @@ export function getDescendantConfigs(
     {},
   );
 
-  return {
-    ...currentLayerChildren,
-    ...Object.values(currentLayerChildren).reduce<WidgetConfigsById>(
-      (prev, cur) => ({ ...prev, ...getDescendantConfigs(cur, deps) }),
-      {},
-    ),
-  };
+  const deeperDescendants = Object.values(currentLayerChildren).reduce<WidgetConfigsById>(
+    (prev, cur) => ({ ...prev, ...getDescendantConfigs(cur, deps) }),
+    {},
+  );
+
+  return { ...currentLayerChildren, ...deeperDescendants };
 }
 
 export interface GetDescendantConfigsDeps {

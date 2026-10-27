@@ -244,7 +244,11 @@ function getPressPreview(
 ): GridResizePreviewArea[] {
   const firstStep = getFirstStepItemConfig(resize, deps);
   const itemAreaDeps = { resize, firstStep };
-  return deps.itemsToRender.map((item) => getItemAreaOnPress(item, itemAreaDeps));
+  const pressPreview = deps.itemsToRender.map((item) =>
+    getItemAreaOnPress(item, itemAreaDeps),
+  );
+
+  return pressPreview;
 }
 
 type GetPressPreviewDeps = GetResizePreviewDeps;
@@ -263,9 +267,11 @@ function getDragPreview(
 
   const itemAreaDeps = { resize, previewGrid };
 
-  return deps.itemsToRender.flatMap(
+  const dragPreview = deps.itemsToRender.flatMap(
     (item) => findItemAreaOnDrag(item, itemAreaDeps) ?? [],
   );
+
+  return dragPreview;
 }
 
 type GetDragPreviewDeps = GetResizePreviewDeps;
@@ -381,11 +387,13 @@ function getResizedItemConfig(
   resize: GridResize,
   deps: GetResizedItemConfigDeps,
 ): GridItemConfig {
-  return resize.handle.sides.reduce(
+  const resizedItemConfig = resize.handle.sides.reduce(
     (itemConfig, side) =>
       getItemConfigResizedAtSide(itemConfig, side, { resize, grid: deps.grid }),
     resize.owner.itemConfig,
   );
+
+  return resizedItemConfig;
 }
 
 interface GetResizedItemConfigDeps {
@@ -525,13 +533,15 @@ export class NonexistentGridResizeHandleKindError extends Error {
 }
 
 function getOutwardStepDelta(handle: GridResizeHandleConfig): GridResizeDelta {
-  return handle.sides.reduce<GridResizeDelta>(
+  const outwardStepDelta = handle.sides.reduce<GridResizeDelta>(
     (delta, side) => {
       const geometry = RESIZE_SIDES[side];
       return { ...delta, [geometry.axis]: geometry.direction === "forward" ? 1 : -1 };
     },
     { rows: 0, columns: 0 },
   );
+
+  return outwardStepDelta;
 }
 
 function getItemRoleOnPress(
