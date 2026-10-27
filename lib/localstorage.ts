@@ -1,8 +1,8 @@
-import type { DashboardState } from "@/state/features/dashboard";
+import type DashboardConfig from "@/lib/dashboard";
 
 const DASHBOARD_LOCALSTORAGE_KEY = "dashboard";
 
-export function saveDashboardToLocalStorage(dashboard: DashboardState) {
+export function saveDashboardToLocalStorage(dashboard: DashboardConfig) {
   try {
     localStorage.setItem(DASHBOARD_LOCALSTORAGE_KEY, JSON.stringify(dashboard));
   } catch (error) {
@@ -22,7 +22,7 @@ export function restoreDashboardFromLocalStorage() {
   try {
     const storageItem = localStorage.getItem(DASHBOARD_LOCALSTORAGE_KEY);
     if (!storageItem) return;
-    const dashboard = JSON.parse(storageItem) as DashboardState;
+    const dashboard = JSON.parse(storageItem) as DashboardConfig;
     return dashboard;
   } catch (error) {
     throw new RestoreDashboardError({ cause: error });

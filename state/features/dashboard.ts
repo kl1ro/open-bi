@@ -15,18 +15,13 @@ import {
   validateWidgetUpdate,
   widgetsHaveSameId,
   type ItemConfig,
-  type WidgetConfigsById,
 } from "@/lib/widget";
+import type DashboardConfig from "@/lib/dashboard";
 import type { WithRequired } from "@/lib/utils";
 
-const initialDashboardState: DashboardState = {
+const initialDashboardState: DashboardConfig = {
   widgetConfigs: {},
 };
-
-export interface DashboardState {
-  widgetConfigs: WidgetConfigsById;
-  rootId?: WidgetConfig["id"];
-}
 
 const slice = createSlice({
   name: "dashboard",
@@ -42,14 +37,14 @@ export const { setDashboard, upsertWidget, removeWidget } = slice.actions;
 export default slice.reducer;
 
 function handleDashboardSet(
-  state: DashboardState,
-  action: PayloadAction<DashboardState>,
+  state: DashboardConfig,
+  action: PayloadAction<DashboardConfig>,
 ) {
   return action.payload;
 }
 
 function handleWidgetUpsert(
-  state: DashboardState,
+  state: DashboardConfig,
   action: PayloadAction<WidgetUpsertPayload>,
 ) {
   const { itemConfig, widgetConfig } = action.payload;
@@ -76,7 +71,7 @@ interface WidgetUpsertPayload {
 }
 
 function handleWidgetRemoval(
-  state: DashboardState,
+  state: DashboardConfig,
   action: PayloadAction<WidgetRemovalPayload>,
 ) {
   const { id } = action.payload;
@@ -211,5 +206,5 @@ function updateRootId(newId: WidgetConfig["id"] | undefined, deps: DashboardSlic
 }
 
 export interface DashboardSliceDeps {
-  state: DashboardState;
+  state: DashboardConfig;
 }
