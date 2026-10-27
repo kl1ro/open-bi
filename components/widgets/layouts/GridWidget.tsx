@@ -193,10 +193,7 @@ function getResizePreview(
   return getDragPreview(resize, deps);
 }
 
-interface GetResizePreviewDeps {
-  grid: GridConfig;
-  itemsToRender: GridItemToRender[];
-}
+type GetResizePreviewDeps = UseGridResizeDeps;
 
 function getGridAreaStyle(itemConfig: GridItemConfig) {
   return {
