@@ -17,9 +17,9 @@ export default function GridMoveHandle(props: GridMoveHandleProps) {
         "opacity-0 group-hover/item:opacity-100 animated",
         isActive && "opacity-100 cursor-grabbing",
       )}
-      onPointerDown={(event) => props.gridState.move.start({ ...props, event })}
+      onPointerDown={(event) => props.gridState.move.tryStart({ ...props, event })}
       onPointerMove={props.gridState.move.continue}
-      onPointerUp={props.gridState.move.finish}
+      onPointerUp={props.gridState.move.tryFinish}
       onPointerCancel={props.gridState.move.reset}
     >
       <GripHorizontalIcon

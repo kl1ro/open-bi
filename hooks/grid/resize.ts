@@ -35,10 +35,11 @@ export default function useGridResize(deps: UseGridResizeDeps) {
   return {
     value: resize,
     preview: getResizePreview(resize, deps),
-    start: (startDeps: GridResizeStartDeps) => tryStartResize({ ...deps, ...startDeps }),
+    tryStart: (startDeps: GridResizeStartDeps) =>
+      tryStartResize({ ...deps, ...startDeps }),
     continue: (event: PointerEvent<HTMLElement>) =>
       continueResize({ ...resizeDeps, event }),
-    finish: (event: PointerEvent<HTMLElement>) =>
+    tryFinish: (event: PointerEvent<HTMLElement>) =>
       tryFinishResize({ ...resizeDeps, event }),
     reset: () => resetResize(deps),
   };

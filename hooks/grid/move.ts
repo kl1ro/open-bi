@@ -33,9 +33,10 @@ export default function useGridMove(deps: UseGridMoveDeps) {
   return {
     value: move,
     preview: getMovePreview(move, deps),
-    start: (startDeps: GridMoveStartDeps) => tryStartMove({ ...deps, ...startDeps }),
+    tryStart: (startDeps: GridMoveStartDeps) => tryStartMove({ ...deps, ...startDeps }),
     continue: (event: PointerEvent<HTMLElement>) => continueMove({ ...moveDeps, event }),
-    finish: (event: PointerEvent<HTMLElement>) => tryFinishMove({ ...moveDeps, event }),
+    tryFinish: (event: PointerEvent<HTMLElement>) =>
+      tryFinishMove({ ...moveDeps, event }),
     reset: () => resetMove(deps),
   };
 }
