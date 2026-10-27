@@ -17,15 +17,12 @@ export default function Dashboard() {
   const state = useDashboardState();
   useDashboardEffects();
   if (!state.rootConfig) return <SlotWidget />;
-  return <Widget {...state.rootConfig} />;
+  return <Widget id={state.rootConfig.id} />;
 }
 
 function useDashboardState() {
-  const dashboardState = useAppSelector((state) => state.dashboard);
-
   return {
-    dashboard: dashboardState,
-    rootConfig: findRootConfig({ state: dashboardState }),
+    rootConfig: useAppSelector((state) => findRootConfig({ state: state.dashboard })),
   };
 }
 
