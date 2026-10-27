@@ -1,6 +1,4 @@
-import type { AbstractLayoutConfig } from "../layout";
-
-import type { ItemConfig } from "@/lib/widget";
+import type { AbstractLayoutConfig } from "@/lib/widgets/layout";
 import type WidgetConfig from "@/lib/widget";
 import {
   getChildrenWithAdoptedChild,
@@ -9,6 +7,7 @@ import {
   InvalidItemConfigTypeError,
   ItemConfigNotFoundError,
   NoItemConfigError,
+  type ItemConfig,
 } from "@/lib/widget";
 import { type CoordinateKey, getRecordWithoutKey } from "@/lib/utils";
 
@@ -26,13 +25,13 @@ export function getGridConfigWithAdoptedChild(
   itemConfig?: ItemConfig,
 ) {
   if (hasChild(parent, child) && !itemConfig) return parent;
-  const validItemConfig = ensureItemConfigParentIsGrid(itemConfig);
+  const gridItemConfig = ensureItemConfigParentTypeIsGrid(itemConfig);
 
   const children = getChildrenWithAdoptedChild(parent, child);
 
   const arrangementWithUpsertedChild = upsertGridItemToArrangement(
     child.id,
-    validItemConfig,
+    gridItemConfig,
     parent.arrangement,
   );
 
@@ -44,22 +43,23 @@ export function isGridChildRedundant(parent: GridConfig, child: WidgetConfig) {
   const itemConfig = getGridItemConfig(parent, child);
 
   return (
-    (child.type == "slot" && is1x1GridItem(itemConfig)) || isGridItemCollapsed(itemConfig)
+    (child.type === "slot" && is1x1GridItem(itemConfig)) ||
+    isGridItemCollapsed(itemConfig)
   );
 }
 
 export function is1x1GridItem(itemConfig: GridItemConfig) {
-  return itemConfig.size.rowSpan == 1 && itemConfig.size.colSpan == 1;
+  return itemConfig.size.rowSpan === 1 && itemConfig.size.colSpan === 1;
 }
 
 export function isGridItemCollapsed(itemConfig: GridItemConfig) {
-  return itemConfig.size.rowSpan == 0 || itemConfig.size.colSpan == 0;
+  return itemConfig.size.rowSpan === 0 || itemConfig.size.colSpan === 0;
 }
 
-function ensureItemConfigParentIsGrid(itemConfig?: ItemConfig) {
+function ensureItemConfigParentTypeIsGrid(itemConfig?: ItemConfig) {
   if (!itemConfig) throw new NoItemConfigError({ requiredType: "grid" });
 
-  if (itemConfig.parentType != "grid")
+  if (itemConfig.parentType !== "grid")
     throw new InvalidItemConfigTypeError({
       requiredType: "grid",
       gotType: itemConfig.parentType,
@@ -92,7 +92,7 @@ function getOverlapsBetweenItemAndArrangement(
   itemId: WidgetConfig["id"],
   arrangement: GridArrangement,
 ): GridItemOverlap[] {
-  const suspectIds = Object.keys(arrangement).filter((id) => id != itemId);
+  const suspectIds = Object.keys(arrangement).filter((id) => id !== itemId);
 
   const overlaps = suspectIds.flatMap(
     (id) => findOverlapInArrangement(itemId, id, arrangement) ?? [],
@@ -113,7 +113,10 @@ function findOverlapInArrangement(
   return { overlappedItemId, overlappedItem, overlap };
 }
 
-export function findItemsOverlap(first: GridItemConfig, second: GridItemConfig) {
+export function findItemsOverlap(
+  first: GridItemConfig,
+  second: GridItemConfig,
+): GridItemConfig | undefined {
   const [firstRect, secondRect] = [convertItemToRect(first), convertItemToRect(second)];
   const overlapRect = findRectsOverlap(firstRect, secondRect);
   if (!overlapRect) return;
@@ -121,11 +124,11 @@ export function findItemsOverlap(first: GridItemConfig, second: GridItemConfig) 
 }
 
 export function hasDelta(delta: GridResizeDelta) {
-  return delta.rows != 0 || delta.columns != 0;
+  return delta.rows !== 0 || delta.columns !== 0;
 }
 
 export function haveSameDelta(first: GridResizeDelta, second: GridResizeDelta) {
-  return first.rows == second.rows && first.columns == second.columns;
+  return first.rows === second.rows && first.columns === second.columns;
 }
 
 export interface GridResizeDelta {
@@ -181,7 +184,7 @@ function resolveOverlap(overlap: GridItemOverlap): {
   id: WidgetConfig["id"];
   itemConfig: GridItemConfig;
 } {
-  const options = findOverlapResolutionOptions(overlap);
+  const options = getOverlapResolutionOptions(overlap);
 
   if (!options.length)
     return {
@@ -191,7 +194,7 @@ function resolveOverlap(overlap: GridItemOverlap): {
 
   const orderedByArea = options.toSorted((a, b) => getItemArea(b) - getItemArea(a));
   const maxArea = getItemArea(orderedByArea[0]);
-  const withMaxArea = orderedByArea.filter((option) => getItemArea(option) == maxArea);
+  const withMaxArea = orderedByArea.filter((option) => getItemArea(option) === maxArea);
   const reference = overlap.overlappedItem;
 
   const orderedByAspectDeviation = withMaxArea.toSorted(
@@ -204,13 +207,15 @@ function resolveOverlap(overlap: GridItemOverlap): {
   };
 }
 
-function findOverlapResolutionOptions(overlap: GridItemOverlap): GridItemConfig[] {
+function getOverlapResolutionOptions(overlap: GridItemOverlap): GridItemConfig[] {
   const itemRect = convertItemToRect(overlap.overlappedItem);
   const overlapRect = convertItemToRect(overlap.overlap);
 
-  return getStripsAroundOverlap(itemRect, overlapRect)
+  const resolutionOptions = getStripsAroundOverlap(itemRect, overlapRect)
     .filter((strip) => !isEmptyRect(strip))
     .map((strip) => convertRectToItem(strip));
+
+  return resolutionOptions;
 }
 
 function getStripsAroundOverlap(itemRect: GridRect, overlapRect: GridRect): GridRect[] {
@@ -275,10 +280,10 @@ function getItemArea(item: GridItemConfig) {
 
 export function occupySameCells(first: GridItemConfig, second: GridItemConfig) {
   return (
-    first.position.row == second.position.row &&
-    first.position.column == second.position.column &&
-    first.size.rowSpan == second.size.rowSpan &&
-    first.size.colSpan == second.size.colSpan
+    first.position.row === second.position.row &&
+    first.position.column === second.position.column &&
+    first.size.rowSpan === second.size.rowSpan &&
+    first.size.colSpan === second.size.colSpan
   );
 }
 
@@ -345,9 +350,11 @@ function getGridItemsFromArrangement(arrangement: GridArrangement): GridItemToRe
 function getComputedGridSlots(grid: GridConfig): GridItemToRender[] {
   const occupancy = getGridOccupancy(grid);
 
-  return getGridCells(grid)
+  const computedSlots = getGridCells(grid)
     .filter((cell) => !occupancy[getGridCoordinateKey(cell)])
     .map((cell) => ({ itemConfig: create1x1GridItemConfig(cell) }));
+
+  return computedSlots;
 }
 
 export function getGridOccupancy(grid: GridConfig) {
@@ -402,26 +409,6 @@ function isCellInsideGridItem(cell: GridItemPosition, item: GridItemConfig) {
   );
 }
 
-export function areAtSamePosition(i1?: GridItemConfig, i2?: GridItemConfig): boolean {
-  if (!i1?.position || !i2?.position) return false;
-
-  return i1.position.row === i2.position.row && i1.position.column === i2.position.column;
-}
-
-export function areAtSameRow(i1?: GridItemConfig, i2?: GridItemConfig): boolean {
-  if (!i1?.position || !i2?.position) return false;
-  return i1.position.row === i2.position.row;
-}
-
-export function areAtSameColumn(i1?: GridItemConfig, i2?: GridItemConfig): boolean {
-  if (!i1?.position || !i2?.position) return false;
-  return i1.position.column === i2.position.column;
-}
-
-export function takesSpace(widget: GridItemConfig): boolean {
-  return widget.size.colSpan > 0 && widget.size.rowSpan > 0;
-}
-
 export const SPACING_OPTIONS = ["1", "2", "3", "4", "5", "6", "8", "9", "12"] as const;
 
 export interface GridItemConfig {
@@ -442,18 +429,13 @@ export interface GridItemSize {
 
 export type GridArrangement = Record<string, GridItemConfig>;
 
-export interface GridItemOverlap {
+interface GridItemOverlap {
   overlappedItemId: WidgetConfig["id"];
   overlappedItem: GridItemConfig;
   overlap: GridItemConfig;
 }
 
-export const DEFAULT_GRID_ITEM_POSITION = {
-  row: 0,
-  column: 0,
-} as const satisfies GridItemPosition;
-
-export const DEFAULT_GRID_ITEM_SIZE = {
+const DEFAULT_GRID_ITEM_SIZE = {
   rowSpan: 1,
   colSpan: 1,
 } as const satisfies GridItemSize;

@@ -1,5 +1,4 @@
-import type { RefObject } from "react";
-import { useEffect, useRef } from "react";
+import { type RefObject, useEffect, useRef } from "react";
 
 import type MapConfig from "@/lib/widgets/map";
 import type { MapView } from "@/lib/widgets/map";
@@ -21,7 +20,7 @@ function useMapWidgetEffects(deps: UseMapWidgetEffectsDeps) {
   useMountMapEffect(deps);
 }
 
-export interface UseMapWidgetEffectsDeps {
+interface UseMapWidgetEffectsDeps {
   container: RefObject<HTMLDivElement | null>;
   config: MapConfig;
 }
@@ -38,7 +37,7 @@ function useMountMapEffect(deps: UseMountMapEffectDeps) {
   );
 }
 
-export interface UseMountMapEffectDeps {
+interface UseMountMapEffectDeps {
   container: RefObject<HTMLDivElement | null>;
   config: MapConfig;
 }
@@ -65,7 +64,7 @@ function mountMapIntoContainer(
   };
 }
 
-export interface MountMapIntoContainerDeps {
+interface MountMapIntoContainerDeps {
   config: MapConfig;
 }
 

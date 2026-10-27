@@ -1,4 +1,4 @@
-import type { AbstractWidgetConfig } from "../widget";
+import type { AbstractWidgetConfig } from "@/lib/widget";
 
 export default interface MapConfig extends AbstractWidgetConfig {
   type: "map";

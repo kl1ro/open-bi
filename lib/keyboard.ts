@@ -1,4 +1,3 @@
 export function isSaveEvent(e: KeyboardEvent) {
-  if (e.code == "KeyS" && e.ctrlKey) return true;
-  return false;
+  return e.code === "KeyS" && e.ctrlKey;
 }

@@ -1,10 +1,10 @@
 import type { MotionProps } from "framer-motion";
 
-const BESIER_EASE = [0.16, 1, 0.3, 1] as const;
+const BEZIER_EASE = [0.16, 1, 0.3, 1] as const;
 
-const BESIER_TRANSITION = {
-  opacity: { duration: 0.35, ease: BESIER_EASE },
-  scale: { duration: 0.35, ease: BESIER_EASE },
+const BEZIER_TRANSITION = {
+  opacity: { duration: 0.35, ease: BEZIER_EASE },
+  scale: { duration: 0.35, ease: BEZIER_EASE },
 };
 
 export const FADE_IN_OUT_ANIMATION = {
@@ -16,7 +16,7 @@ export const FADE_IN_OUT_ANIMATION = {
     visible: { opacity: 1, scale: 1 },
     exit: { opacity: 0, scale: 0.9, pointerEvents: "none" },
   },
-  transition: BESIER_TRANSITION,
+  transition: BEZIER_TRANSITION,
 } as const satisfies MotionProps;
 
 export const SPRING_RESIZE_ANIMATION = {
@@ -26,7 +26,7 @@ export const SPRING_RESIZE_ANIMATION = {
 
 export const SOFT_RESIZE_ANIMATION = {
   layout: true,
-  transition: BESIER_TRANSITION,
+  transition: BEZIER_TRANSITION,
 } as const satisfies MotionProps;
 
 export function combineAnimations(animations?: readonly MotionProps[]): MotionProps {

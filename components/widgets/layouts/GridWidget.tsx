@@ -69,7 +69,7 @@ function useGridWidgetState(props: GridConfig) {
   };
 }
 
-export type GridWidgetState = ReturnType<typeof useGridWidgetState>;
+type GridWidgetState = ReturnType<typeof useGridWidgetState>;
 
 function getGridTemplateStyle(grid: GridConfig) {
   return {
@@ -160,7 +160,7 @@ function GridItemContent(props: GridItemContentProps) {
   if (!props.item.id)
     return <SlotWidget parentId={props.parentId} itemConfig={props.item.itemConfig} />;
 
-  return <Widget id={props.item.id} itemConfig={props.item.itemConfig} />;
+  return <Widget id={props.item.id} />;
 }
 
 interface GridItemContentProps {
@@ -271,7 +271,7 @@ function getDragPreview(
 type GetDragPreviewDeps = GetResizePreviewDeps;
 
 function isResizeOwner(item: GridItemToRender, resize: GridResize | undefined) {
-  return resize?.owner.key == getRenderedGridItemKey(item);
+  return resize?.owner.key === getRenderedGridItemKey(item);
 }
 
 function startResize(deps: StartResizeDeps) {
@@ -342,7 +342,7 @@ function ResizeGrip(props: ResizeGripProps) {
       return <CornerGrip className={props.className} />;
 
     default:
-      return props.kind satisfies never;
+      throw getUnexpectedGridResizeHandleKindError(props.kind);
   }
 }
 
@@ -500,11 +500,35 @@ interface CornerGripProps {
   className: string;
 }
 
+function getUnexpectedGridResizeHandleKindError(kind: never) {
+  return kind
+    ? new NonexistentGridResizeHandleKindError({ kind })
+    : new NoGridResizeHandleKindError();
+}
+
+export class NoGridResizeHandleKindError extends Error {
+  public name = NoGridResizeHandleKindError.name;
+
+  public constructor(options?: ErrorOptions) {
+    super(`Grid resize handle has no kind`, options);
+  }
+}
+
+export class NonexistentGridResizeHandleKindError extends Error {
+  public name = NonexistentGridResizeHandleKindError.name;
+  public kind: unknown;
+
+  public constructor(options: ErrorOptions & { kind: unknown }) {
+    super(`Grid resize handle kind ${options.kind as string} does not exist`, options);
+    this.kind = options.kind;
+  }
+}
+
 function getOutwardStepDelta(handle: GridResizeHandleConfig): GridResizeDelta {
   return handle.sides.reduce<GridResizeDelta>(
     (delta, side) => {
       const geometry = RESIZE_SIDES[side];
-      return { ...delta, [geometry.axis]: geometry.direction == "forward" ? 1 : -1 };
+      return { ...delta, [geometry.axis]: geometry.direction === "forward" ? 1 : -1 };
     },
     { rows: 0, columns: 0 },
   );
@@ -529,7 +553,7 @@ function getItemConfigResizedAtSide(
   const delta = deps.resize.delta[geometry.axis];
   const sideDeps = { geometry, delta, grid: deps.grid };
 
-  return geometry.direction == "forward"
+  return geometry.direction === "forward"
     ? getItemConfigResizedForward(itemConfig, sideDeps)
     : getItemConfigResizedBackward(itemConfig, sideDeps);
 }

@@ -25,7 +25,7 @@ export function getRecordWithoutKey<Value>(
 }
 
 export function haveSameElements<Value>(first?: Value[], second?: Value[]) {
-  if (!first || !second) return first == second;
+  if (!first || !second) return first === second;
 
   return (
     first.every((value) => second.includes(value)) &&

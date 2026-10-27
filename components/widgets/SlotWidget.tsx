@@ -1,10 +1,10 @@
 import { useState } from "react";
 
-import CreateWidgetDialog from "../dialogs/CreateWidgetDialog";
-
+import CreateWidgetDialog from "@/components/dialogs/CreateWidgetDialog";
 import { cn } from "@/lib/utils";
-import type { ItemConfig } from "@/lib/widget";
+import type SlotConfig from "@/lib/widgets/slot";
 import type WidgetConfig from "@/lib/widget";
+import type { ItemConfig } from "@/lib/widget";
 
 export default function SlotWidget(props: SlotWidgetProps) {
   const state = useSlotWidgetState();
@@ -23,6 +23,7 @@ export default function SlotWidget(props: SlotWidgetProps) {
       >
         +
       </button>
+
       <CreateWidgetDialog
         open={state.isFormOpen}
         setOpen={state.setIsFormOpen}
@@ -34,10 +35,25 @@ export default function SlotWidget(props: SlotWidgetProps) {
   );
 }
 
-export interface SlotWidgetProps {
-  id?: WidgetConfig["id"];
-  parentId?: WidgetConfig["id"];
-  itemConfig?: ItemConfig;
+export type SlotWidgetProps =
+  | StoredSlotWidgetProps
+  | ComputedRootSlotWidgetProps
+  | ComputedChildSlotWidgetProps;
+
+export interface StoredSlotWidgetProps extends SlotConfig {
+  itemConfig?: undefined;
+}
+
+export interface ComputedRootSlotWidgetProps {
+  id?: undefined;
+  parentId?: undefined;
+  itemConfig?: undefined;
+}
+
+export interface ComputedChildSlotWidgetProps {
+  id?: undefined;
+  parentId: WidgetConfig["id"];
+  itemConfig: ItemConfig;
 }
 
 function useSlotWidgetState() {

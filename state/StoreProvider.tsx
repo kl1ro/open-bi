@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef } from "react";
+import { type ReactNode, useRef } from "react";
 import { Provider } from "react-redux";
 
-import { makeStore, type AppStore, type RootState } from "./store";
+import { makeStore, type AppStore, type RootState } from "@/state/store";
 
 export default function StoreProvider(props: StoreProviderProps) {
   const store = usePerProviderStore(props.preloadedState);
@@ -16,7 +16,7 @@ function usePerProviderStore(preloadedState?: Partial<RootState>) {
   return storeRef.current;
 }
 
-type StoreProviderProps = {
+export interface StoreProviderProps {
   preloadedState?: Partial<RootState>;
-  children: React.ReactNode;
-};
+  children: ReactNode;
+}

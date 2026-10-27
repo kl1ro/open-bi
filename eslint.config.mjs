@@ -8,9 +8,9 @@ import importPlugin from 'eslint-plugin-import';
 import { globalIgnores } from 'eslint/config';
 
 export default tseslint.config(
-  globalIgnores(['node_modules/', 'dist/', 'build/']),
+  globalIgnores(['node_modules/', 'dist/', 'build/', '.next/', 'out/']),
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: ['eslint.config.mjs', 'postcss.config.mjs'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
@@ -100,6 +100,7 @@ export default tseslint.config(
 
       // JS
       'no-var': 'off',
+      eqeqeq: ['error', 'always'],
 
       // Prettier
       'prettier/prettier': 'error',

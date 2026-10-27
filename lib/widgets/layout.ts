@@ -1,22 +1,21 @@
-import type { AbstractWidgetConfig, ItemConfig } from "../widget";
-import type WidgetConfig from "../widget";
-import type AbsoluteConfig from "./layouts/absolute";
+import type { AbstractWidgetConfig, ItemConfig } from "@/lib/widget";
+import type WidgetConfig from "@/lib/widget";
+import type AbsoluteConfig from "@/lib/widgets/layouts/absolute";
 import {
   getAbsoluteConfigWithAdoptedChild,
   getAbsoluteConfigWithDisownedChild,
-} from "./layouts/absolute";
-import type FlexConfig from "./layouts/flex";
+} from "@/lib/widgets/layouts/absolute";
+import type FlexConfig from "@/lib/widgets/layouts/flex";
 import {
   getFlexConfigWithAdoptedChild,
   getFlexConfigWithDisownedChild,
-  isFlexChildRedundant,
-} from "./layouts/flex";
-import type GridConfig from "./layouts/grid";
+} from "@/lib/widgets/layouts/flex";
+import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getGridConfigWithAdoptedChild,
   getGridConfigWithDisownedChild,
   isGridChildRedundant,
-} from "./layouts/grid";
+} from "@/lib/widgets/layouts/grid";
 
 type LayoutConfig = GridConfig | AbsoluteConfig | FlexConfig;
 
@@ -43,6 +42,9 @@ export function getLayoutConfigWithAdoptedChild(
 
     case "absolute":
       return getAbsoluteConfigWithAdoptedChild(parent, child, itemConfig);
+
+    default:
+      throw getUnexpectedLayoutTypeError(parent);
   }
 }
 
@@ -61,7 +63,7 @@ export function getLayoutConfigWithDisownedChild(
       return getAbsoluteConfigWithDisownedChild(parent, child);
 
     default:
-      return parent satisfies never;
+      throw getUnexpectedLayoutTypeError(parent);
   }
 }
 
@@ -76,7 +78,7 @@ export function validateLayoutUpdate(oldLayout: LayoutConfig, newLayout: LayoutC
 
 export function layoutsHaveSameType(first?: LayoutConfig, second?: LayoutConfig) {
   if (!first || !second) return false;
-  return first.layout == second.layout;
+  return first.layout === second.layout;
 }
 
 export class ImpossibleLayoutTypeChangeError extends Error {
@@ -109,9 +111,33 @@ export function isLayoutChildRedundant(parent: LayoutConfig, child: WidgetConfig
       return isGridChildRedundant(parent, child);
 
     case "flex":
-      return isFlexChildRedundant(parent, child);
+    case "absolute":
+      return false;
 
     default:
-      return false;
+      throw getUnexpectedLayoutTypeError(parent);
+  }
+}
+
+export function getUnexpectedLayoutTypeError(layout: never) {
+  const type = (layout as { layout?: unknown })?.layout;
+  return type ? new NonexistentLayoutTypeError({ type }) : new NoLayoutTypeError();
+}
+
+export class NoLayoutTypeError extends Error {
+  public name = NoLayoutTypeError.name;
+
+  public constructor(options?: ErrorOptions) {
+    super(`Layout has no type`, options);
+  }
+}
+
+export class NonexistentLayoutTypeError extends Error {
+  public name = NonexistentLayoutTypeError.name;
+  public type: unknown;
+
+  public constructor(options: ErrorOptions & { type: unknown }) {
+    super(`Layout type ${options.type as string} does not exist`, options);
+    this.type = options.type;
   }
 }

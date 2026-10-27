@@ -1,15 +1,43 @@
-import GraphWidget from "./widgets/GraphWidget";
-import LayoutWidget from "./widgets/LayoutWidget";
-import TitleWidget from "./widgets/TitleWidget";
-import MapWidget from "./widgets/MapWidget";
-import VoidWidget from "./widgets/SlotWidget";
+import { ErrorBoundary } from "react-error-boundary";
+import { toast } from "sonner";
+import type { ReactNode } from "react";
 
+import BrokenWidget from "@/components/BrokenWidget";
+import GraphWidget from "@/components/widgets/GraphWidget";
+import LayoutWidget from "@/components/widgets/LayoutWidget";
+import TitleWidget from "@/components/widgets/TitleWidget";
+import MapWidget from "@/components/widgets/MapWidget";
+import SlotWidget from "@/components/widgets/SlotWidget";
 import type WidgetConfig from "@/lib/widget";
+import { getUnexpectedWidgetTypeError } from "@/lib/widget";
 import { useAppSelector } from "@/state/hooks";
-import type { ItemConfig } from "@/lib/widget";
 
 export default function Widget(props: WidgetProps) {
-  const state = useWidgetState(props);
+  return (
+    <WidgetErrorBoundary>
+      <WidgetContent {...props} />
+    </WidgetErrorBoundary>
+  );
+}
+
+export interface WidgetProps {
+  id: WidgetConfig["id"];
+}
+
+function WidgetErrorBoundary(props: WidgetErrorBoundaryProps) {
+  return (
+    <ErrorBoundary FallbackComponent={BrokenWidget} onError={reportWidgetRenderError}>
+      {props.children}
+    </ErrorBoundary>
+  );
+}
+
+interface WidgetErrorBoundaryProps {
+  children: ReactNode;
+}
+
+function WidgetContent(props: WidgetContentProps) {
+  const state = useWidgetContentState(props);
   if (!state.widgetConfig) return;
 
   return (
@@ -19,15 +47,16 @@ export default function Widget(props: WidgetProps) {
   );
 }
 
-interface WidgetProps {
-  id: WidgetConfig["id"];
-  itemConfig: ItemConfig;
+type WidgetContentProps = WidgetProps;
+
+function reportWidgetRenderError(error: unknown) {
+  console.error(error);
+  toast.error("Не удалось отобразить виджет");
 }
 
-function useWidgetState(props: WidgetProps) {
+function useWidgetContentState(props: WidgetContentProps) {
   return {
     widgetConfig: useAppSelector((state) => state.dashboard.widgetConfigs[props.id]),
-    itemConfig: props.itemConfig,
   };
 }
 
@@ -46,49 +75,13 @@ function getWidgetByType(deps: GetWidgetByTypeDeps) {
       return <MapWidget {...deps.widgetConfig} />;
 
     case "slot":
-      return <VoidWidget itemConfig={deps.itemConfig} {...deps.widgetConfig} />;
+      return <SlotWidget {...deps.widgetConfig} />;
 
     default:
-      handleUnexpectedWidgetType(deps.widgetConfig);
+      throw getUnexpectedWidgetTypeError(deps.widgetConfig);
   }
 }
 
 interface GetWidgetByTypeDeps {
   widgetConfig: WidgetConfig;
-  itemConfig: ItemConfig;
-}
-
-function handleUnexpectedWidgetType(widgetConfig: never) {
-  const type = (widgetConfig as { type?: unknown })?.type;
-  let error: Error;
-
-  if (!type) {
-    error = new NoWidgetTypeError();
-  } else {
-    error = new UnexpectedWidgetTypeError({ type });
-  }
-
-  console.error(error);
-}
-
-export class NoWidgetTypeError extends Error {
-  public name = NoWidgetTypeError.name;
-
-  public constructor(options?: ErrorOptions) {
-    super(`Error while trying to handle the widget with no type`, options);
-  }
-}
-
-export class UnexpectedWidgetTypeError extends Error {
-  public name = UnexpectedWidgetTypeError.name;
-  public type: unknown;
-
-  public constructor(options: ErrorOptions & { type: unknown }) {
-    super(
-      `Error while trying to handle the widget: type ${options.type as string} is unexpected`,
-      options,
-    );
-
-    this.type = options.type;
-  }
 }

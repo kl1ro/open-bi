@@ -1,5 +1,4 @@
-import type { AbstractLayoutConfig } from "../layout";
-
+import type { AbstractLayoutConfig } from "@/lib/widgets/layout";
 import type WidgetConfig from "@/lib/widget";
 import { getChildrenWithAdoptedChild, getChildrenWithDisownedChild } from "@/lib/widget";
 
@@ -20,10 +19,6 @@ export function getFlexConfigWithAdoptedChild(parent: FlexConfig, child: WidgetC
 export function getFlexConfigWithDisownedChild(parent: FlexConfig, child: WidgetConfig) {
   const children = getChildrenWithDisownedChild(parent, child);
   return { ...parent, children };
-}
-
-export function isFlexChildRedundant(parent: FlexConfig, child: WidgetConfig) {
-  return false;
 }
 
 export type FlexDirection = "row" | "column";

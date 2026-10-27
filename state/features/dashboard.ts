@@ -1,8 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 import type WidgetConfig from "@/lib/widget";
-import type { ItemConfig, WidgetConfigsById } from "@/lib/widget";
 import {
   findWidgetConfig,
   getChildren,
@@ -16,6 +14,8 @@ import {
   isTurningToSlot,
   validateWidgetUpdate,
   widgetsHaveSameId,
+  type ItemConfig,
+  type WidgetConfigsById,
 } from "@/lib/widget";
 import type { WithRequired } from "@/lib/utils";
 
@@ -146,24 +146,6 @@ function removeWidgetWithDescendants(
   removeWidgetFromState(widgetConfig, deps);
 }
 
-function removeDescendantsFromState(
-  widgetConfig: WidgetConfig,
-  deps: DashboardSliceDeps,
-) {
-  const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
-
-  const descendants = Object.values(
-    getDescendantConfigs(widgetConfig, widgetConfigsDeps),
-  );
-
-  descendants.forEach((descendant) => removeWidgetFromState(descendant, deps));
-}
-
-function removeWidgetFromState(widgetConfig: WidgetConfig, deps: DashboardSliceDeps) {
-  if (isRootConfig(widgetConfig, deps)) updateRootId(undefined, deps);
-  delete deps.state.widgetConfigs[widgetConfig.id];
-}
-
 export function isRootConfig(widgetConfig: WidgetConfig, deps: DashboardSliceDeps) {
   const root = findRootConfig(deps);
   return widgetsHaveSameId(widgetConfig, root);
@@ -186,11 +168,25 @@ function removeRedundantChildren(parent: WidgetConfig, deps: DashboardSliceDeps)
   redundant.forEach((child) => removeWidgetWithDescendants(child, deps));
 }
 
-function updateRootId(newId: WidgetConfig["id"] | undefined, deps: DashboardSliceDeps) {
-  deps.state.rootId = newId;
+function removeDescendantsFromState(
+  widgetConfig: WidgetConfig,
+  deps: DashboardSliceDeps,
+) {
+  const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
+
+  const descendants = Object.values(
+    getDescendantConfigs(widgetConfig, widgetConfigsDeps),
+  );
+
+  descendants.forEach((descendant) => removeWidgetFromState(descendant, deps));
 }
 
-export function findRootConfig(deps: DashboardSliceDeps) {
+function removeWidgetFromState(widgetConfig: WidgetConfig, deps: DashboardSliceDeps) {
+  if (isRootConfig(widgetConfig, deps)) updateRootId(undefined, deps);
+  delete deps.state.widgetConfigs[widgetConfig.id];
+}
+
+export function findRootConfig(deps: DashboardSliceDeps): WidgetConfig | undefined {
   if (!deps.state.rootId) return;
   const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
   return findWidgetConfig(deps.state.rootId, widgetConfigsDeps);
@@ -208,6 +204,10 @@ function removeWidgetsOutsideSubtree(
   Object.values(deps.state.widgetConfigs)
     .filter((config) => !keptIds.has(config.id))
     .forEach((config) => removeWidgetFromState(config, deps));
+}
+
+function updateRootId(newId: WidgetConfig["id"] | undefined, deps: DashboardSliceDeps) {
+  deps.state.rootId = newId;
 }
 
 export interface DashboardSliceDeps {

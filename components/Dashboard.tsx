@@ -2,9 +2,8 @@
 import { useEffect } from "react";
 import { toast } from "sonner";
 
-import Widget from "./Widget";
-import VoidWidget from "./widgets/SlotWidget";
-
+import Widget from "@/components/Widget";
+import SlotWidget from "@/components/widgets/SlotWidget";
 import { findRootConfig, setDashboard } from "@/state/features/dashboard";
 import { useAppSelector, useAppStore } from "@/state/hooks";
 import type { AppStore } from "@/state/store";
@@ -17,7 +16,7 @@ import {
 export default function Dashboard() {
   const state = useDashboardState();
   useDashboardEffects();
-  if (!state.rootConfig) return <VoidWidget />;
+  if (!state.rootConfig) return <SlotWidget />;
   return <Widget {...state.rootConfig} />;
 }
 
@@ -43,6 +42,21 @@ function useRestoreDashboardEffect() {
   }, []);
 }
 
+function useSaveDashboardEffect() {
+  const state = useSaveDashboardEffectState();
+
+  useEffect(() => {
+    const keydown = (e: KeyboardEvent) => {
+      if (!isSaveEvent(e)) return;
+      e.preventDefault();
+      trySaveDashboard(state);
+    };
+
+    document.addEventListener("keydown", keydown);
+    return () => document.removeEventListener("keydown", keydown);
+  }, []);
+}
+
 function useRestoreDashboardEffectState() {
   return {
     store: useAppStore(),
@@ -61,23 +75,8 @@ function tryRestoreDashboard(deps: TryRestoreDashboardDeps) {
   }
 }
 
-type TryRestoreDashboardDeps = {
+interface TryRestoreDashboardDeps {
   store: AppStore;
-};
-
-function useSaveDashboardEffect() {
-  const state = useSaveDashboardEffectState();
-
-  useEffect(() => {
-    const keydown = (e: KeyboardEvent) => {
-      if (!isSaveEvent(e)) return;
-      e.preventDefault();
-      trySaveDashboard(state);
-    };
-
-    document.addEventListener("keydown", keydown);
-    return () => document.removeEventListener("keydown", keydown);
-  }, []);
 }
 
 function useSaveDashboardEffectState() {
@@ -96,6 +95,6 @@ function trySaveDashboard(deps: TrySaveDashboardDeps) {
   }
 }
 
-type TrySaveDashboardDeps = {
+interface TrySaveDashboardDeps {
   store: AppStore;
-};
+}

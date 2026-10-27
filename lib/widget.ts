@@ -1,15 +1,15 @@
-import type GraphConfig from "./widgets/graph";
-import type LayoutConfig from "./widgets/layout";
+import type GraphConfig from "@/lib/widgets/graph";
+import type LayoutConfig from "@/lib/widgets/layout";
 import {
   getLayoutConfigWithAdoptedChild,
   getLayoutConfigWithDisownedChild,
   isLayoutChildRedundant,
   validateLayoutUpdate,
-} from "./widgets/layout";
-import type TitleConfig from "./widgets/title";
-import type MapConfig from "./widgets/map";
-import type SlotConfig from "./widgets/slot";
-import { haveSameElements, type WithRequired } from "./utils";
+} from "@/lib/widgets/layout";
+import type TitleConfig from "@/lib/widgets/title";
+import type MapConfig from "@/lib/widgets/map";
+import type SlotConfig from "@/lib/widgets/slot";
+import { haveSameElements, type WithRequired } from "@/lib/utils";
 
 type WidgetConfig = LayoutConfig | TitleConfig | GraphConfig | MapConfig | SlotConfig;
 
@@ -180,7 +180,7 @@ export function hasMovedFromParent(
 
 export function widgetsHaveSameParentId(first?: WidgetConfig, second?: WidgetConfig) {
   if (!first || !second) return false;
-  return first.parentId == second.parentId;
+  return first.parentId === second.parentId;
 }
 
 export function getChildren(
@@ -227,7 +227,7 @@ export interface GetDescendantConfigsDeps {
 
 export function widgetsHaveSameId(first?: WidgetConfig, second?: WidgetConfig) {
   if (!first || !second) return false;
-  return first.id == second.id;
+  return first.id === second.id;
 }
 
 export function validateWidgetUpdate(
@@ -250,7 +250,7 @@ export function validateWidgetUpdate(
       wantedChildren: newConfig.children,
     });
 
-  if (oldConfig.type == "layout" && newConfig.type == "layout")
+  if (oldConfig.type === "layout" && newConfig.type === "layout")
     return validateLayoutUpdate(oldConfig, newConfig);
 }
 
@@ -320,13 +320,13 @@ export function isRedundant(widgetConfig: WidgetConfig, deps: IsRedundantDeps) {
   }
 }
 
-interface IsRedundantDeps {
+export interface IsRedundantDeps {
   widgetConfigs: WidgetConfigsById;
 }
 
 export function widgetsHaveSameType(first?: WidgetConfig, second?: WidgetConfig) {
   if (!first || !second) return false;
-  return first.type == second.type;
+  return first.type === second.type;
 }
 
 export function widgetsHaveSameChildren(first?: WidgetConfig, second?: WidgetConfig) {
@@ -335,11 +335,11 @@ export function widgetsHaveSameChildren(first?: WidgetConfig, second?: WidgetCon
 }
 
 export function isTurningFromSlot(oldConfig: WidgetConfig, newConfig: WidgetConfig) {
-  return oldConfig.type == "slot" && newConfig.type != "slot";
+  return oldConfig.type === "slot" && newConfig.type !== "slot";
 }
 
 export function isTurningToSlot(oldConfig: WidgetConfig, newConfig: WidgetConfig) {
-  return oldConfig.type != "slot" && newConfig.type == "slot";
+  return oldConfig.type !== "slot" && newConfig.type === "slot";
 }
 
 export function getChildrenWithAdoptedChild(
@@ -361,7 +361,7 @@ export function getChildrenWithDisownedChild(
   parent: ContainerConfig,
   child: WidgetConfig,
 ) {
-  return parent.children?.filter((childId) => childId != child.id);
+  return parent.children?.filter((childId) => childId !== child.id);
 }
 
 export interface AbstractWidgetConfig {
@@ -437,6 +437,29 @@ export class ItemConfigNotFoundError extends Error {
 
     this.containerId = options.containerId;
     this.widgetConfigId = options.widgetConfigId;
+  }
+}
+
+export function getUnexpectedWidgetTypeError(widgetConfig: never) {
+  const type = (widgetConfig as { type?: unknown })?.type;
+  return type ? new NonexistentWidgetTypeError({ type }) : new NoWidgetTypeError();
+}
+
+export class NoWidgetTypeError extends Error {
+  public name = NoWidgetTypeError.name;
+
+  public constructor(options?: ErrorOptions) {
+    super(`Widget has no type`, options);
+  }
+}
+
+export class NonexistentWidgetTypeError extends Error {
+  public name = NonexistentWidgetTypeError.name;
+  public type: unknown;
+
+  public constructor(options: ErrorOptions & { type: unknown }) {
+    super(`Widget type ${options.type as string} does not exist`, options);
+    this.type = options.type;
   }
 }
 
