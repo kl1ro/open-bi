@@ -15,10 +15,8 @@ import {
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
 import type GridGesture from "@/lib/widgets/layouts/grid/gesture";
-import type {
-  GridPreviewArea,
-  GridPreviewRole,
-} from "@/lib/widgets/layouts/grid/gesture";
+import type GridPreviewArea from "@/lib/widgets/layouts/grid/preview";
+import type { GridPreviewRole } from "@/lib/widgets/layouts/grid/preview";
 import type WidgetConfig from "@/lib/widget";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/hooks";

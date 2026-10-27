@@ -6,12 +6,11 @@ import {
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
 import {
-  getDragPreview,
   isGestureOwner,
   type AbstractGridGesture,
-  type GridPreviewArea,
-  type GridPreviewRole,
 } from "@/lib/widgets/layouts/grid/gesture";
+import type GridPreviewArea from "@/lib/widgets/layouts/grid/preview";
+import { getDragPreview, type GridPreviewRole } from "@/lib/widgets/layouts/grid/preview";
 import { clamp } from "@/lib/utils";
 
 export default interface GridMove extends AbstractGridGesture {
