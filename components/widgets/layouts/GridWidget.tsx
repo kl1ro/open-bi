@@ -286,12 +286,13 @@ function startResize(deps: StartResizeDeps) {
   if (!owner || !container) return;
 
   takeOverPointerEvent(deps.event);
+  const cellPitchDeps = { container, grid: deps.gridState.grid };
 
   deps.gridState.resize.set({
     owner,
     handle: deps.handle,
     startPoint: { clientX: deps.event.clientX, clientY: deps.event.clientY },
-    cellPitch: measureCellPitch(container, deps.gridState),
+    cellPitch: measureCellPitch(cellPitchDeps),
     delta: { rows: 0, columns: 0 },
   });
 }
@@ -448,19 +449,17 @@ function takeOverPointerEvent(event: PointerEvent<HTMLElement>) {
   event.currentTarget.setPointerCapture(event.pointerId);
 }
 
-function measureCellPitch(
-  container: HTMLElement,
-  deps: MeasureCellPitchDeps,
-): GridCellPitch {
-  const style = getComputedStyle(container);
+function measureCellPitch(deps: MeasureCellPitchDeps): GridCellPitch {
+  const style = getComputedStyle(deps.container);
 
   return {
-    width: (container.clientWidth + parseFloat(style.columnGap)) / deps.grid.columns,
-    height: (container.clientHeight + parseFloat(style.rowGap)) / deps.grid.rows,
+    width: (deps.container.clientWidth + parseFloat(style.columnGap)) / deps.grid.columns,
+    height: (deps.container.clientHeight + parseFloat(style.rowGap)) / deps.grid.rows,
   };
 }
 
 interface MeasureCellPitchDeps {
+  container: HTMLElement;
   grid: GridConfig;
 }
 
