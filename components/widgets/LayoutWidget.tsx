@@ -25,14 +25,10 @@ function getLayoutByType(deps: GetLayoutByTypeDeps) {
       return <AbsoluteWidget />;
 
     default:
-      handleUnexpectedLayoutType(deps.layout);
+      throw getUnexpectedLayoutTypeError(deps.layout);
   }
 }
 
 interface GetLayoutByTypeDeps {
   layout: LayoutConfig;
-}
-
-function handleUnexpectedLayoutType(layout: never) {
-  console.error(getUnexpectedLayoutTypeError(layout));
 }

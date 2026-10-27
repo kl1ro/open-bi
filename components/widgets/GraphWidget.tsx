@@ -8,10 +8,6 @@ export default function GraphWidget(props: GraphConfig) {
       return <LineGraph />;
 
     default:
-      handleUnexpectedGraphType(props.graph);
+      throw getUnexpectedGraphTypeError(props.graph);
   }
-}
-
-function handleUnexpectedGraphType(graph: never) {
-  console.error(getUnexpectedGraphTypeError(graph));
 }
