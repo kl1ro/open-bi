@@ -1,5 +1,6 @@
 import { ErrorBoundary } from "react-error-boundary";
 import { toast } from "sonner";
+import type { ReactNode } from "react";
 
 import BrokenWidget from "@/components/BrokenWidget";
 import GraphWidget from "@/components/widgets/GraphWidget";
@@ -13,22 +14,17 @@ import { useAppSelector } from "@/state/hooks";
 
 export default function Widget(props: WidgetProps) {
   return (
-    <ErrorBoundary FallbackComponent={BrokenWidget} onError={reportWidgetRenderError}>
+    <WidgetErrorBoundary>
       <WidgetContent {...props} />
-    </ErrorBoundary>
+    </WidgetErrorBoundary>
   );
 }
 
-export interface WidgetProps {
+interface WidgetProps {
   id: WidgetConfig["id"];
 }
 
-function reportWidgetRenderError(error: unknown) {
-  console.error(error);
-  toast.error("Не удалось отобразить виджет");
-}
-
-function WidgetContent(props: WidgetProps) {
+function WidgetContent(props: WidgetContentProps) {
   const state = useWidgetContentState(props);
   if (!state.widgetConfig) return;
 
@@ -39,7 +35,9 @@ function WidgetContent(props: WidgetProps) {
   );
 }
 
-function useWidgetContentState(props: WidgetProps) {
+type WidgetContentProps = WidgetProps;
+
+function useWidgetContentState(props: WidgetContentProps) {
   return {
     widgetConfig: useAppSelector((state) => state.dashboard.widgetConfigs[props.id]),
   };
@@ -69,4 +67,21 @@ function getWidgetByType(deps: GetWidgetByTypeDeps) {
 
 interface GetWidgetByTypeDeps {
   widgetConfig: WidgetConfig;
+}
+
+function WidgetErrorBoundary(props: WidgetErrorBoundaryProps) {
+  return (
+    <ErrorBoundary FallbackComponent={BrokenWidget} onError={reportWidgetRenderError}>
+      {props.children}
+    </ErrorBoundary>
+  );
+}
+
+export interface WidgetErrorBoundaryProps {
+  children?: ReactNode;
+}
+
+function reportWidgetRenderError(error: unknown) {
+  console.error(error);
+  toast.error("Не удалось отобразить виджет");
 }
