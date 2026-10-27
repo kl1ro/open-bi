@@ -16,14 +16,13 @@ function useMapWidgetState(props: MapConfig) {
   };
 }
 
+type MapWidgetState = ReturnType<typeof useMapWidgetState>;
+
 function useMapWidgetEffects(deps: UseMapWidgetEffectsDeps) {
   useMountMapEffect(deps);
 }
 
-interface UseMapWidgetEffectsDeps {
-  container: RefObject<HTMLDivElement | null>;
-  config: MapConfig;
-}
+type UseMapWidgetEffectsDeps = MapWidgetState;
 
 function useMountMapEffect(deps: UseMountMapEffectDeps) {
   useEffect(
@@ -37,10 +36,7 @@ function useMountMapEffect(deps: UseMountMapEffectDeps) {
   );
 }
 
-interface UseMountMapEffectDeps {
-  container: RefObject<HTMLDivElement | null>;
-  config: MapConfig;
-}
+type UseMountMapEffectDeps = UseMapWidgetEffectsDeps;
 
 function mountMapIntoContainer(
   container: RefObject<HTMLDivElement | null>,
@@ -64,9 +60,7 @@ function mountMapIntoContainer(
   };
 }
 
-interface MountMapIntoContainerDeps {
-  config: MapConfig;
-}
+type MountMapIntoContainerDeps = Pick<UseMountMapEffectDeps, "config">;
 
 function fitMapToContainer(map: ymaps.Map | undefined) {
   map?.container.fitToViewport();
