@@ -144,6 +144,7 @@ export class ParentConfigNotFoundError extends WidgetConfigNotFoundError {
       message: `Parent config with id of (${options.parentId}) of child config with id of (${options.childId}) is not found on the dashboard`,
       id: options.parentId,
     });
+
     this.childId = options.childId;
     this.parentId = options.parentId;
   }
@@ -183,14 +184,14 @@ export function widgetsHaveSameParentId(first?: WidgetConfig, second?: WidgetCon
   return first.parentId === second.parentId;
 }
 
-export function getChildren(
+export function getChildConfigs(
   widgetConfig: WidgetConfig,
-  deps: GetChildrenDeps,
+  deps: GetChildConfigsDeps,
 ): WidgetConfig[] {
   return widgetConfig.children?.map((id) => getWidgetConfig(id, deps)) ?? [];
 }
 
-export interface GetChildrenDeps {
+export interface GetChildConfigsDeps {
   widgetConfigs: WidgetConfigsById;
 }
 
@@ -208,13 +209,12 @@ export function getDescendantConfigs(
     {},
   );
 
-  return {
-    ...currentLayerChildren,
-    ...Object.values(currentLayerChildren).reduce<WidgetConfigsById>(
-      (prev, cur) => ({ ...prev, ...getDescendantConfigs(cur, deps) }),
-      {},
-    ),
-  };
+  const deeperDescendants = Object.values(currentLayerChildren).reduce<WidgetConfigsById>(
+    (prev, cur) => ({ ...prev, ...getDescendantConfigs(cur, deps) }),
+    {},
+  );
+
+  return { ...currentLayerChildren, ...deeperDescendants };
 }
 
 export interface GetDescendantConfigsDeps {

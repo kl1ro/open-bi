@@ -85,7 +85,7 @@ function upsertGridItemToArrangement(
   itemConfig: GridItemConfig,
   arrangement?: GridArrangement,
 ) {
-  return { ...(arrangement ?? {}), [id]: itemConfig };
+  return { ...arrangement, [id]: itemConfig };
 }
 
 function getOverlapsBetweenItemAndArrangement(
@@ -341,10 +341,12 @@ export interface GridItemToRender {
 }
 
 function getGridItemsFromArrangement(arrangement: GridArrangement): GridItemToRender[] {
-  return Object.entries(arrangement).map(([id, itemConfig]) => ({
+  const gridItems = Object.entries(arrangement).map(([id, itemConfig]) => ({
     id,
     itemConfig,
   }));
+
+  return gridItems;
 }
 
 function getComputedGridSlots(grid: GridConfig): GridItemToRender[] {
@@ -395,9 +397,11 @@ function getGridCellOccupancyInArrangement(
   cell: GridItemPosition,
   arrangement: GridArrangement,
 ) {
-  return Object.entries(arrangement).find(([, itemConfig]) =>
+  const occupyingEntry = Object.entries(arrangement).find(([, itemConfig]) =>
     isCellInsideGridItem(cell, itemConfig),
-  )?.[0];
+  );
+
+  return occupyingEntry?.[0];
 }
 
 function isCellInsideGridItem(cell: GridItemPosition, item: GridItemConfig) {

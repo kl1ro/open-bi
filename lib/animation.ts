@@ -32,7 +32,7 @@ export const SOFT_RESIZE_ANIMATION = {
 export function combineAnimations(animations?: readonly MotionProps[]): MotionProps {
   if (!animations?.length) return {};
 
-  return animations.reduce<MotionProps>(
+  const combinedAnimation = animations.reduce<MotionProps>(
     (prev, cur) => ({
       ...prev,
       ...cur,
@@ -40,4 +40,6 @@ export function combineAnimations(animations?: readonly MotionProps[]): MotionPr
     }),
     {},
   );
+
+  return combinedAnimation;
 }
