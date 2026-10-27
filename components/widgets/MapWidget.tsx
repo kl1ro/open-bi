@@ -49,7 +49,7 @@ function mountMapIntoContainer(
 
   void window.ymaps.ready(() => {
     if (isUnmounted || !container.current) return;
-    map = createMap(container.current, deps.config);
+    map = createMapInContainer(container.current, deps);
     resizeObserver.observe(container.current);
   });
 
@@ -66,13 +66,15 @@ function fitMapToContainer(map: ymaps.Map | undefined) {
   map?.container.fitToViewport();
 }
 
-function createMap(container: HTMLDivElement, config: MapConfig) {
+function createMapInContainer(container: HTMLDivElement, deps: CreateMapInContainerDeps) {
   return new window.ymaps.Map(container, {
-    center: [config.center.latitude, config.center.longitude],
-    zoom: config.zoom,
-    type: YANDEX_MAP_TYPE[config.view],
+    center: [deps.config.center.latitude, deps.config.center.longitude],
+    zoom: deps.config.zoom,
+    type: YANDEX_MAP_TYPE[deps.config.view],
   });
 }
+
+type CreateMapInContainerDeps = MountMapIntoContainerDeps;
 
 const YANDEX_MAP_TYPE = {
   scheme: "yandex#map",
