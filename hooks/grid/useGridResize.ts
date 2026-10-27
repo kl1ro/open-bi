@@ -4,8 +4,8 @@ import { toast } from "sonner";
 import type { GridGestureState } from "@/components/widgets/layouts/GridWidget";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
-  hasDelta,
   haveSameDelta,
+  occupySameCells,
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
 import { createGesture, isGestureInProgress } from "@/lib/widgets/layouts/grid/gesture";
@@ -116,8 +116,8 @@ function resetResize(deps: ResetResizeDeps) {
 type ResetResizeDeps = Pick<UseGridResizeDeps, "gesture">;
 
 function applyResize(resize: GridResize, deps: ApplyResizeDeps) {
-  if (!hasDelta(resize.delta)) return;
   const itemConfig = getResizedItemConfig(resize, deps);
+  if (occupySameCells(resize.owner.itemConfig, itemConfig)) return;
   deps.store.dispatch(upsertWidget({ widgetConfig: resize.owner.child, itemConfig }));
 }
 
