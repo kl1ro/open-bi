@@ -26,7 +26,7 @@ type UseMapWidgetEffectsDeps = MapWidgetState;
 
 function useMountMapEffect(deps: UseMountMapEffectDeps) {
   useEffect(
-    () => mountMapIntoContainer(deps.container, deps),
+    () => mountMapIntoContainer(deps.config, deps.container),
     [
       deps.config.center.latitude,
       deps.config.center.longitude,
@@ -39,8 +39,8 @@ function useMountMapEffect(deps: UseMountMapEffectDeps) {
 type UseMountMapEffectDeps = UseMapWidgetEffectsDeps;
 
 function mountMapIntoContainer(
+  config: MapConfig,
   container: RefObject<HTMLDivElement | null>,
-  deps: MountMapIntoContainerDeps,
 ) {
   let map: ymaps.Map | undefined;
   let isUnmounted = false;
@@ -49,7 +49,7 @@ function mountMapIntoContainer(
 
   void window.ymaps.ready(() => {
     if (isUnmounted || !container.current) return;
-    map = createMapInContainer(container.current, deps);
+    map = createMapInContainer(config, container.current);
     resizeObserver.observe(container.current);
   });
 
@@ -60,21 +60,17 @@ function mountMapIntoContainer(
   };
 }
 
-type MountMapIntoContainerDeps = Pick<UseMountMapEffectDeps, "config">;
-
 function fitMapToContainer(map: ymaps.Map | undefined) {
   map?.container.fitToViewport();
 }
 
-function createMapInContainer(container: HTMLDivElement, deps: CreateMapInContainerDeps) {
+function createMapInContainer(config: MapConfig, container: HTMLDivElement) {
   return new window.ymaps.Map(container, {
-    center: [deps.config.center.latitude, deps.config.center.longitude],
-    zoom: deps.config.zoom,
-    type: YANDEX_MAP_TYPE[deps.config.view],
+    center: [config.center.latitude, config.center.longitude],
+    zoom: config.zoom,
+    type: YANDEX_MAP_TYPE[config.view],
   });
 }
-
-type CreateMapInContainerDeps = MountMapIntoContainerDeps;
 
 const YANDEX_MAP_TYPE = {
   scheme: "yandex#map",
