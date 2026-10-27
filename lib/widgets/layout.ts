@@ -31,21 +31,25 @@ export type LayoutType = LayoutConfig["layout"];
 export function getLayoutConfigWithAdoptedChild(
   parent: LayoutConfig,
   child: WidgetConfig,
-  itemConfig?: ItemConfig,
+  deps: GetLayoutConfigWithAdoptedChildDeps,
 ) {
   switch (parent.layout) {
     case "grid":
-      return getGridConfigWithAdoptedChild(parent, child, itemConfig);
+      return getGridConfigWithAdoptedChild(parent, child, deps);
 
     case "flex":
       return getFlexConfigWithAdoptedChild(parent, child);
 
     case "absolute":
-      return getAbsoluteConfigWithAdoptedChild(parent, child, itemConfig);
+      return getAbsoluteConfigWithAdoptedChild(parent, child, deps);
 
     default:
       throw getUnexpectedLayoutTypeError(parent);
   }
+}
+
+export interface GetLayoutConfigWithAdoptedChildDeps {
+  itemConfig?: ItemConfig;
 }
 
 export function getLayoutConfigWithDisownedChild(

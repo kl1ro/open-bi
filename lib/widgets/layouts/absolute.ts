@@ -19,16 +19,21 @@ export default interface AbsoluteConfig extends AbstractLayoutConfig {
 export function getAbsoluteConfigWithAdoptedChild(
   parent: AbsoluteConfig,
   child: WidgetConfig,
-  itemConfig?: ItemConfig,
+  deps: GetAbsoluteConfigWithAdoptedChildDeps,
 ) {
-  if (hasChild(parent, child) && !itemConfig) return parent;
+  if (hasChild(parent, child) && !deps.itemConfig) return parent;
 
-  const absoluteItemConfig = ensureItemConfigParentTypeIsAbsolute(itemConfig);
+  const absoluteItemConfig = ensureItemConfigParentTypeIsAbsolute(deps.itemConfig);
   const children = getChildrenWithAdoptedChild(parent, child);
 
-  const arrangement = getArrangementWithAdoptedChild(parent, child, absoluteItemConfig);
+  const adoptionDeps = { itemConfig: absoluteItemConfig };
+  const arrangement = getArrangementWithAdoptedChild(parent, child, adoptionDeps);
 
   return { ...parent, children, arrangement };
+}
+
+export interface GetAbsoluteConfigWithAdoptedChildDeps {
+  itemConfig?: ItemConfig;
 }
 
 function ensureItemConfigParentTypeIsAbsolute(
@@ -48,9 +53,13 @@ function ensureItemConfigParentTypeIsAbsolute(
 function getArrangementWithAdoptedChild(
   parent: AbsoluteConfig,
   child: WidgetConfig,
-  absoluteItemConfig: AbsoluteItemConfig,
+  deps: GetArrangementWithAdoptedChildDeps,
 ) {
-  return { ...parent.arrangement, [child.id]: absoluteItemConfig };
+  return { ...parent.arrangement, [child.id]: deps.itemConfig };
+}
+
+interface GetArrangementWithAdoptedChildDeps {
+  itemConfig: AbsoluteItemConfig;
 }
 
 export function getAbsoluteConfigWithDisownedChild(
