@@ -94,9 +94,11 @@ function getOverlapsBetweenItemAndArrangement(
 ): GridItemOverlap[] {
   const suspectIds = Object.keys(arrangement).filter((id) => id !== itemId);
 
-  return suspectIds.flatMap(
+  const overlaps = suspectIds.flatMap(
     (id) => findOverlapInArrangement(itemId, id, arrangement) ?? [],
   );
+
+  return overlaps;
 }
 
 function findOverlapInArrangement(

@@ -22,7 +22,8 @@ export function restoreDashboardFromLocalStorage() {
   try {
     const storageItem = localStorage.getItem(DASHBOARD_LOCALSTORAGE_KEY);
     if (!storageItem) return;
-    return JSON.parse(storageItem) as DashboardState;
+    const dashboard = JSON.parse(storageItem) as DashboardState;
+    return dashboard;
   } catch (error) {
     throw new RestoreDashboardError({ cause: error });
   }
