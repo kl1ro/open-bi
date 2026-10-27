@@ -9,7 +9,7 @@ import TitleWidget from "@/components/widgets/TitleWidget";
 import MapWidget from "@/components/widgets/MapWidget";
 import SlotWidget from "@/components/widgets/SlotWidget";
 import type WidgetConfig from "@/lib/widget";
-import { getUnexpectedWidgetTypeError } from "@/lib/widget";
+import { findWidgetConfig, getUnexpectedWidgetTypeError } from "@/lib/widget";
 import { useAppSelector } from "@/state/hooks";
 
 export default function Widget(props: WidgetProps) {
@@ -42,7 +42,7 @@ function WidgetContent(props: WidgetContentProps) {
 
   return (
     <div className="relative size-full rounded-xl animated no-scrollbar overflow-auto">
-      {getWidgetByType(state)}
+      {getWidgetByType(state.widgetConfig)}
     </div>
   );
 }
@@ -56,32 +56,30 @@ function reportWidgetRenderError(error: unknown) {
 
 function useWidgetContentState(props: WidgetContentProps) {
   return {
-    widgetConfig: useAppSelector((state) => state.dashboard.widgetConfigs[props.id]),
+    widgetConfig: useAppSelector((state) =>
+      findWidgetConfig(props.id, { widgetConfigs: state.dashboard.widgetConfigs }),
+    ),
   };
 }
 
-function getWidgetByType(deps: GetWidgetByTypeDeps) {
-  switch (deps.widgetConfig.type) {
+function getWidgetByType(widgetConfig: WidgetConfig) {
+  switch (widgetConfig.type) {
     case "layout":
-      return <LayoutWidget {...deps.widgetConfig} />;
+      return <LayoutWidget {...widgetConfig} />;
 
     case "title":
-      return <TitleWidget {...deps.widgetConfig} />;
+      return <TitleWidget {...widgetConfig} />;
 
     case "graph":
-      return <GraphWidget {...deps.widgetConfig} />;
+      return <GraphWidget {...widgetConfig} />;
 
     case "map":
-      return <MapWidget {...deps.widgetConfig} />;
+      return <MapWidget {...widgetConfig} />;
 
     case "slot":
-      return <SlotWidget {...deps.widgetConfig} />;
+      return <SlotWidget {...widgetConfig} />;
 
     default:
-      throw getUnexpectedWidgetTypeError(deps.widgetConfig);
+      throw getUnexpectedWidgetTypeError(widgetConfig);
   }
-}
-
-interface GetWidgetByTypeDeps {
-  widgetConfig: WidgetConfig;
 }

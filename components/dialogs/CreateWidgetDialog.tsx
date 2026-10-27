@@ -146,7 +146,7 @@ function WidgetTypeField(props: FieldProps) {
           <Select
             value={field.value}
             onValueChange={(type) =>
-              props.form.reset(getDefaultFormValues(type as FormValues["type"]))
+              isFormType(type) && props.form.reset(getDefaultFormValues(type))
             }
           >
             <FormControl>
@@ -363,6 +363,10 @@ function getWidgetConfigFromFormValues(
 interface GetWidgetConfigFromFormValuesDeps {
   id?: WidgetConfig["id"];
   parentId?: WidgetConfig["id"];
+}
+
+function isFormType(type: string): type is FormValues["type"] {
+  return Object.hasOwn(WIDGET_TYPE_LABELS, type);
 }
 
 function getUnexpectedFormTypeError(type: never) {
