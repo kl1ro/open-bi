@@ -85,7 +85,7 @@ function upsertGridItemToArrangement(
   itemConfig: GridItemConfig,
   arrangement?: GridArrangement,
 ) {
-  return { ...(arrangement ?? {}), [id]: itemConfig };
+  return { ...arrangement, [id]: itemConfig };
 }
 
 function getOverlapsBetweenItemAndArrangement(
