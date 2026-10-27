@@ -1,6 +1,7 @@
 import type { PointerEvent, RefObject } from "react";
 import { toast } from "sonner";
 
+import type { GridGestureState } from "@/components/widgets/layouts/GridWidget";
 import type { GridResizeHandleConfig } from "@/components/widgets/layouts/grid/GridResizeHandles";
 import {
   createGesture,
@@ -10,7 +11,6 @@ import {
   isGestureOwner,
   takeOverPointerEvent,
   type AbstractGridGesture,
-  type GridGestureState,
   type GridPreviewArea,
   type GridPreviewRole,
 } from "@/hooks/grid/gesture";

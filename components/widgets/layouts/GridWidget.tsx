@@ -1,12 +1,11 @@
-import { type ReactNode, useRef } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import { AnimatePresence, motion, type MotionProps } from "framer-motion";
 
 import Widget from "@/components/Widget";
 import SlotWidget from "@/components/widgets/SlotWidget";
 import GridMoveHandle from "@/components/widgets/layouts/grid/GridMoveHandle";
 import GridResizeHandles from "@/components/widgets/layouts/grid/GridResizeHandles";
-import useGridGesture from "@/hooks/grid/gesture";
-import type { GridPreviewArea, GridPreviewRole } from "@/hooks/grid/gesture";
+import type { GridGesture, GridPreviewArea, GridPreviewRole } from "@/hooks/grid/gesture";
 import useGridMove from "@/hooks/grid/move";
 import useGridResize from "@/hooks/grid/resize";
 import type GridConfig from "@/lib/widgets/layouts/grid";
@@ -130,6 +129,13 @@ const PREVIEW_ROLE_CLASSES = {
   eaten: "ring-red-600 bg-red-600/10",
   unaffected: "ring-neutral-500",
 } as const satisfies { [Role in GridPreviewRole]: string };
+
+function useGridGesture() {
+  const [value, set] = useState<GridGesture>();
+  return { value, set };
+}
+
+export type GridGestureState = ReturnType<typeof useGridGesture>;
 
 function GridArea(props: GridAreaProps) {
   return (

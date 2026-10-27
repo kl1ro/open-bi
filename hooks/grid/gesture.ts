@@ -1,5 +1,6 @@
-import { useState, type PointerEvent, type RefObject } from "react";
+import type { PointerEvent, RefObject } from "react";
 
+import type { GridGestureState } from "@/components/widgets/layouts/GridWidget";
 import type { GridMove } from "@/hooks/grid/move";
 import type { GridResize } from "@/hooks/grid/resize";
 import type GridConfig from "@/lib/widgets/layouts/grid";
@@ -18,13 +19,6 @@ import type WidgetConfig from "@/lib/widget";
 import { getWidgetConfig } from "@/lib/widget";
 import { createSlotConfig } from "@/lib/widgets/slot";
 import type { AppStore } from "@/state/store";
-
-export default function useGridGesture() {
-  const [value, set] = useState<GridGesture>();
-  return { value, set };
-}
-
-export type GridGestureState = ReturnType<typeof useGridGesture>;
 
 export function isGestureOwner(
   item: GridItemToRender,
