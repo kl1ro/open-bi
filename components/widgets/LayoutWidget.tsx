@@ -6,9 +6,11 @@ import type LayoutConfig from "@/lib/widgets/layout";
 import { getUnexpectedLayoutTypeError } from "@/lib/widgets/layout";
 
 export default function LayoutWidget(props: LayoutConfig) {
+  const deps = { layout: props };
+
   return (
     <div className={cn("size-full", props.parentId && "p-5")}>
-      {getLayoutByType({ layout: props })}
+      {getLayoutByType(deps)}
     </div>
   );
 }

@@ -9,7 +9,8 @@ import TitleWidget from "@/components/widgets/TitleWidget";
 import MapWidget from "@/components/widgets/MapWidget";
 import SlotWidget from "@/components/widgets/SlotWidget";
 import type WidgetConfig from "@/lib/widget";
-import { findWidgetConfig, getUnexpectedWidgetTypeError } from "@/lib/widget";
+import { getUnexpectedWidgetTypeError } from "@/lib/widget";
+import { selectWidgetConfig } from "@/state/features/dashboard";
 import { useAppSelector } from "@/state/hooks";
 
 export default function Widget(props: WidgetProps) {
@@ -56,9 +57,7 @@ function reportWidgetRenderError(error: unknown) {
 
 function useWidgetContentState(props: WidgetContentProps) {
   return {
-    widgetConfig: useAppSelector((state) =>
-      findWidgetConfig(props.id, { widgetConfigs: state.dashboard.widgetConfigs }),
-    ),
+    widgetConfig: useAppSelector((state) => selectWidgetConfig(state, props.id)),
   };
 }
 

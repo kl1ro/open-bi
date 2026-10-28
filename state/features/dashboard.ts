@@ -18,6 +18,7 @@ import {
 } from "@/lib/widget";
 import type DashboardConfig from "@/lib/dashboard";
 import type { WithRequired } from "@/lib/utils";
+import type { RootState } from "@/state/store";
 
 const initialDashboardState: DashboardConfig = {
   widgetConfigs: {},
@@ -178,7 +179,7 @@ function removeWidgetFromState(widgetConfig: WidgetConfig, deps: DashboardSliceD
   delete deps.state.widgetConfigs[widgetConfig.id];
 }
 
-export function findRootConfig(deps: DashboardSliceDeps): WidgetConfig | undefined {
+function findRootConfig(deps: DashboardSliceDeps): WidgetConfig | undefined {
   if (!deps.state.rootId) return;
   const innerDeps = { ...deps, widgetConfigs: deps.state.widgetConfigs };
   return findWidgetConfig(deps.state.rootId, innerDeps);
@@ -204,4 +205,17 @@ function updateRootId(newId: WidgetConfig["id"] | undefined, deps: DashboardSlic
 
 export interface DashboardSliceDeps {
   state: DashboardConfig;
+}
+
+export function selectRootConfig(state: RootState): WidgetConfig | undefined {
+  const deps = { state: state.dashboard };
+  return findRootConfig(deps);
+}
+
+export function selectWidgetConfig(
+  state: RootState,
+  id: WidgetConfig["id"],
+): WidgetConfig | undefined {
+  const deps = { widgetConfigs: state.dashboard.widgetConfigs };
+  return findWidgetConfig(id, deps);
 }
