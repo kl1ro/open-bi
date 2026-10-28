@@ -76,7 +76,7 @@ interface FindItemAreaOnDragDeps {
 
 function getOwnerArea(deps: GetOwnerAreaDeps): GridPreviewArea {
   const { owner } = deps.gesture;
-  const previewItemConfig = getOwnerPreviewItemConfig(deps);
+  const previewItemConfig = getGridItemConfig(deps.previewGrid, owner.child);
 
   if (isGridItemCollapsed(previewItemConfig))
     return { key: owner.key, itemConfig: owner.itemConfig, role: "eaten" };
@@ -100,7 +100,9 @@ function findComputedSlotAreaOnDrag(
   item: GridItemToRender,
   deps: FindComputedSlotAreaOnDragDeps,
 ): GridPreviewArea | undefined {
-  if (findItemsOverlap(item.itemConfig, getOwnerPreviewItemConfig(deps))) return;
+  const { owner } = deps.gesture;
+  const ownerPreviewItemConfig = getGridItemConfig(deps.previewGrid, owner.child);
+  if (findItemsOverlap(item.itemConfig, ownerPreviewItemConfig)) return;
 
   return {
     key: getRenderedGridItemKey(item),
@@ -110,12 +112,6 @@ function findComputedSlotAreaOnDrag(
 }
 
 type FindComputedSlotAreaOnDragDeps = FindItemAreaOnDragDeps;
-
-function getOwnerPreviewItemConfig(deps: GetOwnerPreviewItemConfigDeps) {
-  return getGridItemConfig(deps.previewGrid, deps.gesture.owner.child);
-}
-
-type GetOwnerPreviewItemConfigDeps = FindItemAreaOnDragDeps;
 
 export type GridPreviewRole =
   | "focused"
