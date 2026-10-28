@@ -24,18 +24,11 @@ export function getDragPreview(
   gesture: AbstractGridGesture,
   deps: GetDragPreviewDeps,
 ): GridPreviewArea[] {
-  const adoptionDeps = { itemConfig: deps.targetItemConfig };
-
-  const previewGrid = getGridConfigWithAdoptedChild(
-    deps.grid,
-    gesture.owner.child,
-    adoptionDeps,
-  );
-
-  const itemAreaDeps = { gesture, previewGrid, ownerRole: deps.ownerRole };
+  const previewGrid = getGridConfigWithAdoptedChild(deps.grid, gesture.owner.child, deps);
+  const innerDeps = { ...deps, gesture, previewGrid };
 
   const dragPreview = deps.itemsToRender.flatMap(
-    (item) => findItemAreaOnDrag(item, itemAreaDeps) ?? [],
+    (item) => findItemAreaOnDrag(item, innerDeps) ?? [],
   );
 
   return dragPreview;
@@ -44,7 +37,7 @@ export function getDragPreview(
 export interface GetDragPreviewDeps {
   grid: GridConfig;
   itemsToRender: GridItemToRender[];
-  targetItemConfig: GridItemConfig;
+  itemConfig: GridItemConfig;
   ownerRole: GridPreviewRole;
 }
 

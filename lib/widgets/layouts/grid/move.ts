@@ -55,10 +55,10 @@ function getMovePressPreview(
   move: GridMove,
   deps: GetMovePressPreviewDeps,
 ): GridPreviewArea[] {
-  const itemAreaDeps = { move };
+  const innerDeps = { ...deps, move };
 
   const pressPreview = deps.itemsToRender.map((item) =>
-    getItemAreaOnMovePress(item, itemAreaDeps),
+    getItemAreaOnMovePress(item, innerDeps),
   );
 
   return pressPreview;
@@ -72,13 +72,13 @@ function getMoveDragPreview(
 ): GridPreviewArea[] {
   const movedItemConfig = getMovedItemConfig(move, deps);
 
-  const dragDeps = {
+  const innerDeps = {
     ...deps,
-    targetItemConfig: movedItemConfig,
+    itemConfig: movedItemConfig,
     ownerRole: "moved" as const,
   };
 
-  return getDragPreview(move, dragDeps);
+  return getDragPreview(move, innerDeps);
 }
 
 type GetMoveDragPreviewDeps = GetMovePreviewDeps;

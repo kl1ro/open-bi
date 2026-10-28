@@ -29,14 +29,13 @@ export function isGestureOwner(
 }
 
 export function createGesture(deps: CreateGestureDeps): AbstractGridGesture {
-  const owner = getGestureOwner(deps.item, deps);
   const container = getGridContainer(deps);
-  const cellPitchDeps = { container, grid: deps.grid };
+  const innerDeps = { ...deps, container };
 
   return {
-    owner,
+    owner: getGestureOwner(deps.item, innerDeps),
     startPoint: { clientX: deps.event.clientX, clientY: deps.event.clientY },
-    cellPitch: measureCellPitch(cellPitchDeps),
+    cellPitch: measureCellPitch(innerDeps),
     delta: { rows: 0, columns: 0 },
   };
 }
@@ -65,16 +64,6 @@ export interface GetGridGestureDeltaDeps {
   event: PointerEvent<HTMLElement>;
 }
 
-function getGestureOwner(
-  item: GridItemToRender,
-  deps: GetGestureOwnerDeps,
-): GridGestureOwner {
-  const child = item.id ? getWidgetConfig(item.id, deps) : createSlotConfig(deps.grid.id);
-  return { key: getRenderedGridItemKey(item), child, itemConfig: item.itemConfig };
-}
-
-type GetGestureOwnerDeps = Pick<CreateGestureDeps, "grid" | "widgetConfigs">;
-
 function getGridContainer(deps: GetGridContainerDeps) {
   const container = deps.container.current;
   if (!container) throw new GridContainerNotMountedError();
@@ -90,6 +79,16 @@ export class GridContainerNotMountedError extends Error {
     super("Grid container is not mounted", options);
   }
 }
+
+function getGestureOwner(
+  item: GridItemToRender,
+  deps: GetGestureOwnerDeps,
+): GridGestureOwner {
+  const child = item.id ? getWidgetConfig(item.id, deps) : createSlotConfig(deps.grid.id);
+  return { key: getRenderedGridItemKey(item), child, itemConfig: item.itemConfig };
+}
+
+type GetGestureOwnerDeps = Pick<CreateGestureDeps, "grid" | "widgetConfigs">;
 
 function measureCellPitch(deps: MeasureCellPitchDeps): GridCellPitch {
   const style = getComputedStyle(deps.container);

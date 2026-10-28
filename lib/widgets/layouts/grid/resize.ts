@@ -58,9 +58,10 @@ export function getResizedItemConfig(
   resize: GridResize,
   deps: GetResizedItemConfigDeps,
 ): GridItemConfig {
+  const innerDeps = { ...deps, resize };
+
   const resizedItemConfig = resize.sides.reduce(
-    (itemConfig, side) =>
-      getItemConfigResizedAtSide(itemConfig, side, { resize, grid: deps.grid }),
+    (itemConfig, side) => getItemConfigResizedAtSide(itemConfig, side, innerDeps),
     resize.owner.itemConfig,
   );
 
@@ -76,10 +77,10 @@ function getResizePressPreview(
   deps: GetResizePressPreviewDeps,
 ): GridPreviewArea[] {
   const firstStep = getFirstStepItemConfig(resize, deps);
-  const itemAreaDeps = { resize, firstStep };
+  const innerDeps = { ...deps, resize, firstStep };
 
   const pressPreview = deps.itemsToRender.map((item) =>
-    getItemAreaOnResizePress(item, itemAreaDeps),
+    getItemAreaOnResizePress(item, innerDeps),
   );
 
   return pressPreview;
@@ -93,13 +94,13 @@ function getResizeDragPreview(
 ): GridPreviewArea[] {
   const resizedItemConfig = getResizedItemConfig(resize, deps);
 
-  const dragDeps = {
+  const innerDeps = {
     ...deps,
-    targetItemConfig: resizedItemConfig,
+    itemConfig: resizedItemConfig,
     ownerRole: "resized" as const,
   };
 
-  return getDragPreview(resize, dragDeps);
+  return getDragPreview(resize, innerDeps);
 }
 
 type GetResizeDragPreviewDeps = GetResizePreviewDeps;
@@ -111,11 +112,11 @@ function getItemConfigResizedAtSide(
 ) {
   const geometry = RESIZE_SIDES[side];
   const delta = deps.resize.delta[geometry.axis];
-  const sideDeps = { geometry, delta, grid: deps.grid };
+  const innerDeps = { ...deps, geometry, delta };
 
   return geometry.direction === "forward"
-    ? getItemConfigResizedForward(itemConfig, sideDeps)
-    : getItemConfigResizedBackward(itemConfig, sideDeps);
+    ? getItemConfigResizedForward(itemConfig, innerDeps)
+    : getItemConfigResizedBackward(itemConfig, innerDeps);
 }
 
 interface GetItemConfigResizedAtSideDeps {

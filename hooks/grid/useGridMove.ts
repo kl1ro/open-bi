@@ -21,16 +21,17 @@ import type { AppStore } from "@/state/store";
 
 export default function useGridMove(deps: UseGridMoveDeps) {
   const move = findOngoingMove(deps);
-  const moveDeps = { ...deps, move };
+  const innerDeps = { ...deps, move };
 
   return {
     value: move,
-    preview: getMovePreview(move, deps),
-    tryStart: (startDeps: GridMoveStartDeps) => tryStartMove({ ...deps, ...startDeps }),
-    continue: (event: PointerEvent<HTMLElement>) => continueMove({ ...moveDeps, event }),
+    preview: getMovePreview(move, innerDeps),
+    tryStart: (startDeps: GridMoveStartDeps) =>
+      tryStartMove({ ...innerDeps, ...startDeps }),
+    continue: (event: PointerEvent<HTMLElement>) => continueMove({ ...innerDeps, event }),
     tryFinish: (event: PointerEvent<HTMLElement>) =>
-      tryFinishMove({ ...moveDeps, event }),
-    reset: () => resetMove(deps),
+      tryFinishMove({ ...innerDeps, event }),
+    reset: () => resetMove(innerDeps),
   };
 }
 
@@ -58,12 +59,12 @@ function tryStartMove(deps: TryStartMoveDeps) {
   if (isGestureInProgress(deps.gesture.value)) return;
 
   try {
-    const creationDeps = {
+    const innerDeps = {
       ...deps,
       widgetConfigs: deps.store.getState().dashboard.widgetConfigs,
     };
 
-    const gesture = createGesture(creationDeps);
+    const gesture = createGesture(innerDeps);
     takeOverPointerEvent(deps.event);
     deps.gesture.set({ ...gesture, kind: "move" });
   } catch (error) {

@@ -22,18 +22,18 @@ import type { AppStore } from "@/state/store";
 
 export default function useGridResize(deps: UseGridResizeDeps) {
   const resize = findOngoingResize(deps);
-  const resizeDeps = { ...deps, resize };
+  const innerDeps = { ...deps, resize };
 
   return {
     value: resize,
-    preview: getResizePreview(resize, deps),
+    preview: getResizePreview(resize, innerDeps),
     tryStart: (startDeps: GridResizeStartDeps) =>
-      tryStartResize({ ...deps, ...startDeps }),
+      tryStartResize({ ...innerDeps, ...startDeps }),
     continue: (event: PointerEvent<HTMLElement>) =>
-      continueResize({ ...resizeDeps, event }),
+      continueResize({ ...innerDeps, event }),
     tryFinish: (event: PointerEvent<HTMLElement>) =>
-      tryFinishResize({ ...resizeDeps, event }),
-    reset: () => resetResize(deps),
+      tryFinishResize({ ...innerDeps, event }),
+    reset: () => resetResize(innerDeps),
   };
 }
 
@@ -62,12 +62,12 @@ function tryStartResize(deps: TryStartResizeDeps) {
   if (isGestureInProgress(deps.gesture.value)) return;
 
   try {
-    const creationDeps = {
+    const innerDeps = {
       ...deps,
       widgetConfigs: deps.store.getState().dashboard.widgetConfigs,
     };
 
-    const gesture = createGesture(creationDeps);
+    const gesture = createGesture(innerDeps);
     takeOverPointerEvent(deps.event);
     deps.gesture.set({ ...gesture, kind: "resize", sides: deps.handle.sides });
   } catch (error) {
