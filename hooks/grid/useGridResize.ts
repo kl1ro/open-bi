@@ -27,12 +27,12 @@ export default function useGridResize(deps: UseGridResizeDeps) {
   return {
     value: resize,
     preview: getResizePreview(resize, innerDeps),
-    tryStart: (startDeps: GridResizeStartDeps) =>
-      tryStartResize({ ...innerDeps, ...startDeps }),
-    continue: (event: PointerEvent<HTMLElement>) =>
-      continueResize({ ...innerDeps, event }),
-    tryFinish: (event: PointerEvent<HTMLElement>) =>
-      tryFinishResize({ ...innerDeps, event }),
+    tryStart: (deps: UseGridResizeTryStartDeps) =>
+      tryStartResize({ ...innerDeps, ...deps }),
+    continue: (deps: UseGridResizeContinueDeps) =>
+      continueResize({ ...innerDeps, ...deps }),
+    tryFinish: (deps: UseGridResizeTryFinishDeps) =>
+      tryFinishResize({ ...innerDeps, ...deps }),
     reset: () => resetResize(innerDeps),
   };
 }
@@ -45,10 +45,18 @@ export interface UseGridResizeDeps {
   gesture: GridGestureState;
 }
 
-export interface GridResizeStartDeps {
+export interface UseGridResizeTryStartDeps {
   event: PointerEvent<HTMLElement>;
   handle: GridResizeHandleConfig;
   item: GridItemToRender;
+}
+
+export interface UseGridResizeContinueDeps {
+  event: PointerEvent<HTMLElement>;
+}
+
+export interface UseGridResizeTryFinishDeps {
+  event: PointerEvent<HTMLElement>;
 }
 
 function findOngoingResize(deps: FindOngoingResizeDeps): GridResize | undefined {
@@ -76,7 +84,7 @@ function tryStartResize(deps: TryStartResizeDeps) {
   }
 }
 
-type TryStartResizeDeps = UseGridResizeDeps & GridResizeStartDeps;
+type TryStartResizeDeps = UseGridResizeDeps & UseGridResizeTryStartDeps;
 
 function continueResize(deps: ContinueResizeDeps) {
   if (!deps.resize) return;
@@ -85,10 +93,8 @@ function continueResize(deps: ContinueResizeDeps) {
   deps.gesture.set({ ...deps.resize, delta });
 }
 
-type ContinueResizeDeps = Pick<UseGridResizeDeps, "gesture"> & {
-  resize?: GridResize;
-  event: PointerEvent<HTMLElement>;
-};
+type ContinueResizeDeps = Pick<UseGridResizeDeps, "gesture"> &
+  UseGridResizeContinueDeps & { resize?: GridResize };
 
 function tryFinishResize(deps: TryFinishResizeDeps) {
   if (!deps.resize) return;
@@ -105,10 +111,8 @@ function tryFinishResize(deps: TryFinishResizeDeps) {
   resetResize(deps);
 }
 
-type TryFinishResizeDeps = Pick<UseGridResizeDeps, "gesture" | "grid" | "store"> & {
-  resize?: GridResize;
-  event: PointerEvent<HTMLElement>;
-};
+type TryFinishResizeDeps = Pick<UseGridResizeDeps, "gesture" | "grid" | "store"> &
+  UseGridResizeTryFinishDeps & { resize?: GridResize };
 
 function resetResize(deps: ResetResizeDeps) {
   deps.gesture.set(undefined);

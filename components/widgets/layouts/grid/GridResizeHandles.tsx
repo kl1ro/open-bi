@@ -33,8 +33,8 @@ function GridResizeHandle(props: GridResizeHandleProps) {
         isActive && "opacity-100",
       )}
       onPointerDown={(event) => props.gridState.resize.tryStart({ ...props, event })}
-      onPointerMove={props.gridState.resize.continue}
-      onPointerUp={props.gridState.resize.tryFinish}
+      onPointerMove={(event) => props.gridState.resize.continue({ event })}
+      onPointerUp={(event) => props.gridState.resize.tryFinish({ event })}
       onPointerCancel={props.gridState.resize.reset}
     >
       <ResizeGrip
