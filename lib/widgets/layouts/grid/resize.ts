@@ -86,7 +86,10 @@ function getResizePressPreview(
   return pressPreview;
 }
 
-type GetResizePressPreviewDeps = GetResizePreviewDeps;
+interface GetResizePressPreviewDeps {
+  grid: GridConfig;
+  itemsToRender: GridItemToRender[];
+}
 
 function getResizeDragPreview(
   resize: GridResize,
@@ -103,7 +106,10 @@ function getResizeDragPreview(
   return getDragPreview(resize, innerDeps);
 }
 
-type GetResizeDragPreviewDeps = GetResizePreviewDeps;
+interface GetResizeDragPreviewDeps {
+  grid: GridConfig;
+  itemsToRender: GridItemToRender[];
+}
 
 function getItemConfigResizedAtSide(
   itemConfig: GridItemConfig,
@@ -132,7 +138,9 @@ function getFirstStepItemConfig(
   return getResizedItemConfig(firstStepResize, deps);
 }
 
-type GetFirstStepItemConfigDeps = Pick<GetResizePressPreviewDeps, "grid">;
+interface GetFirstStepItemConfigDeps {
+  grid: GridConfig;
+}
 
 function getItemAreaOnResizePress(
   item: GridItemToRender,
@@ -207,13 +215,18 @@ function getItemRoleOnResizePress(
   return isTouchedByFirstStep(item, deps) ? "affected" : "unaffected";
 }
 
-type GetItemRoleOnResizePressDeps = GetItemAreaOnResizePressDeps;
+interface GetItemRoleOnResizePressDeps {
+  resize: GridResize;
+  firstStep: GridItemConfig;
+}
 
 function isTouchedByFirstStep(item: GridItemToRender, deps: IsTouchedByFirstStepDeps) {
   return Boolean(findItemsOverlap(item.itemConfig, deps.firstStep));
 }
 
-type IsTouchedByFirstStepDeps = Pick<GetItemRoleOnResizePressDeps, "firstStep">;
+interface IsTouchedByFirstStepDeps {
+  firstStep: GridItemConfig;
+}
 
 export type GridResizeSide = "top" | "bottom" | "left" | "right";
 

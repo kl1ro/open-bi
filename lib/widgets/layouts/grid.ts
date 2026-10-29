@@ -230,7 +230,9 @@ function pickBestResolutionOption(
   return bestOption;
 }
 
-type PickBestResolutionOptionDeps = Pick<GridItemOverlap, "overlappedItem">;
+interface PickBestResolutionOptionDeps {
+  overlappedItem: GridItemConfig;
+}
 
 function getStripsAroundOverlap(itemRect: GridRect, overlapRect: GridRect): GridRect[] {
   return [

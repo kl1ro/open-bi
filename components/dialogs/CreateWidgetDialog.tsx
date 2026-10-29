@@ -37,6 +37,7 @@ import { SPACING_OPTIONS } from "@/lib/widgets/layouts/grid";
 import { MAP_VIEWS, type MapView } from "@/lib/widgets/map";
 import { upsertWidget } from "@/state/features/dashboard";
 import { useAppDispatch } from "@/state/hooks";
+import type { AppDispatch } from "@/state/store";
 
 export default function CreateWidgetDialog(props: CreateWidgetDialogProps) {
   const state = useCreateWidgetDialogState(props);
@@ -120,8 +121,6 @@ function useCreateWidgetDialogState(props: CreateWidgetDialogProps) {
   };
 }
 
-type CreateWidgetDialogState = ReturnType<typeof useCreateWidgetDialogState>;
-
 function tryCreateWidgetFromFormValues(
   values: FormValues,
   deps: TryCreateWidgetFromFormValuesDeps,
@@ -136,10 +135,13 @@ function tryCreateWidgetFromFormValues(
   }
 }
 
-type TryCreateWidgetFromFormValuesDeps = Pick<
-  CreateWidgetDialogState,
-  "dispatch" | "id" | "parentId" | "itemConfig" | "close"
->;
+interface TryCreateWidgetFromFormValuesDeps {
+  dispatch: AppDispatch;
+  id?: WidgetConfig["id"];
+  parentId?: WidgetConfig["id"];
+  itemConfig?: ItemConfig;
+  close: () => void;
+}
 
 function WidgetTypeField(props: FieldProps) {
   return (
@@ -379,10 +381,10 @@ function getWidgetConfigFromFormValues(
   }
 }
 
-type GetWidgetConfigFromFormValuesDeps = Pick<
-  TryCreateWidgetFromFormValuesDeps,
-  "id" | "parentId"
->;
+interface GetWidgetConfigFromFormValuesDeps {
+  id?: WidgetConfig["id"];
+  parentId?: WidgetConfig["id"];
+}
 
 function isFormType(type: string): type is FormValues["type"] {
   return Object.hasOwn(WIDGET_TYPE_LABELS, type);

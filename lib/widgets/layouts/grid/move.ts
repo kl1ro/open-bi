@@ -64,7 +64,9 @@ function getMovePressPreview(
   return pressPreview;
 }
 
-type GetMovePressPreviewDeps = Pick<GetMovePreviewDeps, "itemsToRender">;
+interface GetMovePressPreviewDeps {
+  itemsToRender: GridItemToRender[];
+}
 
 function getMoveDragPreview(
   move: GridMove,
@@ -81,7 +83,10 @@ function getMoveDragPreview(
   return getDragPreview(move, innerDeps);
 }
 
-type GetMoveDragPreviewDeps = GetMovePreviewDeps;
+interface GetMoveDragPreviewDeps {
+  grid: GridConfig;
+  itemsToRender: GridItemToRender[];
+}
 
 function getItemAreaOnMovePress(
   item: GridItemToRender,
@@ -105,4 +110,6 @@ function getItemRoleOnMovePress(
   return isGestureOwner(item, deps.move) ? "focused" : "unaffected";
 }
 
-type GetItemRoleOnMovePressDeps = GetItemAreaOnMovePressDeps;
+interface GetItemRoleOnMovePressDeps {
+  move: GridMove;
+}

@@ -16,13 +16,14 @@ function useMapWidgetState(props: MapConfig) {
   };
 }
 
-type MapWidgetState = ReturnType<typeof useMapWidgetState>;
-
 function useMapWidgetEffects(deps: UseMapWidgetEffectsDeps) {
   useMountMapEffect(deps);
 }
 
-type UseMapWidgetEffectsDeps = MapWidgetState;
+interface UseMapWidgetEffectsDeps {
+  config: MapConfig;
+  container: RefObject<HTMLDivElement | null>;
+}
 
 function useMountMapEffect(deps: UseMountMapEffectDeps) {
   useEffect(
@@ -36,7 +37,10 @@ function useMountMapEffect(deps: UseMountMapEffectDeps) {
   );
 }
 
-type UseMountMapEffectDeps = UseMapWidgetEffectsDeps;
+interface UseMountMapEffectDeps {
+  config: MapConfig;
+  container: RefObject<HTMLDivElement | null>;
+}
 
 function mountMapIntoContainer(
   config: MapConfig,

@@ -77,7 +77,11 @@ function getOwnerArea(deps: GetOwnerAreaDeps): GridPreviewArea {
   return { key: owner.key, itemConfig: previewItemConfig, role: deps.ownerRole };
 }
 
-type GetOwnerAreaDeps = FindItemAreaOnDragDeps;
+interface GetOwnerAreaDeps {
+  gesture: AbstractGridGesture;
+  previewGrid: GridConfig;
+  ownerRole: GridPreviewRole;
+}
 
 function findPreviewItemConfig(
   item: GridItemToRender,
@@ -87,7 +91,9 @@ function findPreviewItemConfig(
   return deps.previewGrid.arrangement?.[item.id];
 }
 
-type FindPreviewItemConfigDeps = Pick<FindItemAreaOnDragDeps, "previewGrid">;
+interface FindPreviewItemConfigDeps {
+  previewGrid: GridConfig;
+}
 
 function findComputedSlotAreaOnDrag(
   item: GridItemToRender,
@@ -104,10 +110,10 @@ function findComputedSlotAreaOnDrag(
   };
 }
 
-type FindComputedSlotAreaOnDragDeps = Pick<
-  FindItemAreaOnDragDeps,
-  "gesture" | "previewGrid"
->;
+interface FindComputedSlotAreaOnDragDeps {
+  previewGrid: GridConfig;
+  gesture: AbstractGridGesture;
+}
 
 export type GridPreviewRole =
   | "focused"

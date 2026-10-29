@@ -70,7 +70,9 @@ function getGridContainer(deps: GetGridContainerDeps) {
   return container;
 }
 
-type GetGridContainerDeps = Pick<CreateGestureDeps, "container">;
+interface GetGridContainerDeps {
+  container: RefObject<HTMLDivElement | null>;
+}
 
 export class GridContainerNotMountedError extends Error {
   public name = GridContainerNotMountedError.name;
@@ -88,7 +90,10 @@ function getGestureOwner(
   return { key: getRenderedGridItemKey(item), child, itemConfig: item.itemConfig };
 }
 
-type GetGestureOwnerDeps = Pick<CreateGestureDeps, "grid" | "widgetConfigs">;
+interface GetGestureOwnerDeps {
+  grid: GridConfig;
+  widgetConfigs: WidgetConfigsById;
+}
 
 function measureCellPitch(deps: MeasureCellPitchDeps): GridCellPitch {
   const style = getComputedStyle(deps.container);
