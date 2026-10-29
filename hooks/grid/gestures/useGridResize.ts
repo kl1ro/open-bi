@@ -1,9 +1,11 @@
-import type { PointerEvent, RefObject } from "react";
+import type { PointerEvent } from "react";
 import { toast } from "sonner";
 
-import type { CurrentGridGestureState } from "@/hooks/grid/useGridGesture";
+import type {
+  CurrentGridGestureState,
+  UseGridGestureDeps,
+} from "@/hooks/grid/useGridGesture";
 import type { GridResizeHandleConfig } from "@/components/widgets/layouts/grid/GridResizeHandles";
-import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   haveSameDelta,
   occupySameCells,
@@ -19,7 +21,6 @@ import {
 import { takeOverPointerEvent } from "@/lib/pointer";
 import { bindDeps } from "@/lib/utils";
 import { upsertWidget } from "@/state/features/dashboard";
-import type { AppStore } from "@/state/store";
 
 export default function useGridResize(deps: UseGridResizeDeps) {
   const resize = findOngoingResize(deps);
@@ -35,11 +36,7 @@ export default function useGridResize(deps: UseGridResizeDeps) {
   };
 }
 
-export interface UseGridResizeDeps {
-  grid: GridConfig;
-  itemsToRender: GridItemToRender[];
-  container: RefObject<HTMLDivElement | null>;
-  store: AppStore;
+export interface UseGridResizeDeps extends UseGridGestureDeps {
   currentGesture: CurrentGridGestureState;
 }
 
