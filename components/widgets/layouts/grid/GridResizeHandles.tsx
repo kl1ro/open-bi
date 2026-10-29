@@ -114,7 +114,7 @@ export interface GridResizeHandleConfig {
 }
 
 function GridResizeHandle(props: GridResizeHandleProps) {
-  const isActive = isGestureOwner(props.item, props.gridState.resize.value);
+  const isActive = isGestureOwner(props.item, props.gridState.gesture.resize.value);
 
   return (
     <div
@@ -125,10 +125,12 @@ function GridResizeHandle(props: GridResizeHandleProps) {
         props.handle.cursor,
         isActive && "opacity-100",
       )}
-      onPointerDown={(event) => props.gridState.resize.tryStart({ ...props, event })}
-      onPointerMove={(event) => props.gridState.resize.continue({ event })}
-      onPointerUp={(event) => props.gridState.resize.tryFinish({ event })}
-      onPointerCancel={props.gridState.resize.reset}
+      onPointerDown={(event) =>
+        props.gridState.gesture.resize.tryStart({ ...props, event })
+      }
+      onPointerMove={(event) => props.gridState.gesture.resize.continue({ event })}
+      onPointerUp={(event) => props.gridState.gesture.resize.tryFinish({ event })}
+      onPointerCancel={props.gridState.gesture.resize.reset}
     >
       <ResizeGrip
         kind={props.handle.kind}

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export default function GridMoveHandle(props: GridMoveHandleProps) {
   if (!props.item.id) return;
-  const isActive = isGestureOwner(props.item, props.gridState.move.value);
+  const isActive = isGestureOwner(props.item, props.gridState.gesture.move.value);
 
   return (
     <div
@@ -17,10 +17,12 @@ export default function GridMoveHandle(props: GridMoveHandleProps) {
         "opacity-0 group-hover/item:opacity-100 animated",
         isActive && "opacity-100 cursor-grabbing",
       )}
-      onPointerDown={(event) => props.gridState.move.tryStart({ ...props, event })}
-      onPointerMove={(event) => props.gridState.move.continue({ event })}
-      onPointerUp={(event) => props.gridState.move.tryFinish({ event })}
-      onPointerCancel={props.gridState.move.reset}
+      onPointerDown={(event) =>
+        props.gridState.gesture.move.tryStart({ ...props, event })
+      }
+      onPointerMove={(event) => props.gridState.gesture.move.continue({ event })}
+      onPointerUp={(event) => props.gridState.gesture.move.tryFinish({ event })}
+      onPointerCancel={props.gridState.gesture.move.reset}
     >
       <GripHorizontalIcon
         className={cn(MOVE_GRIP_CLASS, isActive && MOVE_ACTIVE_GRIP_CLASS)}

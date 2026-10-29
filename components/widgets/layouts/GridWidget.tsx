@@ -1,12 +1,11 @@
-import { type ReactNode, useRef, useState } from "react";
+import { type ReactNode, useRef } from "react";
 import { AnimatePresence, motion, type MotionProps } from "framer-motion";
 
 import Widget from "@/components/Widget";
 import SlotWidget from "@/components/widgets/SlotWidget";
 import GridMoveHandle from "@/components/widgets/layouts/grid/GridMoveHandle";
 import GridResizeHandles from "@/components/widgets/layouts/grid/GridResizeHandles";
-import useGridMove from "@/hooks/grid/useGridMove";
-import useGridResize from "@/hooks/grid/useGridResize";
+import useGridGesture from "@/hooks/grid/useGridGesture";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getGridItemsToRender,
@@ -14,7 +13,6 @@ import {
   type GridItemConfig,
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
-import type GridGesture from "@/lib/widgets/layouts/grid/gesture";
 import type GridPreviewArea from "@/lib/widgets/layouts/grid/preview";
 import type { GridPreviewRole } from "@/lib/widgets/layouts/grid/preview";
 import type WidgetConfig from "@/lib/widget";
@@ -33,8 +31,8 @@ export default function GridWidget(props: GridConfig) {
   return (
     <div
       ref={state.container}
-      data-resizing={state.resize.value ? "" : undefined}
-      data-moving={state.move.value ? "" : undefined}
+      data-resizing={state.gesture.resize.value ? "" : undefined}
+      data-moving={state.gesture.move.value ? "" : undefined}
       className="group/grid size-full grid gap-8 grid-rows-(--rows) grid-cols-(--cols) relative"
       style={getGridTemplateStyle(state.grid)}
     >
@@ -45,7 +43,7 @@ export default function GridWidget(props: GridConfig) {
       </AnimatePresence>
 
       <AnimatePresence>
-        {[...state.resize.preview, ...state.move.preview].map((area) => (
+        {[...state.gesture.resize.preview, ...state.gesture.move.preview].map((area) => (
           <PreviewHighlight key={area.key} area={area} />
         ))}
       </AnimatePresence>
@@ -59,13 +57,11 @@ function useGridWidgetState(props: GridConfig) {
     itemsToRender: getGridItemsToRender(props),
     container: useRef<HTMLDivElement>(null),
     store: useAppStore(),
-    gesture: useGridGesture(),
   };
 
   return {
     ...deps,
-    resize: useGridResize(deps),
-    move: useGridMove(deps),
+    gesture: useGridGesture(deps),
   };
 }
 
@@ -131,13 +127,6 @@ const PREVIEW_ROLE_CLASSES = {
   eaten: "ring-red-600 bg-red-600/10",
   unaffected: "ring-neutral-500",
 } as const satisfies { [Role in GridPreviewRole]: string };
-
-function useGridGesture() {
-  const [value, set] = useState<GridGesture>();
-  return { value, set };
-}
-
-export type GridGestureState = ReturnType<typeof useGridGesture>;
 
 function GridArea(props: GridAreaProps) {
   return (

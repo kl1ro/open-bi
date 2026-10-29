@@ -1,7 +1,7 @@
 import type { PointerEvent, RefObject } from "react";
 import { toast } from "sonner";
 
-import type { GridGestureState } from "@/components/widgets/layouts/GridWidget";
+import type { CurrentGridGestureState } from "@/hooks/grid/useGridGesture";
 import type { GridResizeHandleConfig } from "@/components/widgets/layouts/grid/GridResizeHandles";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
@@ -40,18 +40,18 @@ export interface UseGridResizeDeps {
   itemsToRender: GridItemToRender[];
   container: RefObject<HTMLDivElement | null>;
   store: AppStore;
-  gesture: GridGestureState;
+  currentGesture: CurrentGridGestureState;
 }
 
 function findOngoingResize(deps: FindOngoingResizeDeps): GridResize | undefined {
-  if (deps.gesture.value?.kind !== "resize") return;
-  return deps.gesture.value;
+  if (deps.currentGesture.value?.kind !== "resize") return;
+  return deps.currentGesture.value;
 }
 
-type FindOngoingResizeDeps = Pick<UseGridResizeDeps, "gesture">;
+type FindOngoingResizeDeps = Pick<UseGridResizeDeps, "currentGesture">;
 
 function tryStartResize(deps: TryStartResizeDeps) {
-  if (isGestureInProgress(deps.gesture.value)) return;
+  if (isGestureInProgress(deps.currentGesture.value)) return;
 
   try {
     const innerDeps = {
@@ -61,7 +61,7 @@ function tryStartResize(deps: TryStartResizeDeps) {
 
     const gesture = createGesture(innerDeps);
     takeOverPointerEvent(deps.event);
-    deps.gesture.set({ ...gesture, kind: "resize", sides: deps.handle.sides });
+    deps.currentGesture.set({ ...gesture, kind: "resize", sides: deps.handle.sides });
   } catch (error) {
     console.error(error);
     toast.error("Не удалось начать изменение размера виджета");
@@ -70,7 +70,7 @@ function tryStartResize(deps: TryStartResizeDeps) {
 
 type TryStartResizeDeps = Pick<
   UseGridResizeDeps,
-  "gesture" | "store" | "grid" | "container"
+  "currentGesture" | "store" | "grid" | "container"
 > & {
   event: PointerEvent<HTMLElement>;
   handle: GridResizeHandleConfig;
@@ -81,10 +81,10 @@ function continueResize(deps: ContinueResizeDeps) {
   if (!deps.resize) return;
   const delta = getGridResizeDelta(deps.resize, deps);
   if (haveSameDelta(delta, deps.resize.delta)) return;
-  deps.gesture.set({ ...deps.resize, delta });
+  deps.currentGesture.set({ ...deps.resize, delta });
 }
 
-type ContinueResizeDeps = Pick<UseGridResizeDeps, "gesture"> & {
+type ContinueResizeDeps = Pick<UseGridResizeDeps, "currentGesture"> & {
   resize?: GridResize;
   event: PointerEvent<HTMLElement>;
 };
@@ -104,16 +104,19 @@ function tryFinishResize(deps: TryFinishResizeDeps) {
   resetResize(deps);
 }
 
-type TryFinishResizeDeps = Pick<UseGridResizeDeps, "gesture" | "grid" | "store"> & {
+type TryFinishResizeDeps = Pick<
+  UseGridResizeDeps,
+  "currentGesture" | "grid" | "store"
+> & {
   resize?: GridResize;
   event: PointerEvent<HTMLElement>;
 };
 
 function resetResize(deps: ResetResizeDeps) {
-  deps.gesture.set(undefined);
+  deps.currentGesture.set(undefined);
 }
 
-type ResetResizeDeps = Pick<UseGridResizeDeps, "gesture">;
+type ResetResizeDeps = Pick<UseGridResizeDeps, "currentGesture">;
 
 function applyResize(resize: GridResize, deps: ApplyResizeDeps) {
   const itemConfig = getResizedItemConfig(resize, deps);
