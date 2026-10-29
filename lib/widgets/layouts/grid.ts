@@ -127,19 +127,6 @@ export function findItemsOverlap(
   return convertRectToItem(overlapRect);
 }
 
-export function hasDelta(delta: GridResizeDelta) {
-  return delta.rows !== 0 || delta.columns !== 0;
-}
-
-export function haveSameDelta(first: GridResizeDelta, second: GridResizeDelta) {
-  return first.rows === second.rows && first.columns === second.columns;
-}
-
-export interface GridResizeDelta {
-  rows: number;
-  columns: number;
-}
-
 function convertItemToRect(item: GridItemConfig): GridRect {
   return {
     topLeft: item.position,
@@ -230,7 +217,9 @@ function pickBestResolutionOption(
   return bestOption;
 }
 
-type PickBestResolutionOptionDeps = Pick<GridItemOverlap, "overlappedItem">;
+interface PickBestResolutionOptionDeps {
+  overlappedItem: GridItemConfig;
+}
 
 function getStripsAroundOverlap(itemRect: GridRect, overlapRect: GridRect): GridRect[] {
   return [

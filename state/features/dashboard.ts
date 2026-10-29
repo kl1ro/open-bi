@@ -18,6 +18,7 @@ import {
 } from "@/lib/widget";
 import type DashboardConfig from "@/lib/dashboard";
 import type { WithRequired } from "@/lib/utils";
+import type { RootState } from "@/state/store";
 
 const initialDashboardState: DashboardConfig = {
   widgetConfigs: {},
@@ -89,121 +90,195 @@ interface WidgetRemovalPayload {
 
 function unlinkWidgetFromParent(
   child: WithRequired<WidgetConfig, "parentId">,
-  deps: DashboardSliceDeps,
+  deps: UnlinkWidgetFromParentDeps,
 ) {
-  const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
-  const parent = getParentConfig(child, widgetConfigsDeps);
+  const innerDeps = { ...deps, widgetConfigs: deps.state.widgetConfigs };
+  const parent = getParentConfig(child, innerDeps);
   const updatedParent = getParentConfigWithDisownedChild(parent, child);
-  upsertWidgetToState(updatedParent, deps);
+  upsertWidgetToState(updatedParent, innerDeps);
+}
+
+interface UnlinkWidgetFromParentDeps {
+  state: DashboardConfig;
 }
 
 function linkWidgetToParent(child: WidgetConfig, deps: LinkWidgetToParentDeps) {
   if (!hasParentId(child)) return;
 
-  const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
-  const parent = getParentConfig(child, widgetConfigsDeps);
-  const updatedParent = getParentConfigWithAdoptedChild(parent, child, deps);
-  upsertWidgetToState(updatedParent, deps);
+  const innerDeps = { ...deps, widgetConfigs: deps.state.widgetConfigs };
+  const parent = getParentConfig(child, innerDeps);
+  const updatedParent = getParentConfigWithAdoptedChild(parent, child, innerDeps);
+  upsertWidgetToState(updatedParent, innerDeps);
 }
 
-type LinkWidgetToParentDeps = DashboardSliceDeps &
-  Pick<WidgetUpsertPayload, "itemConfig">;
-
-function removeWidgetDescendants(widgetConfig: WidgetConfig, deps: DashboardSliceDeps) {
-  const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
-  const children = getChildConfigs(widgetConfig, widgetConfigsDeps);
-  children.forEach((child) => removeWidgetWithDescendants(child, deps));
+interface LinkWidgetToParentDeps {
+  state: DashboardConfig;
+  itemConfig?: ItemConfig;
 }
 
-function upsertWidgetToState(widgetConfig: WidgetConfig, deps: DashboardSliceDeps) {
+function removeWidgetDescendants(
+  widgetConfig: WidgetConfig,
+  deps: RemoveWidgetDescendantsDeps,
+) {
+  const innerDeps = { ...deps, widgetConfigs: deps.state.widgetConfigs };
+  const children = getChildConfigs(widgetConfig, innerDeps);
+  children.forEach((child) => removeWidgetWithDescendants(child, innerDeps));
+}
+
+interface RemoveWidgetDescendantsDeps {
+  state: DashboardConfig;
+}
+
+function upsertWidgetToState(widgetConfig: WidgetConfig, deps: UpsertWidgetToStateDeps) {
   if (!hasParentId(widgetConfig) && !isRootConfig(widgetConfig, deps))
     setWidgetAsNewRoot(widgetConfig, deps);
   else updateWidgetInState(widgetConfig, deps);
 }
 
+interface UpsertWidgetToStateDeps {
+  state: DashboardConfig;
+}
+
 function removeRedundantChildrenInParentOf(
   oneOfChildren: WidgetConfig,
-  deps: DashboardSliceDeps,
+  deps: RemoveRedundantChildrenInParentOfDeps,
 ) {
   if (!hasParentId(oneOfChildren)) return;
-  const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
-  const parent = getParentConfig(oneOfChildren, widgetConfigsDeps);
-  removeRedundantChildren(parent, deps);
+  const innerDeps = { ...deps, widgetConfigs: deps.state.widgetConfigs };
+  const parent = getParentConfig(oneOfChildren, innerDeps);
+  removeRedundantChildren(parent, innerDeps);
+}
+
+interface RemoveRedundantChildrenInParentOfDeps {
+  state: DashboardConfig;
 }
 
 function removeWidgetWithDescendants(
   widgetConfig: WidgetConfig,
-  deps: DashboardSliceDeps,
+  deps: RemoveWidgetWithDescendantsDeps,
 ) {
   if (hasParentId(widgetConfig)) unlinkWidgetFromParent(widgetConfig, deps);
   removeDescendantsFromState(widgetConfig, deps);
   removeWidgetFromState(widgetConfig, deps);
 }
 
-export function isRootConfig(widgetConfig: WidgetConfig, deps: DashboardSliceDeps) {
+interface RemoveWidgetWithDescendantsDeps {
+  state: DashboardConfig;
+}
+
+export function isRootConfig(widgetConfig: WidgetConfig, deps: IsRootConfigDeps) {
   const root = findRootConfig(deps);
   return widgetsHaveSameId(widgetConfig, root);
 }
 
-function setWidgetAsNewRoot(widgetConfig: WidgetConfig, deps: DashboardSliceDeps) {
+export interface IsRootConfigDeps {
+  state: DashboardConfig;
+}
+
+function setWidgetAsNewRoot(widgetConfig: WidgetConfig, deps: SetWidgetAsNewRootDeps) {
   removeWidgetsOutsideSubtree(widgetConfig, deps);
   updateWidgetInState(widgetConfig, deps);
   updateRootId(widgetConfig.id, deps);
 }
 
-function updateWidgetInState(widgetConfig: WidgetConfig, deps: DashboardSliceDeps) {
+interface SetWidgetAsNewRootDeps {
+  state: DashboardConfig;
+}
+
+function updateWidgetInState(widgetConfig: WidgetConfig, deps: UpdateWidgetInStateDeps) {
   deps.state.widgetConfigs[widgetConfig.id] = { ...widgetConfig };
 }
 
-function removeRedundantChildren(parent: WidgetConfig, deps: DashboardSliceDeps) {
-  const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
-  const children = getChildConfigs(parent, widgetConfigsDeps);
-  const redundant = children.filter((child) => isRedundant(child, widgetConfigsDeps));
-  redundant.forEach((child) => removeWidgetWithDescendants(child, deps));
+interface UpdateWidgetInStateDeps {
+  state: DashboardConfig;
+}
+
+function removeRedundantChildren(
+  parent: WidgetConfig,
+  deps: RemoveRedundantChildrenDeps,
+) {
+  const innerDeps = { ...deps, widgetConfigs: deps.state.widgetConfigs };
+  const children = getChildConfigs(parent, innerDeps);
+  const redundant = children.filter((child) => isRedundant(child, innerDeps));
+  redundant.forEach((child) => removeWidgetWithDescendants(child, innerDeps));
+}
+
+interface RemoveRedundantChildrenDeps {
+  state: DashboardConfig;
 }
 
 function removeDescendantsFromState(
   widgetConfig: WidgetConfig,
-  deps: DashboardSliceDeps,
+  deps: RemoveDescendantsFromStateDeps,
 ) {
-  const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
+  const innerDeps = { ...deps, widgetConfigs: deps.state.widgetConfigs };
 
-  const descendants = Object.values(
-    getDescendantConfigs(widgetConfig, widgetConfigsDeps),
-  );
+  const descendants = Object.values(getDescendantConfigs(widgetConfig, innerDeps));
 
-  descendants.forEach((descendant) => removeWidgetFromState(descendant, deps));
+  descendants.forEach((descendant) => removeWidgetFromState(descendant, innerDeps));
 }
 
-function removeWidgetFromState(widgetConfig: WidgetConfig, deps: DashboardSliceDeps) {
+interface RemoveDescendantsFromStateDeps {
+  state: DashboardConfig;
+}
+
+function removeWidgetFromState(
+  widgetConfig: WidgetConfig,
+  deps: RemoveWidgetFromStateDeps,
+) {
   if (isRootConfig(widgetConfig, deps)) updateRootId(undefined, deps);
   delete deps.state.widgetConfigs[widgetConfig.id];
 }
 
-export function findRootConfig(deps: DashboardSliceDeps): WidgetConfig | undefined {
+interface RemoveWidgetFromStateDeps {
+  state: DashboardConfig;
+}
+
+function findRootConfig(deps: FindRootConfigDeps): WidgetConfig | undefined {
   if (!deps.state.rootId) return;
-  const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
-  return findWidgetConfig(deps.state.rootId, widgetConfigsDeps);
+  const innerDeps = { ...deps, widgetConfigs: deps.state.widgetConfigs };
+  return findWidgetConfig(deps.state.rootId, innerDeps);
+}
+
+interface FindRootConfigDeps {
+  state: DashboardConfig;
 }
 
 function removeWidgetsOutsideSubtree(
   subtreeRoot: WidgetConfig,
-  deps: DashboardSliceDeps,
+  deps: RemoveWidgetsOutsideSubtreeDeps,
 ) {
-  const widgetConfigsDeps = { widgetConfigs: deps.state.widgetConfigs };
+  const innerDeps = { ...deps, widgetConfigs: deps.state.widgetConfigs };
 
-  const descendants = getDescendantConfigs(subtreeRoot, widgetConfigsDeps);
+  const descendants = getDescendantConfigs(subtreeRoot, innerDeps);
   const keptIds = new Set([subtreeRoot.id, ...Object.keys(descendants)]);
 
   Object.values(deps.state.widgetConfigs)
     .filter((config) => !keptIds.has(config.id))
-    .forEach((config) => removeWidgetFromState(config, deps));
+    .forEach((config) => removeWidgetFromState(config, innerDeps));
 }
 
-function updateRootId(newId: WidgetConfig["id"] | undefined, deps: DashboardSliceDeps) {
+interface RemoveWidgetsOutsideSubtreeDeps {
+  state: DashboardConfig;
+}
+
+function updateRootId(newId: WidgetConfig["id"] | undefined, deps: UpdateRootIdDeps) {
   deps.state.rootId = newId;
 }
 
-export interface DashboardSliceDeps {
+interface UpdateRootIdDeps {
   state: DashboardConfig;
+}
+
+export function selectRootConfig(state: RootState): WidgetConfig | undefined {
+  const deps = { state: state.dashboard };
+  return findRootConfig(deps);
+}
+
+export function selectWidgetConfig(
+  state: RootState,
+  id: WidgetConfig["id"],
+): WidgetConfig | undefined {
+  const deps = { widgetConfigs: state.dashboard.widgetConfigs };
+  return findWidgetConfig(id, deps);
 }

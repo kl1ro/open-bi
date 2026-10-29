@@ -8,15 +8,15 @@ import { getUnexpectedLayoutTypeError } from "@/lib/widgets/layout";
 export default function LayoutWidget(props: LayoutConfig) {
   return (
     <div className={cn("size-full", props.parentId && "p-5")}>
-      {getLayoutByType({ layout: props })}
+      {getLayoutByType(props)}
     </div>
   );
 }
 
-function getLayoutByType(deps: GetLayoutByTypeDeps) {
-  switch (deps.layout.layout) {
+function getLayoutByType(layout: LayoutConfig) {
+  switch (layout.layout) {
     case "grid":
-      return <GridWidget {...deps.layout} />;
+      return <GridWidget {...layout} />;
 
     case "flex":
       return <FlexWidget />;
@@ -25,10 +25,6 @@ function getLayoutByType(deps: GetLayoutByTypeDeps) {
       return <AbsoluteWidget />;
 
     default:
-      throw getUnexpectedLayoutTypeError(deps.layout);
+      throw getUnexpectedLayoutTypeError(layout);
   }
-}
-
-interface GetLayoutByTypeDeps {
-  layout: LayoutConfig;
 }

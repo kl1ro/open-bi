@@ -9,7 +9,7 @@ import TitleWidget from "@/components/widgets/TitleWidget";
 import MapWidget from "@/components/widgets/MapWidget";
 import SlotWidget from "@/components/widgets/SlotWidget";
 import type WidgetConfig from "@/lib/widget";
-import { findWidgetConfig, getUnexpectedWidgetTypeError } from "@/lib/widget";
+import { selectWidgetConfig } from "@/state/features/dashboard";
 import { useAppSelector } from "@/state/hooks";
 
 export default function Widget(props: WidgetProps) {
@@ -56,9 +56,7 @@ function reportWidgetRenderError(error: unknown) {
 
 function useWidgetContentState(props: WidgetContentProps) {
   return {
-    widgetConfig: useAppSelector((state) =>
-      findWidgetConfig(props.id, { widgetConfigs: state.dashboard.widgetConfigs }),
-    ),
+    widgetConfig: useAppSelector((state) => selectWidgetConfig(state, props.id)),
   };
 }
 
@@ -81,5 +79,28 @@ function getWidgetByType(widgetConfig: WidgetConfig) {
 
     default:
       throw getUnexpectedWidgetTypeError(widgetConfig);
+  }
+}
+
+export function getUnexpectedWidgetTypeError(widgetConfig: never) {
+  const type = (widgetConfig as { type?: unknown })?.type;
+  return type ? new NonexistentWidgetTypeError({ type }) : new NoWidgetTypeError();
+}
+
+export class NoWidgetTypeError extends Error {
+  public name = NoWidgetTypeError.name;
+
+  public constructor(options?: ErrorOptions) {
+    super(`Widget has no type`, options);
+  }
+}
+
+export class NonexistentWidgetTypeError extends Error {
+  public name = NonexistentWidgetTypeError.name;
+  public type: unknown;
+
+  public constructor(options: ErrorOptions & { type: unknown }) {
+    super(`Widget type ${String(options.type)} does not exist`, options);
+    this.type = options.type;
   }
 }

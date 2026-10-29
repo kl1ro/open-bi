@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 import Widget from "@/components/Widget";
 import SlotWidget from "@/components/widgets/SlotWidget";
-import { findRootConfig, setDashboard } from "@/state/features/dashboard";
+import { selectRootConfig, setDashboard } from "@/state/features/dashboard";
 import { useAppSelector, useAppStore } from "@/state/hooks";
 import type { AppStore } from "@/state/store";
 import { isSaveEvent } from "@/lib/keyboard";
@@ -22,7 +22,7 @@ export default function Dashboard() {
 
 function useDashboardState() {
   return {
-    rootConfig: useAppSelector((state) => findRootConfig({ state: state.dashboard })),
+    rootConfig: useAppSelector(selectRootConfig),
   };
 }
 

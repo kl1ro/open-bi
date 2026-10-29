@@ -24,10 +24,10 @@ export function getAbsoluteConfigWithAdoptedChild(
   if (hasChild(parent, child) && !deps.itemConfig) return parent;
 
   const absoluteItemConfig = ensureItemConfigParentTypeIsAbsolute(deps.itemConfig);
-  const children = getChildrenWithAdoptedChild(parent, child);
+  const innerDeps = { ...deps, itemConfig: absoluteItemConfig };
 
-  const adoptionDeps = { itemConfig: absoluteItemConfig };
-  const arrangement = getArrangementWithAdoptedChild(parent, child, adoptionDeps);
+  const children = getChildrenWithAdoptedChild(parent, child);
+  const arrangement = getArrangementWithAdoptedChild(parent, child, innerDeps);
 
   return { ...parent, children, arrangement };
 }
