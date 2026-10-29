@@ -20,94 +20,6 @@ export interface GridResizeHandlesProps {
   gridState: GridWidgetState;
 }
 
-function GridResizeHandle(props: GridResizeHandleProps) {
-  const isActive = isGestureOwner(props.item, props.gridState.resize.value);
-
-  return (
-    <div
-      className={cn(
-        "absolute z-10 pointer-events-auto touch-none flex items-center justify-center",
-        "opacity-0 group-hover/item:opacity-100 animated",
-        props.handle.handleClass,
-        props.handle.cursor,
-        isActive && "opacity-100",
-      )}
-      onPointerDown={(event) => props.gridState.resize.tryStart({ ...props, event })}
-      onPointerMove={(event) => props.gridState.resize.continue({ event })}
-      onPointerUp={(event) => props.gridState.resize.tryFinish({ event })}
-      onPointerCancel={props.gridState.resize.reset}
-    >
-      <ResizeGrip
-        kind={props.handle.kind}
-        className={cn(props.handle.gripClass, isActive && props.handle.activeGripClass)}
-      />
-    </div>
-  );
-}
-
-interface GridResizeHandleProps {
-  handle: GridResizeHandleConfig;
-  item: GridItemToRender;
-  gridState: GridWidgetState;
-}
-
-function ResizeGrip(props: ResizeGripProps) {
-  switch (props.kind) {
-    case "edge":
-      return <div className={props.className} />;
-
-    case "corner":
-      return <CornerGrip className={props.className} />;
-
-    default:
-      throw getUnexpectedGridResizeHandleKindError(props.kind);
-  }
-}
-
-interface ResizeGripProps {
-  kind: GridResizeHandleKind;
-  className: string;
-}
-
-function CornerGrip(props: CornerGripProps) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={cn("size-6 fill-none stroke-current", props.className)}
-    >
-      <path d="M4 20 V12 A8 8 0 0 1 12 4 H20" strokeWidth={4} strokeLinecap="round" />
-    </svg>
-  );
-}
-
-interface CornerGripProps {
-  className: string;
-}
-
-function getUnexpectedGridResizeHandleKindError(kind: never) {
-  return kind
-    ? new NonexistentGridResizeHandleKindError({ kind })
-    : new NoGridResizeHandleKindError();
-}
-
-export class NoGridResizeHandleKindError extends Error {
-  public name = NoGridResizeHandleKindError.name;
-
-  public constructor(options?: ErrorOptions) {
-    super(`Grid resize handle has no kind`, options);
-  }
-}
-
-export class NonexistentGridResizeHandleKindError extends Error {
-  public name = NonexistentGridResizeHandleKindError.name;
-  public kind: unknown;
-
-  public constructor(options: ErrorOptions & { kind: unknown }) {
-    super(`Grid resize handle kind ${String(options.kind)} does not exist`, options);
-    this.kind = options.kind;
-  }
-}
-
 const EDGE_GRIP_CLASS = "rounded-full bg-medium hover:bg-blue-700 animated";
 const EDGE_ACTIVE_GRIP_CLASS = "bg-blue-700";
 
@@ -199,4 +111,92 @@ export interface GridResizeHandleConfig {
   handleClass: string;
   gripClass: string;
   activeGripClass: string;
+}
+
+function GridResizeHandle(props: GridResizeHandleProps) {
+  const isActive = isGestureOwner(props.item, props.gridState.resize.value);
+
+  return (
+    <div
+      className={cn(
+        "absolute z-10 pointer-events-auto touch-none flex items-center justify-center",
+        "opacity-0 group-hover/item:opacity-100 animated",
+        props.handle.handleClass,
+        props.handle.cursor,
+        isActive && "opacity-100",
+      )}
+      onPointerDown={(event) => props.gridState.resize.tryStart({ ...props, event })}
+      onPointerMove={(event) => props.gridState.resize.continue({ event })}
+      onPointerUp={(event) => props.gridState.resize.tryFinish({ event })}
+      onPointerCancel={props.gridState.resize.reset}
+    >
+      <ResizeGrip
+        kind={props.handle.kind}
+        className={cn(props.handle.gripClass, isActive && props.handle.activeGripClass)}
+      />
+    </div>
+  );
+}
+
+interface GridResizeHandleProps {
+  handle: GridResizeHandleConfig;
+  item: GridItemToRender;
+  gridState: GridWidgetState;
+}
+
+function ResizeGrip(props: ResizeGripProps) {
+  switch (props.kind) {
+    case "edge":
+      return <div className={props.className} />;
+
+    case "corner":
+      return <CornerGrip className={props.className} />;
+
+    default:
+      throw getUnexpectedGridResizeHandleKindError(props.kind);
+  }
+}
+
+interface ResizeGripProps {
+  kind: GridResizeHandleKind;
+  className: string;
+}
+
+function CornerGrip(props: CornerGripProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={cn("size-6 fill-none stroke-current", props.className)}
+    >
+      <path d="M4 20 V12 A8 8 0 0 1 12 4 H20" strokeWidth={4} strokeLinecap="round" />
+    </svg>
+  );
+}
+
+interface CornerGripProps {
+  className: string;
+}
+
+function getUnexpectedGridResizeHandleKindError(kind: never) {
+  return kind
+    ? new NonexistentGridResizeHandleKindError({ kind })
+    : new NoGridResizeHandleKindError();
+}
+
+export class NoGridResizeHandleKindError extends Error {
+  public name = NoGridResizeHandleKindError.name;
+
+  public constructor(options?: ErrorOptions) {
+    super(`Grid resize handle has no kind`, options);
+  }
+}
+
+export class NonexistentGridResizeHandleKindError extends Error {
+  public name = NonexistentGridResizeHandleKindError.name;
+  public kind: unknown;
+
+  public constructor(options: ErrorOptions & { kind: unknown }) {
+    super(`Grid resize handle kind ${String(options.kind)} does not exist`, options);
+    this.kind = options.kind;
+  }
 }

@@ -10,13 +10,13 @@ export default function StoreProvider(props: StoreProviderProps) {
   return <Provider store={store}>{props.children}</Provider>;
 }
 
+export interface StoreProviderProps {
+  preloadedState?: Partial<RootState>;
+  children: ReactNode;
+}
+
 function usePerProviderStore(preloadedState?: Partial<RootState>) {
   const storeRef = useRef<AppStore | null>(null);
   if (!storeRef.current) storeRef.current = makeStore(preloadedState);
   return storeRef.current;
-}
-
-export interface StoreProviderProps {
-  preloadedState?: Partial<RootState>;
-  children: ReactNode;
 }
