@@ -29,3 +29,5 @@ export interface CurrentGridGestureState {
   value: GridGesture | undefined;
   set: Dispatch<SetStateAction<CurrentGridGestureState["value"]>>;
 }
+
+export type UseGridGestureInterface = ReturnType<typeof useGridGesture>;

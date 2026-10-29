@@ -5,7 +5,9 @@ import Widget from "@/components/Widget";
 import SlotWidget from "@/components/widgets/SlotWidget";
 import GridMoveHandle from "@/components/widgets/layouts/grid/GridMoveHandle";
 import GridResizeHandles from "@/components/widgets/layouts/grid/GridResizeHandles";
-import useGridGesture from "@/hooks/grid/useGridGesture";
+import useGridGesture, {
+  type UseGridGestureInterface,
+} from "@/hooks/grid/useGridGesture";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getGridItemsToRender,
@@ -38,7 +40,12 @@ export default function GridWidget(props: GridConfig) {
     >
       <AnimatePresence initial={false}>
         {state.itemsToRender.map((item) => (
-          <GridItem key={getRenderedGridItemKey(item)} item={item} gridState={state} />
+          <GridItem
+            key={getRenderedGridItemKey(item)}
+            parentId={state.grid.id}
+            item={item}
+            gesture={state.gesture}
+          />
         ))}
       </AnimatePresence>
 
@@ -88,18 +95,19 @@ function GridItem(props: GridItemProps) {
           "group-data-moving/grid:opacity-15 group-data-moving/grid:pointer-events-none",
         )}
       >
-        <GridItemContent item={props.item} parentId={props.gridState.grid.id} />
+        <GridItemContent item={props.item} parentId={props.parentId} />
       </div>
 
-      <GridResizeHandles item={props.item} gridState={props.gridState} />
-      <GridMoveHandle item={props.item} gridState={props.gridState} />
+      <GridResizeHandles item={props.item} gesture={props.gesture} />
+      <GridMoveHandle item={props.item} gesture={props.gesture} />
     </GridArea>
   );
 }
 
 interface GridItemProps {
   item: GridItemToRender;
-  gridState: GridWidgetState;
+  parentId: WidgetConfig["id"];
+  gesture: UseGridGestureInterface;
 }
 
 function PreviewHighlight(props: PreviewHighlightProps) {

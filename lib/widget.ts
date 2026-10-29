@@ -440,29 +440,6 @@ export class ItemConfigNotFoundError extends Error {
   }
 }
 
-export function getUnexpectedWidgetTypeError(widgetConfig: never) {
-  const type = (widgetConfig as { type?: unknown })?.type;
-  return type ? new NonexistentWidgetTypeError({ type }) : new NoWidgetTypeError();
-}
-
-export class NoWidgetTypeError extends Error {
-  public name = NoWidgetTypeError.name;
-
-  public constructor(options?: ErrorOptions) {
-    super(`Widget has no type`, options);
-  }
-}
-
-export class NonexistentWidgetTypeError extends Error {
-  public name = NonexistentWidgetTypeError.name;
-  public type: unknown;
-
-  public constructor(options: ErrorOptions & { type: unknown }) {
-    super(`Widget type ${String(options.type)} does not exist`, options);
-    this.type = options.type;
-  }
-}
-
 export type WidgetType = WidgetConfig["type"];
 
 export const WIDGET_TYPE = {

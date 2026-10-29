@@ -1,8 +1,8 @@
-import type { GridWidgetState } from "@/components/widgets/layouts/GridWidget";
 import type { GridItemToRender } from "@/lib/widgets/layouts/grid";
 import { isGestureOwner } from "@/lib/widgets/layouts/grid/gesture";
 import type { GridResizeSide } from "@/lib/widgets/layouts/grid/resize";
 import { cn } from "@/lib/utils";
+import type { UseGridGestureInterface } from "@/hooks/grid/useGridGesture";
 
 export default function GridResizeHandles(props: GridResizeHandlesProps) {
   return RESIZE_HANDLES.map((handle) => (
@@ -10,14 +10,14 @@ export default function GridResizeHandles(props: GridResizeHandlesProps) {
       key={handle.name}
       handle={handle}
       item={props.item}
-      gridState={props.gridState}
+      gesture={props.gesture}
     />
   ));
 }
 
 export interface GridResizeHandlesProps {
   item: GridItemToRender;
-  gridState: GridWidgetState;
+  gesture: UseGridGestureInterface;
 }
 
 const EDGE_GRIP_CLASS = "rounded-full bg-medium hover:bg-blue-700 animated";
@@ -114,7 +114,7 @@ export interface GridResizeHandleConfig {
 }
 
 function GridResizeHandle(props: GridResizeHandleProps) {
-  const isActive = isGestureOwner(props.item, props.gridState.gesture.resize.value);
+  const isActive = isGestureOwner(props.item, props.gesture.resize.value);
 
   return (
     <div
@@ -125,12 +125,10 @@ function GridResizeHandle(props: GridResizeHandleProps) {
         props.handle.cursor,
         isActive && "opacity-100",
       )}
-      onPointerDown={(event) =>
-        props.gridState.gesture.resize.tryStart({ ...props, event })
-      }
-      onPointerMove={(event) => props.gridState.gesture.resize.continue({ event })}
-      onPointerUp={(event) => props.gridState.gesture.resize.tryFinish({ event })}
-      onPointerCancel={props.gridState.gesture.resize.reset}
+      onPointerDown={(event) => props.gesture.resize.tryStart({ ...props, event })}
+      onPointerMove={(event) => props.gesture.resize.continue({ event })}
+      onPointerUp={(event) => props.gesture.resize.tryFinish({ event })}
+      onPointerCancel={props.gesture.resize.reset}
     >
       <ResizeGrip
         kind={props.handle.kind}
@@ -143,7 +141,7 @@ function GridResizeHandle(props: GridResizeHandleProps) {
 interface GridResizeHandleProps {
   handle: GridResizeHandleConfig;
   item: GridItemToRender;
-  gridState: GridWidgetState;
+  gesture: UseGridGestureInterface;
 }
 
 function ResizeGrip(props: ResizeGripProps) {

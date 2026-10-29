@@ -4,13 +4,13 @@ import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   findItemsOverlap,
   getRenderedGridItemKey,
-  hasDelta,
-  type GridDelta,
   type GridItemConfig,
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
 import {
   getGridGestureDelta,
+  type GridDelta,
+  hasDelta,
   isGestureOwner,
   type AbstractGridGesture,
 } from "@/lib/widgets/layouts/grid/gesture";

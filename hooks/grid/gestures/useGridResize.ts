@@ -4,12 +4,12 @@ import { toast } from "sonner";
 import type { CurrentGridGestureState } from "@/hooks/grid/useGridGesture";
 import type { GridResizeHandleConfig } from "@/components/widgets/layouts/grid/GridResizeHandles";
 import type GridConfig from "@/lib/widgets/layouts/grid";
+import { occupySameCells, type GridItemToRender } from "@/lib/widgets/layouts/grid";
 import {
+  createGesture,
   haveSameDelta,
-  occupySameCells,
-  type GridItemToRender,
-} from "@/lib/widgets/layouts/grid";
-import { createGesture, isGestureInProgress } from "@/lib/widgets/layouts/grid/gesture";
+  isGestureInProgress,
+} from "@/lib/widgets/layouts/grid/gesture";
 import type GridResize from "@/lib/widgets/layouts/grid/resize";
 import {
   getGridResizeDelta,

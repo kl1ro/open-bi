@@ -3,15 +3,12 @@ import { toast } from "sonner";
 
 import type { CurrentGridGestureState } from "@/hooks/grid/useGridGesture";
 import type GridConfig from "@/lib/widgets/layouts/grid";
-import {
-  haveSameDelta,
-  occupySameCells,
-  type GridItemToRender,
-} from "@/lib/widgets/layouts/grid";
+import { occupySameCells, type GridItemToRender } from "@/lib/widgets/layouts/grid";
 import {
   createGesture,
   isGestureInProgress,
   getGridGestureDelta,
+  haveSameDelta,
 } from "@/lib/widgets/layouts/grid/gesture";
 import type GridMove from "@/lib/widgets/layouts/grid/move";
 import { getMovedItemConfig, getMovePreview } from "@/lib/widgets/layouts/grid/move";

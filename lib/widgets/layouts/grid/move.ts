@@ -1,11 +1,11 @@
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getRenderedGridItemKey,
-  hasDelta,
   type GridItemConfig,
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
 import {
+  hasDelta,
   isGestureOwner,
   type AbstractGridGesture,
 } from "@/lib/widgets/layouts/grid/gesture";

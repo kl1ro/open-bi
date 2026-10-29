@@ -3,7 +3,6 @@ import type { PointerEvent, RefObject } from "react";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getRenderedGridItemKey,
-  type GridDelta,
   type GridItemConfig,
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
@@ -104,6 +103,14 @@ function measureCellPitch(deps: MeasureCellPitchDeps): GridCellPitch {
   };
 }
 
+export function hasDelta(delta: GridDelta) {
+  return delta.rows !== 0 || delta.columns !== 0;
+}
+
+export function haveSameDelta(first: GridDelta, second: GridDelta) {
+  return first.rows === second.rows && first.columns === second.columns;
+}
+
 interface MeasureCellPitchDeps {
   container: HTMLElement;
   grid: GridConfig;
@@ -114,6 +121,11 @@ export interface AbstractGridGesture {
   startPoint: { clientX: number; clientY: number };
   cellPitch: GridCellPitch;
   delta: GridDelta;
+}
+
+export interface GridDelta {
+  rows: number;
+  columns: number;
 }
 
 export interface GridGestureOwner {
