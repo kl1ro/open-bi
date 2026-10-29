@@ -64,7 +64,7 @@ function getMovePressPreview(
   return pressPreview;
 }
 
-type GetMovePressPreviewDeps = GetMovePreviewDeps;
+type GetMovePressPreviewDeps = Pick<GetMovePreviewDeps, "itemsToRender">;
 
 function getMoveDragPreview(
   move: GridMove,

@@ -104,7 +104,10 @@ function findComputedSlotAreaOnDrag(
   };
 }
 
-type FindComputedSlotAreaOnDragDeps = FindItemAreaOnDragDeps;
+type FindComputedSlotAreaOnDragDeps = Pick<
+  FindItemAreaOnDragDeps,
+  "gesture" | "previewGrid"
+>;
 
 export type GridPreviewRole =
   | "focused"
