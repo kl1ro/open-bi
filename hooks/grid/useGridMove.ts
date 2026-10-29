@@ -16,6 +16,7 @@ import {
 import type GridMove from "@/lib/widgets/layouts/grid/move";
 import { getMovedItemConfig, getMovePreview } from "@/lib/widgets/layouts/grid/move";
 import { takeOverPointerEvent } from "@/lib/pointer";
+import { bindDeps } from "@/lib/utils";
 import { upsertWidget } from "@/state/features/dashboard";
 import type { AppStore } from "@/state/store";
 
@@ -26,11 +27,10 @@ export default function useGridMove(deps: UseGridMoveDeps) {
   return {
     value: move,
     preview: getMovePreview(move, innerDeps),
-    tryStart: (deps: UseGridMoveTryStartDeps) => tryStartMove({ ...innerDeps, ...deps }),
-    continue: (deps: UseGridMoveContinueDeps) => continueMove({ ...innerDeps, ...deps }),
-    tryFinish: (deps: UseGridMoveTryFinishDeps) =>
-      tryFinishMove({ ...innerDeps, ...deps }),
-    reset: () => resetMove(innerDeps),
+    tryStart: bindDeps(tryStartMove, innerDeps),
+    continue: bindDeps(continueMove, innerDeps),
+    tryFinish: bindDeps(tryFinishMove, innerDeps),
+    reset: bindDeps(resetMove, innerDeps),
   };
 }
 
@@ -40,19 +40,6 @@ export interface UseGridMoveDeps {
   container: RefObject<HTMLDivElement | null>;
   store: AppStore;
   gesture: GridGestureState;
-}
-
-export interface UseGridMoveTryStartDeps {
-  event: PointerEvent<HTMLElement>;
-  item: GridItemToRender;
-}
-
-export interface UseGridMoveContinueDeps {
-  event: PointerEvent<HTMLElement>;
-}
-
-export interface UseGridMoveTryFinishDeps {
-  event: PointerEvent<HTMLElement>;
 }
 
 function findOngoingMove(deps: FindOngoingMoveDeps): GridMove | undefined {
@@ -80,7 +67,13 @@ function tryStartMove(deps: TryStartMoveDeps) {
   }
 }
 
-type TryStartMoveDeps = UseGridMoveDeps & UseGridMoveTryStartDeps;
+type TryStartMoveDeps = Pick<
+  UseGridMoveDeps,
+  "gesture" | "store" | "grid" | "container"
+> & {
+  event: PointerEvent<HTMLElement>;
+  item: GridItemToRender;
+};
 
 function continueMove(deps: ContinueMoveDeps) {
   if (!deps.move) return;
@@ -89,8 +82,10 @@ function continueMove(deps: ContinueMoveDeps) {
   deps.gesture.set({ ...deps.move, delta });
 }
 
-type ContinueMoveDeps = Pick<UseGridMoveDeps, "gesture"> &
-  UseGridMoveContinueDeps & { move?: GridMove };
+type ContinueMoveDeps = Pick<UseGridMoveDeps, "gesture"> & {
+  move?: GridMove;
+  event: PointerEvent<HTMLElement>;
+};
 
 function tryFinishMove(deps: TryFinishMoveDeps) {
   if (!deps.move) return;
@@ -107,8 +102,10 @@ function tryFinishMove(deps: TryFinishMoveDeps) {
   resetMove(deps);
 }
 
-type TryFinishMoveDeps = Pick<UseGridMoveDeps, "gesture" | "grid" | "store"> &
-  UseGridMoveTryFinishDeps & { move?: GridMove };
+type TryFinishMoveDeps = Pick<UseGridMoveDeps, "gesture" | "grid" | "store"> & {
+  move?: GridMove;
+  event: PointerEvent<HTMLElement>;
+};
 
 function resetMove(deps: ResetMoveDeps) {
   deps.gesture.set(undefined);
