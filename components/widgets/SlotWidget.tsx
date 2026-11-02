@@ -13,6 +13,7 @@ export default function SlotWidget(props: SlotWidgetProps) {
     <>
       <button
         onClick={() => state.setIsFormOpen(true)}
+        aria-label="Добавить виджет"
         className={cn(
           "size-full",
           "flex justify-center items-center",
