@@ -13,7 +13,7 @@ import {
 import type GridMove from "@/lib/widgets/layouts/grid/move";
 import { getMovedItemConfig, getMovePreview } from "@/lib/widgets/layouts/grid/move";
 import { takeOverPointerEvent } from "@/lib/pointer";
-import { bindDeps } from "@/lib/utils";
+import bindDeps from "@/lib/deps";
 import { upsertWidget } from "@/state/features/dashboard";
 import type { AppStore } from "@/state/store";
 

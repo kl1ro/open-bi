@@ -17,7 +17,7 @@ import {
   getResizePreview,
 } from "@/lib/widgets/layouts/grid/resize";
 import { takeOverPointerEvent } from "@/lib/pointer";
-import { bindDeps } from "@/lib/utils";
+import bindDeps from "@/lib/deps";
 import { upsertWidget } from "@/state/features/dashboard";
 import type { AppStore } from "@/state/store";
 
