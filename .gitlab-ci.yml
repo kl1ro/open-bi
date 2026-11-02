@@ -15,7 +15,7 @@ deploy:
   image: alpine:latest
   before_script:
     - echo "Connecting to server..."
-    - sed -i 's|https://dl-cdn.alpinelinux.org/alpine|http://mirror.yandex.ru/mirrors/alpine|g' /etc/apk/repositories
+    - sed -i 's|https://dl-cdn.alpinelinux.org/alpine|https://mirror.yandex.ru/mirrors/alpine|g' /etc/apk/repositories
     - apk add --no-cache openssh-client-default
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | ssh-add -
