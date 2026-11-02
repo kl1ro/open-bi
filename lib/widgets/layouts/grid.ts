@@ -171,10 +171,7 @@ interface GridRect {
   bottomRight: GridItemPosition;
 }
 
-function resolveOverlap(overlap: GridItemOverlap): {
-  id: WidgetConfig["id"];
-  itemConfig: GridItemConfig;
-} {
+function resolveOverlap(overlap: GridItemOverlap): GridItemResolution {
   const options = getOverlapResolutionOptions(overlap);
 
   if (!options.length)
@@ -187,6 +184,11 @@ function resolveOverlap(overlap: GridItemOverlap): {
     id: overlap.overlappedItemId,
     itemConfig: pickBestResolutionOption(options, overlap),
   };
+}
+
+interface GridItemResolution {
+  id: WidgetConfig["id"];
+  itemConfig: GridItemConfig;
 }
 
 function getOverlapResolutionOptions(overlap: GridItemOverlap): GridItemConfig[] {
