@@ -27,20 +27,20 @@ function useDashboardState() {
 }
 
 function useDashboardEffects() {
-  useRestoreDashboardEffect();
-  useSaveDashboardEffect();
+  useDashboardRestoreEffect();
+  useDashboardSaveEffect();
 }
 
-function useRestoreDashboardEffect() {
-  const state = useRestoreDashboardEffectState();
+function useDashboardRestoreEffect() {
+  const state = useDashboardRestoreEffectState();
 
   useEffect(() => {
     tryRestoreDashboard(state);
   }, []);
 }
 
-function useSaveDashboardEffect() {
-  const state = useSaveDashboardEffectState();
+function useDashboardSaveEffect() {
+  const state = useDashboardSaveEffectState();
 
   useEffect(() => {
     const keydown = (e: KeyboardEvent) => {
@@ -54,7 +54,7 @@ function useSaveDashboardEffect() {
   }, []);
 }
 
-function useRestoreDashboardEffectState() {
+function useDashboardRestoreEffectState() {
   return {
     store: useAppStore(),
   };
@@ -76,7 +76,7 @@ interface TryRestoreDashboardDeps {
   store: AppStore;
 }
 
-function useSaveDashboardEffectState() {
+function useDashboardSaveEffectState() {
   return {
     store: useAppStore(),
   };

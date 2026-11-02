@@ -72,8 +72,6 @@ function useGridWidgetState(props: GridConfig) {
   };
 }
 
-export type GridWidgetState = ReturnType<typeof useGridWidgetState>;
-
 function getGridTemplateStyle(grid: GridConfig) {
   return {
     "--rows": `repeat(${grid.rows}, minmax(0, 1fr))`,

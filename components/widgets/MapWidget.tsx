@@ -5,7 +5,7 @@ import type { MapView } from "@/lib/widgets/map";
 
 export default function MapWidget(props: MapConfig) {
   const state = useMapWidgetState(props);
-  useMapMountEffect(state);
+  useMapWidgetEffects(state);
   return <div ref={state.container} className="size-full" />;
 }
 
@@ -16,7 +16,16 @@ function useMapWidgetState(props: MapConfig) {
   };
 }
 
-function useMapMountEffect(deps: UseMountMapEffectDeps) {
+function useMapWidgetEffects(deps: UseMapWidgetEffectsDeps) {
+  useMapMountEffect(deps);
+}
+
+interface UseMapWidgetEffectsDeps {
+  config: MapConfig;
+  container: RefObject<HTMLDivElement | null>;
+}
+
+function useMapMountEffect(deps: UseMapMountEffectDeps) {
   useEffect(
     () => mountMapIntoContainer(deps.config, deps.container),
     [
@@ -28,7 +37,7 @@ function useMapMountEffect(deps: UseMountMapEffectDeps) {
   );
 }
 
-interface UseMountMapEffectDeps {
+interface UseMapMountEffectDeps {
   config: MapConfig;
   container: RefObject<HTMLDivElement | null>;
 }

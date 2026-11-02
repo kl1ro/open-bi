@@ -103,17 +103,17 @@ function measureCellPitch(deps: MeasureCellPitchDeps): GridCellPitch {
   };
 }
 
+interface MeasureCellPitchDeps {
+  container: HTMLElement;
+  grid: GridConfig;
+}
+
 export function hasDelta(delta: GridDelta) {
   return delta.rows !== 0 || delta.columns !== 0;
 }
 
 export function haveSameDelta(first: GridDelta, second: GridDelta) {
   return first.rows === second.rows && first.columns === second.columns;
-}
-
-interface MeasureCellPitchDeps {
-  container: HTMLElement;
-  grid: GridConfig;
 }
 
 export interface AbstractGridGesture {
