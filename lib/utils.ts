@@ -46,12 +46,16 @@ export function bindDeps<
   ToBind extends Pick<Deps, keyof ToBind & keyof Deps>,
   Result,
 >(target: (...args: [...Args, Deps]) => Result, toBind: ToBind) {
-  return (...args: [...Args, ...RemainingDepsParameter<Deps, ToBind>]) => {
+  const boundTarget = (...args: [...Args, ...RemainingDepsParameter<Deps, ToBind>]) => {
     const leading = args.slice(0, target.length - 1) as Args;
     const remaining = (args[target.length - 1] ?? {}) as RemainingDeps<Deps, ToBind>;
     const deps = { ...remaining, ...toBind };
     return target(...leading, deps);
   };
+
+  const boundTargetWithTargetArity = keepArity(boundTarget, target.length);
+
+  return boundTargetWithTargetArity;
 }
 
 export type RemainingDepsParameter<Deps, ToBind> =
@@ -60,6 +64,10 @@ export type RemainingDepsParameter<Deps, ToBind> =
     : [deps: RemainingDeps<Deps, ToBind>];
 
 export type RemainingDeps<Deps, ToBind> = Omit<Deps, keyof ToBind>;
+
+function keepArity<Bound extends object>(bound: Bound, arity: number) {
+  return Object.defineProperty(bound, "length", { value: arity });
+}
 
 export type WithRequired<Type, Key extends keyof Type> = Type & Required<Pick<Type, Key>>;
 
