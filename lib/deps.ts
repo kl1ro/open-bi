@@ -67,11 +67,12 @@ function splitTargetArguments<Args extends unknown[], PassedDeps>(
 ) {
   const depsIndex = target.length - 1;
   const leading = args.slice(0, depsIndex) as Args;
-  const passedDeps = findPassedDeps(args[depsIndex]) as PassedDeps | undefined;
+  const passedDeps = findPassedDeps(args, depsIndex) as PassedDeps | undefined;
   return { leading, passedDeps };
 }
 
-function findPassedDeps(candidate: unknown): object | undefined {
+function findPassedDeps(args: unknown[], depsIndex: number): object | undefined {
+  const candidate = args[depsIndex];
   if (!isPlainObject(candidate)) return;
   return candidate;
 }
