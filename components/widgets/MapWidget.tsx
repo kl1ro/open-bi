@@ -17,7 +17,7 @@ function useMapWidgetState(props: MapConfig) {
 }
 
 function useMapWidgetEffects(deps: UseMapWidgetEffectsDeps) {
-  useMountMapEffect(deps);
+  useMapMountEffect(deps);
 }
 
 interface UseMapWidgetEffectsDeps {
@@ -25,7 +25,7 @@ interface UseMapWidgetEffectsDeps {
   container: RefObject<HTMLDivElement | null>;
 }
 
-function useMountMapEffect(deps: UseMountMapEffectDeps) {
+function useMapMountEffect(deps: UseMapMountEffectDeps) {
   useEffect(
     () => mountMapIntoContainer(deps.config, deps.container),
     [
@@ -37,7 +37,7 @@ function useMountMapEffect(deps: UseMountMapEffectDeps) {
   );
 }
 
-interface UseMountMapEffectDeps {
+interface UseMapMountEffectDeps {
   config: MapConfig;
   container: RefObject<HTMLDivElement | null>;
 }
