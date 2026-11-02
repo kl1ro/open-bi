@@ -7,18 +7,9 @@ export default function bindDeps<
   Result,
 >(target: (...args: [...Args, Deps]) => Result, toBind: ToBind) {
   validateBindDepsTarget(target);
-  const depsIndex = target.length - 1;
-
-  const boundTarget = (...args: [...Args, ...RemainingDepsParameter<Deps, ToBind>]) => {
-    const leading = args.slice(0, depsIndex) as Args;
-    const remaining = (findPassedDeps(args[depsIndex]) ?? {}) as RemainingDeps<Deps, ToBind>;
-    const deps = { ...remaining, ...toBind };
-    return target(...leading, deps);
-  };
-
-  const boundTargetWithTargetArity = keepArity(boundTarget, target.length);
-
-  return boundTargetWithTargetArity;
+  const targetWithBoundDeps = createTargetWithBoundDeps(target, toBind);
+  const targetWithBoundDepsAndArity = copyArity(target, targetWithBoundDeps);
+  return targetWithBoundDepsAndArity;
 }
 
 export type RemainingDepsParameter<Deps, ToBind> =
@@ -46,11 +37,41 @@ export class BindDepsError extends Error {
   }
 }
 
-function findPassedDeps(argument: unknown): object | undefined {
-  if (!isPlainObject(argument)) return;
-  return argument;
+function createTargetWithBoundDeps<
+  Args extends unknown[],
+  Deps extends object,
+  ToBind extends Pick<Deps, keyof ToBind & keyof Deps>,
+  Result,
+>(target: (...args: [...Args, Deps]) => Result, toBind: ToBind) {
+  const targetWithBoundDeps = (
+    ...args: [...Args, ...RemainingDepsParameter<Deps, ToBind>]
+  ) => {
+    const split = splitTargetArguments<Args, RemainingDeps<Deps, ToBind>>(target, args);
+    const deps = { ...split.passedDeps, ...toBind };
+    return target(...split.leading, deps);
+  };
+
+  return targetWithBoundDeps;
 }
 
-function keepArity<Bound extends object>(bound: Bound, arity: number) {
-  return Object.defineProperty(bound, "length", { value: arity });
+function copyArity<Destination extends object>(
+  source: (...args: never[]) => unknown,
+  destination: Destination,
+) {
+  return Object.defineProperty(destination, "length", { value: source.length });
+}
+
+function splitTargetArguments<Args extends unknown[], PassedDeps>(
+  target: (...args: never[]) => unknown,
+  args: unknown[],
+) {
+  const depsIndex = target.length - 1;
+  const leading = args.slice(0, depsIndex) as Args;
+  const passedDeps = findPassedDeps(args[depsIndex]) as PassedDeps | undefined;
+  return { leading, passedDeps };
+}
+
+function findPassedDeps(candidate: unknown): object | undefined {
+  if (!isPlainObject(candidate)) return;
+  return candidate;
 }
