@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { isNumber } from "@/lib/utils";
 import type WidgetConfig from "@/lib/widget";
 import type { ItemConfig } from "@/lib/widget";
 import type GridConfig from "@/lib/widgets/layouts/grid";
@@ -501,7 +502,7 @@ const formSchema = z.discriminatedUnion("type", [
 
 function isNumberInRange(value: string, min: number, max: number) {
   const number = Number(value);
-  return value.trim() !== "" && !Number.isNaN(number) && number >= min && number <= max;
+  return value.trim() !== "" && isNumber(number) && number >= min && number <= max;
 }
 
 type FormValues = z.infer<typeof formSchema>;
