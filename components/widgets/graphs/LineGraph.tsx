@@ -20,7 +20,7 @@ export default function LineGraph() {
 
 const LINE_GRAPH_OPTIONS: ApexOptions = {
   chart: {
-    id: "area-chart",
+    id: "line-chart",
     toolbar: {
       show: true,
       tools: {
