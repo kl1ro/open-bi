@@ -205,7 +205,8 @@ function pickBestResolutionOption(
   deps: PickBestResolutionOptionDeps,
 ): GridItemConfig {
   const orderedByArea = options.toSorted((a, b) => getItemArea(b) - getItemArea(a));
-  const maxArea = getItemArea(orderedByArea[0]);
+  const largestOption = orderedByArea[0];
+  const maxArea = getItemArea(largestOption);
   const withMaxArea = orderedByArea.filter((option) => getItemArea(option) === maxArea);
   const reference = deps.overlappedItem;
 
