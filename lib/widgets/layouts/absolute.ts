@@ -13,7 +13,7 @@ import {
 export default interface AbsoluteConfig extends AbstractLayoutConfig {
   layout: "absolute";
   children?: WidgetConfig["id"][];
-  arrangement?: Record<string, AbsoluteItemConfig>;
+  arrangement?: AbsoluteArrangement;
 }
 
 export function getAbsoluteConfigWithAdoptedChild(
@@ -88,3 +88,5 @@ export interface AbsoluteItemSize {
   width?: number;
   height?: number;
 }
+
+export type AbsoluteArrangement = Record<string, AbsoluteItemConfig>;
