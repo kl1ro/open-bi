@@ -331,10 +331,12 @@ export function getGridItemConfig(gridConfig: GridConfig, widgetConfig: WidgetCo
 export function getGridItemsToRender(grid: GridConfig): GridItemToRender[] {
   if (!grid.arrangement) return [];
 
-  return [
+  const gridItemsToRender = [
     ...getGridItemsFromArrangement(grid.arrangement),
     ...getComputedGridSlots(grid),
   ];
+
+  return gridItemsToRender;
 }
 
 export function getRenderedGridItemKey(item: GridItemToRender) {

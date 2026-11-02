@@ -192,7 +192,10 @@ export function getChildConfigs(
   widgetConfig: WidgetConfig,
   deps: GetChildConfigsDeps,
 ): WidgetConfig[] {
-  return widgetConfig.children?.map((id) => getWidgetConfig(id, deps)) ?? [];
+  const childConfigs =
+    widgetConfig.children?.map((id) => getWidgetConfig(id, deps)) ?? [];
+
+  return childConfigs;
 }
 
 export interface GetChildConfigsDeps {
@@ -218,7 +221,8 @@ export function getDescendantConfigs(
     {},
   );
 
-  return { ...currentLayerChildren, ...deeperDescendants };
+  const descendants = { ...currentLayerChildren, ...deeperDescendants };
+  return descendants;
 }
 
 export interface GetDescendantConfigsDeps {
