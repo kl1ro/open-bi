@@ -2,7 +2,6 @@ import type { PointerEvent } from "react";
 
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
-  findItemsOverlap,
   getRenderedGridItemKey,
   type GridItemConfig,
   type GridItemToRender,
@@ -14,6 +13,7 @@ import {
   isGestureOwner,
   type AbstractGridGesture,
 } from "@/lib/widgets/layouts/grid/gesture";
+import { findItemsOverlap } from "@/lib/widgets/layouts/grid/overlap";
 import type GridPreviewArea from "@/lib/widgets/layouts/grid/preview";
 import { getDragPreview, type GridPreviewRole } from "@/lib/widgets/layouts/grid/preview";
 import { clamp } from "@/lib/utils";

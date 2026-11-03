@@ -1,6 +1,5 @@
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
-  findItemsOverlap,
   getGridConfigWithAdoptedChild,
   getGridItemConfig,
   getRenderedGridItemKey,
@@ -13,6 +12,7 @@ import {
   isGestureOwner,
   type AbstractGridGesture,
 } from "@/lib/widgets/layouts/grid/gesture";
+import { findItemsOverlap } from "@/lib/widgets/layouts/grid/overlap";
 
 export default interface GridPreviewArea {
   key: string;
