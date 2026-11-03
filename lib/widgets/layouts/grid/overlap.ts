@@ -5,6 +5,12 @@ import type {
 } from "@/lib/widgets/layouts/grid";
 import type WidgetConfig from "@/lib/widget";
 
+export default interface GridItemOverlap {
+  overlappedItemId: WidgetConfig["id"];
+  overlappedItem: GridItemConfig;
+  overlap: GridItemConfig;
+}
+
 export function getOverlapsBetweenItemAndArrangement(
   itemId: WidgetConfig["id"],
   arrangement: GridArrangement,
@@ -16,72 +22,6 @@ export function getOverlapsBetweenItemAndArrangement(
   );
 
   return overlaps;
-}
-
-function findOverlapInArrangement(
-  overlappingItemId: WidgetConfig["id"],
-  overlappedItemId: WidgetConfig["id"],
-  arrangement: GridArrangement,
-): GridItemOverlap | undefined {
-  const overlappingItem = arrangement[overlappingItemId];
-  const overlappedItem = arrangement[overlappedItemId];
-  const overlap = findItemsOverlap(overlappingItem, overlappedItem);
-  if (!overlap) return;
-  return { overlappedItemId, overlappedItem, overlap };
-}
-
-export function findItemsOverlap(
-  first: GridItemConfig,
-  second: GridItemConfig,
-): GridItemConfig | undefined {
-  const [firstRect, secondRect] = [convertItemToRect(first), convertItemToRect(second)];
-  const overlapRect = findRectsOverlap(firstRect, secondRect);
-  if (!overlapRect) return;
-  return convertRectToItem(overlapRect);
-}
-
-function convertItemToRect(item: GridItemConfig): GridRect {
-  return {
-    topLeft: item.position,
-
-    bottomRight: {
-      row: item.position.row + item.size.rowSpan - 1,
-      column: item.position.column + item.size.colSpan - 1,
-    },
-  };
-}
-
-function findRectsOverlap(first: GridRect, second: GridRect): GridRect | undefined {
-  const overlap = {
-    topLeft: {
-      row: Math.max(first.topLeft.row, second.topLeft.row),
-      column: Math.max(first.topLeft.column, second.topLeft.column),
-    },
-
-    bottomRight: {
-      row: Math.min(first.bottomRight.row, second.bottomRight.row),
-      column: Math.min(first.bottomRight.column, second.bottomRight.column),
-    },
-  };
-
-  if (isEmptyRect(overlap)) return;
-  return overlap;
-}
-
-function convertRectToItem(rect: GridRect): GridItemConfig {
-  return {
-    parentType: "grid",
-    position: rect.topLeft,
-    size: {
-      rowSpan: rect.bottomRight.row - rect.topLeft.row + 1,
-      colSpan: rect.bottomRight.column - rect.topLeft.column + 1,
-    },
-  };
-}
-
-interface GridRect {
-  topLeft: GridItemPosition;
-  bottomRight: GridItemPosition;
 }
 
 export function resolveOverlap(overlap: GridItemOverlap): GridItemResolution {
@@ -104,6 +44,18 @@ export interface GridItemResolution {
   itemConfig: GridItemConfig;
 }
 
+function findOverlapInArrangement(
+  overlappingItemId: WidgetConfig["id"],
+  overlappedItemId: WidgetConfig["id"],
+  arrangement: GridArrangement,
+): GridItemOverlap | undefined {
+  const overlappingItem = arrangement[overlappingItemId];
+  const overlappedItem = arrangement[overlappedItemId];
+  const overlap = findItemsOverlap(overlappingItem, overlappedItem);
+  if (!overlap) return;
+  return { overlappedItemId, overlappedItem, overlap };
+}
+
 function getOverlapResolutionOptions(overlap: GridItemOverlap): GridItemConfig[] {
   const itemRect = convertItemToRect(overlap.overlappedItem);
   const overlapRect = convertItemToRect(overlap.overlap);
@@ -113,6 +65,16 @@ function getOverlapResolutionOptions(overlap: GridItemOverlap): GridItemConfig[]
     .map((strip) => convertRectToItem(strip));
 
   return resolutionOptions;
+}
+
+export function getCollapsedItem(item: GridItemConfig) {
+  return {
+    ...item,
+    size: {
+      rowSpan: 0,
+      colSpan: 0,
+    },
+  };
 }
 
 function pickBestResolutionOption(
@@ -137,6 +99,32 @@ interface PickBestResolutionOptionDeps {
   overlappedItem: GridItemConfig;
 }
 
+export function findItemsOverlap(
+  first: GridItemConfig,
+  second: GridItemConfig,
+): GridItemConfig | undefined {
+  const [firstRect, secondRect] = [convertItemToRect(first), convertItemToRect(second)];
+  const overlapRect = findRectsOverlap(firstRect, secondRect);
+  if (!overlapRect) return;
+  return convertRectToItem(overlapRect);
+}
+
+function convertItemToRect(item: GridItemConfig): GridRect {
+  return {
+    topLeft: item.position,
+
+    bottomRight: {
+      row: item.position.row + item.size.rowSpan - 1,
+      column: item.position.column + item.size.colSpan - 1,
+    },
+  };
+}
+
+interface GridRect {
+  topLeft: GridItemPosition;
+  bottomRight: GridItemPosition;
+}
+
 function getStripsAroundOverlap(itemRect: GridRect, overlapRect: GridRect): GridRect[] {
   return [
     getStripAboveOverlap(itemRect, overlapRect),
@@ -151,6 +139,45 @@ function isEmptyRect(rect: GridRect) {
     rect.topLeft.row > rect.bottomRight.row ||
     rect.topLeft.column > rect.bottomRight.column
   );
+}
+
+function convertRectToItem(rect: GridRect): GridItemConfig {
+  return {
+    parentType: "grid",
+    position: rect.topLeft,
+    size: {
+      rowSpan: rect.bottomRight.row - rect.topLeft.row + 1,
+      colSpan: rect.bottomRight.column - rect.topLeft.column + 1,
+    },
+  };
+}
+
+function getItemArea(item: GridItemConfig) {
+  return item.size.rowSpan * item.size.colSpan;
+}
+
+function getAspectDeviation(item: GridItemConfig, reference: GridItemConfig) {
+  return Math.abs(
+    Math.log(item.size.colSpan / item.size.rowSpan) -
+      Math.log(reference.size.colSpan / reference.size.rowSpan),
+  );
+}
+
+function findRectsOverlap(first: GridRect, second: GridRect): GridRect | undefined {
+  const overlap = {
+    topLeft: {
+      row: Math.max(first.topLeft.row, second.topLeft.row),
+      column: Math.max(first.topLeft.column, second.topLeft.column),
+    },
+
+    bottomRight: {
+      row: Math.min(first.bottomRight.row, second.bottomRight.row),
+      column: Math.min(first.bottomRight.column, second.bottomRight.column),
+    },
+  };
+
+  if (isEmptyRect(overlap)) return;
+  return overlap;
 }
 
 function getStripAboveOverlap(itemRect: GridRect, overlapRect: GridRect): GridRect {
@@ -191,31 +218,4 @@ function getStripRightOfOverlap(itemRect: GridRect, overlapRect: GridRect): Grid
     },
     bottomRight: itemRect.bottomRight,
   };
-}
-
-function getItemArea(item: GridItemConfig) {
-  return item.size.rowSpan * item.size.colSpan;
-}
-
-function getAspectDeviation(item: GridItemConfig, reference: GridItemConfig) {
-  return Math.abs(
-    Math.log(item.size.colSpan / item.size.rowSpan) -
-      Math.log(reference.size.colSpan / reference.size.rowSpan),
-  );
-}
-
-export function getCollapsedItem(item: GridItemConfig) {
-  return {
-    ...item,
-    size: {
-      rowSpan: 0,
-      colSpan: 0,
-    },
-  };
-}
-
-export default interface GridItemOverlap {
-  overlappedItemId: WidgetConfig["id"];
-  overlappedItem: GridItemConfig;
-  overlap: GridItemConfig;
 }

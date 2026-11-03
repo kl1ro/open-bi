@@ -76,6 +76,14 @@ function ensureItemConfigParentTypeIsGrid(itemConfig?: ItemConfig) {
   return itemConfig;
 }
 
+function upsertGridItemToArrangement(
+  id: WidgetConfig["id"],
+  itemConfig: GridItemConfig,
+  arrangement?: GridArrangement,
+) {
+  return { ...arrangement, [id]: itemConfig };
+}
+
 function rearrangeAroundItem(arrangement: GridArrangement, itemId: WidgetConfig["id"]) {
   const overlaps = getOverlapsBetweenItemAndArrangement(itemId, arrangement);
   const resolved = overlaps.map(resolveOverlap);
@@ -86,14 +94,6 @@ function rearrangeAroundItem(arrangement: GridArrangement, itemId: WidgetConfig[
   );
 
   return resolvedArrangement;
-}
-
-function upsertGridItemToArrangement(
-  id: WidgetConfig["id"],
-  itemConfig: GridItemConfig,
-  arrangement?: GridArrangement,
-) {
-  return { ...arrangement, [id]: itemConfig };
 }
 
 export function occupySameCells(first: GridItemConfig, second: GridItemConfig) {
