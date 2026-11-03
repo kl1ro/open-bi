@@ -172,15 +172,8 @@ export function hasParentId(
   return Boolean(widgetConfig.parentId);
 }
 
-export function hasMovedFromParent(
-  oldWidgetConfig: WidgetConfig | undefined,
-  newWidgetConfig: WidgetConfig,
-): oldWidgetConfig is WithRequired<WidgetConfig, "parentId"> {
-  return Boolean(
-    oldWidgetConfig &&
-    hasParentId(oldWidgetConfig) &&
-    !widgetsHaveSameParentId(oldWidgetConfig, newWidgetConfig),
-  );
+export function hasMovedFromParent(oldConfig: WidgetConfig, newConfig: WidgetConfig) {
+  return hasParentId(oldConfig) && !widgetsHaveSameParentId(oldConfig, newConfig);
 }
 
 export function widgetsHaveSameParentId(first?: WidgetConfig, second?: WidgetConfig) {
@@ -350,14 +343,12 @@ export function getChildrenWithAdoptedChild(
   parent: ContainerConfig,
   child: WidgetConfig,
 ) {
-  if (hasChild(parent, child)) return parent.children;
-  return [...(parent.children ?? []), child.id];
+  const children = parent.children ?? [];
+  if (hasChild(parent, child)) return children;
+  return [...children, child.id];
 }
 
-export function hasChild(
-  parent: WidgetConfig,
-  child: WidgetConfig,
-): parent is WithRequired<WidgetConfig, "children"> {
+export function hasChild(parent: WidgetConfig, child: WidgetConfig) {
   return Boolean(parent.children?.includes(child.id));
 }
 
