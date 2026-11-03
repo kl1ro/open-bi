@@ -1,4 +1,5 @@
 import { type RefObject, useEffect, useRef } from "react";
+import type YandexMaps from "yandex-maps";
 
 import type MapConfig from "@/lib/widgets/map";
 import type { MapView } from "@/lib/widgets/map";
@@ -46,14 +47,16 @@ function mountMapIntoContainer(
   config: MapConfig,
   container: RefObject<HTMLDivElement | null>,
 ) {
+  const yandexMaps = getYandexMapsApi();
+  const deps = { yandexMaps };
   let map: ymaps.Map | undefined;
   let isUnmounted = false;
 
   const resizeObserver = new ResizeObserver(() => fitMapToContainer(map));
 
-  void window.ymaps.ready(() => {
+  void yandexMaps.ready(() => {
     if (isUnmounted || !container.current) return;
-    map = createMapInContainer(config, container.current);
+    map = createMapInContainer(config, container.current, deps);
     resizeObserver.observe(container.current);
   });
 
@@ -64,16 +67,38 @@ function mountMapIntoContainer(
   };
 }
 
+function getYandexMapsApi() {
+  const yandexMaps = window.ymaps;
+  if (!yandexMaps) throw new YandexMapsNotLoadedError();
+  return yandexMaps;
+}
+
+export class YandexMapsNotLoadedError extends Error {
+  public name = YandexMapsNotLoadedError.name;
+
+  public constructor(options?: ErrorOptions) {
+    super("Yandex Maps API is not loaded", options);
+  }
+}
+
 function fitMapToContainer(map: ymaps.Map | undefined) {
   map?.container.fitToViewport();
 }
 
-function createMapInContainer(config: MapConfig, container: HTMLDivElement) {
-  return new window.ymaps.Map(container, {
+function createMapInContainer(
+  config: MapConfig,
+  container: HTMLDivElement,
+  deps: CreateMapInContainerDeps,
+) {
+  return new deps.yandexMaps.Map(container, {
     center: [config.center.latitude, config.center.longitude],
     zoom: config.zoom,
     type: YANDEX_MAP_TYPE[config.view],
   });
+}
+
+interface CreateMapInContainerDeps {
+  yandexMaps: typeof YandexMaps;
 }
 
 const YANDEX_MAP_TYPE = {
