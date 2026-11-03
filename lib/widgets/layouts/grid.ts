@@ -440,7 +440,7 @@ export interface GridItemSize {
   colSpan: number;
 }
 
-export type GridArrangement = Record<string, GridItemConfig>;
+export type GridArrangement = Record<WidgetConfig["id"], GridItemConfig>;
 
 interface GridItemOverlap {
   overlappedItemId: WidgetConfig["id"];

@@ -89,4 +89,4 @@ export interface AbsoluteItemSize {
   height?: number;
 }
 
-export type AbsoluteArrangement = Record<string, AbsoluteItemConfig>;
+export type AbsoluteArrangement = Record<WidgetConfig["id"], AbsoluteItemConfig>;
