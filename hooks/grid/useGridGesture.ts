@@ -12,6 +12,7 @@ export default function useGridGesture(deps: UseGridGestureDeps) {
   const innerDeps = { ...deps, currentGesture: { value, set } };
 
   return {
+    current: { value, set },
     resize: useGridResize(innerDeps),
     move: useGridMove(innerDeps),
   };
