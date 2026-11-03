@@ -1,7 +1,38 @@
-export default function BrokenWidget() {
+import type { FallbackProps } from "react-error-boundary";
+
+import { NoWidgetTypeError, NonexistentWidgetTypeError } from "@/components/Widget";
+import { YandexMapsNotLoadedError } from "@/components/widgets/MapWidget";
+import { ItemConfigNotFoundError, WidgetConfigNotFoundError } from "@/lib/widget";
+import { NoLayoutTypeError, NonexistentLayoutTypeError } from "@/lib/widgets/layout";
+import { NoGraphTypeError, NonexistentGraphTypeError } from "@/lib/widgets/graph";
+
+export default function BrokenWidget(props: FallbackProps) {
   return (
     <div className="size-full flex justify-center items-center text-center rounded-xl bg-red-600/10 ring-1 ring-inset ring-red-600/40 text-red-400">
-      Повреждены данные
+      {getBrokenWidgetMessage(props.error)}
     </div>
   );
+}
+
+function getBrokenWidgetMessage(error: unknown) {
+  if (error instanceof YandexMapsNotLoadedError)
+    return "Не удалось загрузить Яндекс Карты";
+
+  if (isCorruptedDataError(error)) return "Повреждены данные";
+  return "Не удалось отобразить виджет";
+}
+
+function isCorruptedDataError(error: unknown) {
+  const corruptedDataErrors = [
+    WidgetConfigNotFoundError,
+    ItemConfigNotFoundError,
+    NoWidgetTypeError,
+    NonexistentWidgetTypeError,
+    NoLayoutTypeError,
+    NonexistentLayoutTypeError,
+    NoGraphTypeError,
+    NonexistentGraphTypeError,
+  ];
+
+  return corruptedDataErrors.some((ErrorClass) => error instanceof ErrorClass);
 }
