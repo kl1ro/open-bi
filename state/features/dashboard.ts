@@ -166,12 +166,12 @@ interface RemoveWidgetWithDescendantsDeps {
   state: DashboardConfig;
 }
 
-function isRootConfig(widgetConfig: WidgetConfig, deps: IsRootConfigDeps) {
+export function isRootConfig(widgetConfig: WidgetConfig, deps: IsRootConfigDeps) {
   const root = findRootConfig(deps);
   return widgetsHaveSameId(widgetConfig, root);
 }
 
-interface IsRootConfigDeps {
+export interface IsRootConfigDeps {
   state: DashboardConfig;
 }
 
