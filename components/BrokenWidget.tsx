@@ -15,11 +15,14 @@ export default function BrokenWidget(props: FallbackProps) {
 }
 
 function getBrokenWidgetMessage(error: unknown) {
-  if (error instanceof YandexMapsNotLoadedError)
-    return "Не удалось загрузить Яндекс Карты";
-
+  if (isServiceLoadError(error)) return "Не удалось загрузить внешний сервис";
   if (isCorruptedDataError(error)) return "Повреждены данные";
   return "Не удалось отобразить виджет";
+}
+
+function isServiceLoadError(error: unknown) {
+  const serviceLoadErrors = [YandexMapsNotLoadedError];
+  return serviceLoadErrors.some((ErrorClass) => error instanceof ErrorClass);
 }
 
 function isCorruptedDataError(error: unknown) {
