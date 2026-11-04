@@ -5,12 +5,6 @@ import type {
 } from "@/lib/widgets/layouts/grid";
 import type WidgetConfig from "@/lib/widget";
 
-export default interface GridItemOverlap {
-  overlappedItemId: WidgetConfig["id"];
-  overlappedItem: GridItemConfig;
-  overlap: GridItemConfig;
-}
-
 export function getOverlapsBetweenItemAndArrangement(
   itemId: WidgetConfig["id"],
   arrangement: GridArrangement,
@@ -22,6 +16,12 @@ export function getOverlapsBetweenItemAndArrangement(
   );
 
   return overlaps;
+}
+
+export interface GridItemOverlap {
+  overlappedItemId: WidgetConfig["id"];
+  overlappedItem: GridItemConfig;
+  overlap: GridItemConfig;
 }
 
 export function resolveOverlap(overlap: GridItemOverlap): GridItemResolution {
