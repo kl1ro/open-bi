@@ -116,8 +116,8 @@ const WIDGET_CONFIG_SCHEMA = z.discriminatedUnion("type", [
 ]);
 
 const DASHBOARD_CONFIG_SCHEMA = z.object({
-  widgetConfigs: z.record(z.string(), WIDGET_CONFIG_SCHEMA),
-  rootId: z.string().optional(),
+  widgetConfigs: z.record(WIDGET_ID_SCHEMA, WIDGET_CONFIG_SCHEMA),
+  rootId: WIDGET_ID_SCHEMA.optional(),
 }) satisfies z.ZodType<DashboardConfig>;
 
 export default DASHBOARD_CONFIG_SCHEMA;
