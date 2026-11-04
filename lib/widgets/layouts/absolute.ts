@@ -20,7 +20,7 @@ export function getAbsoluteConfigWithAdoptedChild(
   parent: AbsoluteConfig,
   child: WidgetConfig,
   deps: GetAbsoluteConfigWithAdoptedChildDeps,
-) {
+): AbsoluteConfig {
   if (hasChild(parent, child) && !deps.itemConfig) return parent;
   const absoluteItemConfig = ensureItemConfigParentTypeIsAbsolute(deps.itemConfig);
 
@@ -57,14 +57,14 @@ function upsertAbsoluteItemToArrangement(
   id: WidgetConfig["id"],
   itemConfig: AbsoluteItemConfig,
   arrangement?: AbsoluteArrangement,
-) {
+): AbsoluteArrangement {
   return { ...arrangement, [id]: itemConfig };
 }
 
 export function getAbsoluteConfigWithDisownedChild(
   parent: AbsoluteConfig,
   child: WidgetConfig,
-) {
+): AbsoluteConfig {
   const children = getChildrenWithDisownedChild(parent, child);
   const arrangement = getRecordWithoutKey(parent.arrangement, child.id);
   return { ...parent, children, arrangement };

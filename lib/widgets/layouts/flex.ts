@@ -11,12 +11,18 @@ export default interface FlexConfig extends AbstractLayoutConfig {
   children?: WidgetConfig["id"][];
 }
 
-export function getFlexConfigWithAdoptedChild(parent: FlexConfig, child: WidgetConfig) {
+export function getFlexConfigWithAdoptedChild(
+  parent: FlexConfig,
+  child: WidgetConfig,
+): FlexConfig {
   const children = getChildrenWithAdoptedChild(parent, child);
   return { ...parent, children };
 }
 
-export function getFlexConfigWithDisownedChild(parent: FlexConfig, child: WidgetConfig) {
+export function getFlexConfigWithDisownedChild(
+  parent: FlexConfig,
+  child: WidgetConfig,
+): FlexConfig {
   const children = getChildrenWithDisownedChild(parent, child);
   return { ...parent, children };
 }

@@ -27,7 +27,7 @@ export function getGridConfigWithAdoptedChild(
   parent: GridConfig,
   child: WidgetConfig,
   deps: GetGridConfigWithAdoptedChildDeps,
-) {
+): GridConfig {
   if (hasChild(parent, child) && !deps.itemConfig) return parent;
   const gridItemConfig = ensureItemConfigParentTypeIsGrid(deps.itemConfig);
 
@@ -80,7 +80,7 @@ function upsertGridItemToArrangement(
   id: WidgetConfig["id"],
   itemConfig: GridItemConfig,
   arrangement?: GridArrangement,
-) {
+): GridArrangement {
   return { ...arrangement, [id]: itemConfig };
 }
 
@@ -105,7 +105,10 @@ export function occupySameCells(first: GridItemConfig, second: GridItemConfig) {
   );
 }
 
-export function getGridConfigWithDisownedChild(parent: GridConfig, child: WidgetConfig) {
+export function getGridConfigWithDisownedChild(
+  parent: GridConfig,
+  child: WidgetConfig,
+): GridConfig {
   const children = getChildrenWithDisownedChild(parent, child);
   const arrangement = getRecordWithoutKey(parent.arrangement, child.id);
   return { ...parent, children, arrangement };
@@ -188,12 +191,12 @@ export function getGridCoordinateKey(cell: GridItemPosition): CoordinateKey {
   return `${cell.row}-${cell.column}`;
 }
 
-function create1x1GridItemConfig(cell: GridItemPosition) {
+function create1x1GridItemConfig(cell: GridItemPosition): GridItemConfig {
   return {
     parentType: "grid",
     position: { ...cell },
     size: DEFAULT_GRID_ITEM_SIZE,
-  } satisfies GridItemConfig;
+  };
 }
 
 function getGridCellOccupancyInArrangement(
