@@ -26,6 +26,7 @@ const initialDashboardState: DashboardConfig = {
 const slice = createSlice({
   name: "dashboard",
   initialState: initialDashboardState,
+
   reducers: {
     setDashboard: handleDashboardSet,
     upsertWidget: handleWidgetUpsert,

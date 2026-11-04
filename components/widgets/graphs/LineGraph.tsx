@@ -21,8 +21,10 @@ export default function LineGraph() {
 const LINE_GRAPH_OPTIONS: ApexOptions = {
   chart: {
     id: "line-chart",
+
     toolbar: {
       show: true,
+
       tools: {
         download: false,
         selection: false,
@@ -34,7 +36,9 @@ const LINE_GRAPH_OPTIONS: ApexOptions = {
       },
     },
   },
+
   stroke: { curve: "smooth" },
+
   xaxis: {
     categories: ["Jan", "Feb", "Mar", "Apr", "May"],
   },

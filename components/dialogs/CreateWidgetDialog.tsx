@@ -433,10 +433,12 @@ function getMapConfigFromFormValues(
     id: deps.id,
     parentId: deps.parentId,
     type: "map",
+
     center: {
       latitude: Number(values.latitude),
       longitude: Number(values.longitude),
     },
+
     zoom: Number(values.zoom),
     view: values.view,
   };
@@ -484,18 +486,22 @@ const formSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("graph") }),
   z.object({
     type: z.literal("map"),
+
     latitude: z
       .string()
       .refine((value) => isNumberInRange(value, -90, 90), "Широта — число от -90 до 90"),
+
     longitude: z
       .string()
       .refine(
         (value) => isNumberInRange(value, -180, 180),
         "Долгота — число от -180 до 180",
       ),
+
     zoom: z
       .string()
       .refine((value) => isNumberInRange(value, 0, 21), "Масштаб — число от 0 до 21"),
+
     view: z.enum(MAP_VIEWS),
   }),
 ]);

@@ -70,6 +70,7 @@ function getOverlapResolutionOptions(overlap: GridItemOverlap): GridItemConfig[]
 export function getCollapsedItem(item: GridItemConfig): GridItemConfig {
   return {
     ...item,
+
     size: {
       rowSpan: 0,
       colSpan: 0,
@@ -145,6 +146,7 @@ function convertRectToItem(rect: GridRect): GridItemConfig {
   return {
     parentType: "grid",
     position: rect.topLeft,
+
     size: {
       rowSpan: rect.bottomRight.row - rect.topLeft.row + 1,
       colSpan: rect.bottomRight.column - rect.topLeft.column + 1,
@@ -183,6 +185,7 @@ function findRectsOverlap(first: GridRect, second: GridRect): GridRect | undefin
 function getStripAboveOverlap(itemRect: GridRect, overlapRect: GridRect): GridRect {
   return {
     topLeft: itemRect.topLeft,
+
     bottomRight: {
       row: overlapRect.topLeft.row - 1,
       column: itemRect.bottomRight.column,
@@ -196,6 +199,7 @@ function getStripBelowOverlap(itemRect: GridRect, overlapRect: GridRect): GridRe
       row: overlapRect.bottomRight.row + 1,
       column: itemRect.topLeft.column,
     },
+
     bottomRight: itemRect.bottomRight,
   };
 }
@@ -203,6 +207,7 @@ function getStripBelowOverlap(itemRect: GridRect, overlapRect: GridRect): GridRe
 function getStripLeftOfOverlap(itemRect: GridRect, overlapRect: GridRect): GridRect {
   return {
     topLeft: itemRect.topLeft,
+
     bottomRight: {
       row: itemRect.bottomRight.row,
       column: overlapRect.topLeft.column - 1,
@@ -216,6 +221,7 @@ function getStripRightOfOverlap(itemRect: GridRect, overlapRect: GridRect): Grid
       row: itemRect.topLeft.row,
       column: overlapRect.bottomRight.column + 1,
     },
+
     bottomRight: itemRect.bottomRight,
   };
 }
