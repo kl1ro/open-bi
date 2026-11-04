@@ -115,9 +115,7 @@ const WIDGET_CONFIG_SCHEMA = z.discriminatedUnion("type", [
   SLOT_CONFIG_SCHEMA,
 ]);
 
-const DASHBOARD_CONFIG_SCHEMA = z.object({
+export const DASHBOARD_CONFIG_SCHEMA = z.object({
   widgetConfigs: z.record(WIDGET_ID_SCHEMA, WIDGET_CONFIG_SCHEMA),
   rootId: WIDGET_ID_SCHEMA.optional(),
 }) satisfies z.ZodType<DashboardConfig>;
-
-export default DASHBOARD_CONFIG_SCHEMA;

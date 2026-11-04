@@ -1,5 +1,5 @@
 import type DashboardConfig from "@/lib/dashboard";
-import DASHBOARD_CONFIG_SCHEMA from "@/lib/dashboard-schema";
+import { DASHBOARD_CONFIG_SCHEMA } from "@/lib/dashboard-schema";
 
 const DASHBOARD_LOCALSTORAGE_KEY = "dashboard";
 
