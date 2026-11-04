@@ -11,7 +11,6 @@ export default function RootLayout(props: RootLayoutProps) {
     <html lang="en" className="size-full">
       <body className="size-full antialiased bg-dark text-secondary">
         {props.children}
-        <script src="https://api-maps.yandex.ru/2.1/?lang=en_US"></script>
       </body>
     </html>
   );

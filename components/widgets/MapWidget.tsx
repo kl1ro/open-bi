@@ -1,8 +1,10 @@
 import { type RefObject, useEffect, useRef } from "react";
+import { useErrorBoundary } from "react-error-boundary";
 import type YandexMaps from "yandex-maps";
 
 import type MapConfig from "@/lib/widgets/map";
 import type { MapView } from "@/lib/widgets/map";
+import { loadYandexMaps } from "@/lib/yandex-maps";
 
 export default function MapWidget(props: MapConfig) {
   const state = useMapWidgetState(props);
@@ -14,6 +16,7 @@ function useMapWidgetState(props: MapConfig) {
   return {
     container: useRef<HTMLDivElement>(null),
     config: props,
+    showBoundary: useErrorBoundary().showBoundary,
   };
 }
 
@@ -24,11 +27,12 @@ function useMapWidgetEffects(deps: UseMapWidgetEffectsDeps) {
 interface UseMapWidgetEffectsDeps {
   config: MapConfig;
   container: RefObject<HTMLDivElement | null>;
+  showBoundary: (error: unknown) => void;
 }
 
 function useMapMountEffect(deps: UseMapMountEffectDeps) {
   useEffect(
-    () => mountMapIntoContainer(deps.config, deps.container),
+    () => mountMapIntoContainer(deps.config, deps.container, deps),
     [
       deps.config.center.latitude,
       deps.config.center.longitude,
@@ -41,24 +45,29 @@ function useMapMountEffect(deps: UseMapMountEffectDeps) {
 interface UseMapMountEffectDeps {
   config: MapConfig;
   container: RefObject<HTMLDivElement | null>;
+  showBoundary: (error: unknown) => void;
 }
 
 function mountMapIntoContainer(
   config: MapConfig,
   container: RefObject<HTMLDivElement | null>,
+  deps: MountMapIntoContainerDeps,
 ) {
-  const yandexMaps = getYandexMapsApi();
-  const deps = { yandexMaps };
   let map: ymaps.Map | undefined;
   let isUnmounted = false;
 
   const resizeObserver = new ResizeObserver(() => fitMapToContainer(map));
 
-  void yandexMaps.ready(() => {
-    if (isUnmounted || !container.current) return;
-    map = createMapInContainer(config, container.current, deps);
-    resizeObserver.observe(container.current);
-  });
+  void loadYandexMaps()
+    .then((yandexMaps) => {
+      if (isUnmounted || !container.current) return;
+      const innerDeps = { ...deps, yandexMaps };
+      map = createMapInContainer(config, container.current, innerDeps);
+      resizeObserver.observe(container.current);
+    })
+    .catch((error: unknown) => {
+      if (!isUnmounted) deps.showBoundary(error);
+    });
 
   return () => {
     isUnmounted = true;
@@ -67,18 +76,8 @@ function mountMapIntoContainer(
   };
 }
 
-function getYandexMapsApi() {
-  const yandexMaps = window.ymaps;
-  if (!yandexMaps) throw new YandexMapsNotLoadedError();
-  return yandexMaps;
-}
-
-export class YandexMapsNotLoadedError extends Error {
-  public name = YandexMapsNotLoadedError.name;
-
-  public constructor(options?: ErrorOptions) {
-    super("Yandex Maps API is not loaded", options);
-  }
+interface MountMapIntoContainerDeps {
+  showBoundary: (error: unknown) => void;
 }
 
 function fitMapToContainer(map: ymaps.Map | undefined) {
