@@ -67,7 +67,7 @@ function getOverlapResolutionOptions(overlap: GridItemOverlap): GridItemConfig[]
   return resolutionOptions;
 }
 
-export function getCollapsedItem(item: GridItemConfig) {
+export function getCollapsedItem(item: GridItemConfig): GridItemConfig {
   return {
     ...item,
     size: {
