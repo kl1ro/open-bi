@@ -22,7 +22,7 @@ function getBrokenWidgetMessage(error: unknown) {
 
 function isServiceLoadError(error: unknown) {
   const serviceLoadErrors = [YandexMapsNotLoadedError];
-  return serviceLoadErrors.some((ErrorClass) => error instanceof ErrorClass);
+  return serviceLoadErrors.some((errorClass) => error instanceof errorClass);
 }
 
 function isCorruptedDataError(error: unknown) {
@@ -37,5 +37,5 @@ function isCorruptedDataError(error: unknown) {
     NonexistentGraphTypeError,
   ];
 
-  return corruptedDataErrors.some((ErrorClass) => error instanceof ErrorClass);
+  return corruptedDataErrors.some((errorClass) => error instanceof errorClass);
 }
