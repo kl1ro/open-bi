@@ -172,7 +172,11 @@ export function hasParentId(
   return Boolean(widgetConfig.parentId);
 }
 
-export function hasMovedFromParent(oldConfig: WidgetConfig, newConfig: WidgetConfig) {
+export function hasMovedFromParent(
+  oldConfig: WidgetConfig | undefined,
+  newConfig: WidgetConfig,
+) {
+  if (!oldConfig) return false;
   return hasParentId(oldConfig) && !widgetsHaveSameParentId(oldConfig, newConfig);
 }
 

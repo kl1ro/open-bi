@@ -54,7 +54,7 @@ function handleWidgetUpsert(
   const oldWidgetConfig = findWidgetConfig(widgetConfig.id, deps);
   validateWidgetUpdate(oldWidgetConfig, widgetConfig);
 
-  if (oldWidgetConfig && hasMovedFromParent(oldWidgetConfig, widgetConfig))
+  if (hasMovedFromParent(oldWidgetConfig, widgetConfig))
     unlinkWidgetFromParent(oldWidgetConfig, deps);
 
   linkWidgetToParent(widgetConfig, deps);
@@ -88,8 +88,11 @@ interface WidgetRemovalPayload {
   id: WidgetConfig["id"];
 }
 
-function unlinkWidgetFromParent(child: WidgetConfig, deps: UnlinkWidgetFromParentDeps) {
-  if (!hasParentId(child)) return;
+function unlinkWidgetFromParent(
+  child: WidgetConfig | undefined,
+  deps: UnlinkWidgetFromParentDeps,
+) {
+  if (!child || !hasParentId(child)) return;
 
   const innerDeps = { ...deps, widgetConfigs: deps.state.widgetConfigs };
   const parent = getParentConfig(child, innerDeps);
