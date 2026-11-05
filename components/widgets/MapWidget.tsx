@@ -15,14 +15,7 @@ export default function MapWidget(props: MapConfig) {
   return (
     <div className="relative size-full">
       <div ref={state.container} className="size-full" />
-
-      <AnimatePresence>
-        {!state.isMapReady.value && (
-          <div className="absolute inset-0">
-            <LoadingWidget />
-          </div>
-        )}
-      </AnimatePresence>
+      <AnimatePresence>{!state.isMapReady.value && <LoadingWidget />}</AnimatePresence>
     </div>
   );
 }
