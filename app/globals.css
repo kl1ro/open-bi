@@ -45,6 +45,20 @@
 	--color-light: #282c38;
 }
 
+@theme {
+  --animate-glare-sweep: glare-sweep 1.8s ease-in-out infinite;
+
+  @keyframes glare-sweep {
+    from {
+      transform: translateX(-100%);
+    }
+
+    to {
+      transform: translateX(100%);
+    }
+  }
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
