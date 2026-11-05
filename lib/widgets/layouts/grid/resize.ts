@@ -250,7 +250,7 @@ export interface GridResizeHandleConfig {
   name: string;
   kind: GridResizeHandleKind;
   sides: readonly GridResizeSide[];
-  cursor: string;
+  cursorClass: string;
   handleClass: string;
   gripClass: string;
   activeGripClass: string;
