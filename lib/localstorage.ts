@@ -1,4 +1,5 @@
 import type DashboardConfig from "@/lib/dashboard";
+import { DASHBOARD_CONFIG_SCHEMA } from "@/lib/dashboard-schema";
 
 const DASHBOARD_LOCALSTORAGE_KEY = "dashboard";
 
@@ -18,21 +19,49 @@ export class SaveDashboardError extends Error {
   }
 }
 
-export function restoreDashboardFromLocalStorage() {
-  try {
-    const storageItem = localStorage.getItem(DASHBOARD_LOCALSTORAGE_KEY);
-    if (!storageItem) return;
-    const dashboard = JSON.parse(storageItem) as DashboardConfig;
-    return dashboard;
-  } catch (error) {
-    throw new RestoreDashboardError({ cause: error });
-  }
+export function restoreDashboardFromLocalStorage(): DashboardConfig | undefined {
+  const storedDashboard = findStoredDashboard();
+  if (!storedDashboard) return;
+  const dashboard = parseDashboard(storedDashboard);
+  return dashboard;
 }
 
 export class RestoreDashboardError extends Error {
   public name = RestoreDashboardError.name;
 
+  public constructor(options?: ErrorOptions & { message?: string }) {
+    super(options?.message ?? "Error while trying to restore the dashboard", options);
+  }
+}
+
+function findStoredDashboard(): string | undefined {
+  try {
+    return localStorage.getItem(DASHBOARD_LOCALSTORAGE_KEY) ?? undefined;
+  } catch (error) {
+    throw new RestoreDashboardError({ cause: error });
+  }
+}
+
+function parseDashboard(storedDashboard: string): DashboardConfig {
+  const json = parseJson(storedDashboard);
+  const validation = DASHBOARD_CONFIG_SCHEMA.safeParse(json);
+  if (!validation.success) throw new CorruptedDashboardError({ cause: validation.error });
+  return validation.data;
+}
+
+export class CorruptedDashboardError extends RestoreDashboardError {
+  public name = CorruptedDashboardError.name;
+
   public constructor(options?: ErrorOptions) {
-    super("Error while trying to restore the dashboard", options);
+    super({ ...options, message: "Stored dashboard is corrupted" });
+  }
+}
+
+function parseJson(text: string): unknown {
+  try {
+    const json: unknown = JSON.parse(text);
+    return json;
+  } catch (error) {
+    throw new CorruptedDashboardError({ cause: error });
   }
 }

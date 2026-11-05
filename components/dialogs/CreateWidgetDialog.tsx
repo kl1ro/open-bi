@@ -31,9 +31,14 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { isNumber } from "@/lib/utils";
 import type WidgetConfig from "@/lib/widget";
 import type { ItemConfig } from "@/lib/widget";
+import type GridConfig from "@/lib/widgets/layouts/grid";
 import { SPACING_OPTIONS } from "@/lib/widgets/layouts/grid";
+import type TitleConfig from "@/lib/widgets/title";
+import type GraphConfig from "@/lib/widgets/graph";
+import type MapConfig from "@/lib/widgets/map";
 import { MAP_VIEWS, type MapView } from "@/lib/widgets/map";
 import { upsertWidget } from "@/state/features/dashboard";
 import { useAppDispatch } from "@/state/hooks";
@@ -342,39 +347,20 @@ function getWidgetConfigFromFormValues(
   deps: GetWidgetConfigFromFormValuesDeps,
 ): WidgetConfig {
   const id = deps.id ?? crypto.randomUUID();
-  const parentId = deps.parentId;
+  const innerDeps = { ...deps, id };
 
   switch (values.type) {
     case "layout":
-      return {
-        id,
-        parentId,
-        type: "layout",
-        layout: "grid",
-        columns: Number(values.columns),
-        rows: Number(values.rows),
-        children: [],
-        arrangement: {},
-      };
+      return getGridConfigFromFormValues(values, innerDeps);
 
     case "title":
-      return { id, parentId, type: "title", text: values.text };
+      return getTitleConfigFromFormValues(values, innerDeps);
 
     case "graph":
-      return { id, parentId, type: "graph", graph: "line" };
+      return getGraphConfigFromFormValues(values, innerDeps);
 
     case "map":
-      return {
-        id,
-        parentId,
-        type: "map",
-        center: {
-          latitude: Number(values.latitude),
-          longitude: Number(values.longitude),
-        },
-        zoom: Number(values.zoom),
-        view: values.view,
-      };
+      return getMapConfigFromFormValues(values, innerDeps);
 
     default:
       throw getUnexpectedFormValuesTypeError(values);
@@ -392,6 +378,75 @@ function isFormType(type: string): type is FormValues["type"] {
 
 function getUnexpectedFormTypeError(type: never) {
   return type ? new NonexistentFormTypeError({ type }) : new NoFormTypeError();
+}
+
+function getGridConfigFromFormValues(
+  values: LayoutFormValues,
+  deps: GetGridConfigFromFormValuesDeps,
+): GridConfig {
+  return {
+    id: deps.id,
+    parentId: deps.parentId,
+    type: "layout",
+    layout: "grid",
+    columns: Number(values.columns),
+    rows: Number(values.rows),
+    children: [],
+    arrangement: {},
+  };
+}
+
+interface GetGridConfigFromFormValuesDeps {
+  id: WidgetConfig["id"];
+  parentId?: WidgetConfig["id"];
+}
+
+function getTitleConfigFromFormValues(
+  values: TitleFormValues,
+  deps: GetTitleConfigFromFormValuesDeps,
+): TitleConfig {
+  return { id: deps.id, parentId: deps.parentId, type: "title", text: values.text };
+}
+
+interface GetTitleConfigFromFormValuesDeps {
+  id: WidgetConfig["id"];
+  parentId?: WidgetConfig["id"];
+}
+
+function getGraphConfigFromFormValues(
+  values: GraphFormValues,
+  deps: GetGraphConfigFromFormValuesDeps,
+): GraphConfig {
+  return { id: deps.id, parentId: deps.parentId, type: "graph", graph: "line" };
+}
+
+interface GetGraphConfigFromFormValuesDeps {
+  id: WidgetConfig["id"];
+  parentId?: WidgetConfig["id"];
+}
+
+function getMapConfigFromFormValues(
+  values: MapFormValues,
+  deps: GetMapConfigFromFormValuesDeps,
+): MapConfig {
+  return {
+    id: deps.id,
+    parentId: deps.parentId,
+    type: "map",
+
+    center: {
+      latitude: Number(values.latitude),
+      longitude: Number(values.longitude),
+    },
+
+    zoom: Number(values.zoom),
+    view: values.view,
+  };
+}
+
+interface GetMapConfigFromFormValuesDeps {
+  id: WidgetConfig["id"];
+  parentId?: WidgetConfig["id"];
 }
 
 function getUnexpectedFormValuesTypeError(values: never) {
@@ -431,25 +486,33 @@ const formSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("graph") }),
   z.object({
     type: z.literal("map"),
+
     latitude: z
       .string()
       .refine((value) => isNumberInRange(value, -90, 90), "Широта — число от -90 до 90"),
+
     longitude: z
       .string()
       .refine(
         (value) => isNumberInRange(value, -180, 180),
         "Долгота — число от -180 до 180",
       ),
+
     zoom: z
       .string()
       .refine((value) => isNumberInRange(value, 0, 21), "Масштаб — число от 0 до 21"),
+
     view: z.enum(MAP_VIEWS),
   }),
 ]);
 
 function isNumberInRange(value: string, min: number, max: number) {
   const number = Number(value);
-  return value.trim() !== "" && !Number.isNaN(number) && number >= min && number <= max;
+  return value.trim() !== "" && isNumber(number) && number >= min && number <= max;
 }
 
 type FormValues = z.infer<typeof formSchema>;
+type LayoutFormValues = Extract<FormValues, { type: "layout" }>;
+type TitleFormValues = Extract<FormValues, { type: "title" }>;
+type GraphFormValues = Extract<FormValues, { type: "graph" }>;
+type MapFormValues = Extract<FormValues, { type: "map" }>;

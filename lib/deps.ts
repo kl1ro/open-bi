@@ -64,11 +64,16 @@ function copyArity<Destination extends object>(
 function splitTargetArguments<Args extends unknown[], PassedDeps>(
   target: (...args: never[]) => unknown,
   args: unknown[],
-) {
+): TargetArguments<Args, PassedDeps> {
   const depsIndex = target.length - 1;
   const leading = args.slice(0, depsIndex) as Args;
   const passedDeps = findPassedDeps(args, depsIndex) as PassedDeps | undefined;
   return { leading, passedDeps };
+}
+
+interface TargetArguments<Args extends unknown[], PassedDeps> {
+  leading: Args;
+  passedDeps: PassedDeps | undefined;
 }
 
 function findPassedDeps(args: unknown[], depsIndex: number): object | undefined {

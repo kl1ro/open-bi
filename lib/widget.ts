@@ -173,14 +173,11 @@ export function hasParentId(
 }
 
 export function hasMovedFromParent(
-  oldWidgetConfig: WidgetConfig | undefined,
-  newWidgetConfig: WidgetConfig,
-): oldWidgetConfig is WithRequired<WidgetConfig, "parentId"> {
-  return Boolean(
-    oldWidgetConfig &&
-    hasParentId(oldWidgetConfig) &&
-    !widgetsHaveSameParentId(oldWidgetConfig, newWidgetConfig),
-  );
+  oldConfig: WidgetConfig | undefined,
+  newConfig: WidgetConfig,
+) {
+  if (!oldConfig) return false;
+  return hasParentId(oldConfig) && !widgetsHaveSameParentId(oldConfig, newConfig);
 }
 
 export function widgetsHaveSameParentId(first?: WidgetConfig, second?: WidgetConfig) {
@@ -192,7 +189,10 @@ export function getChildConfigs(
   widgetConfig: WidgetConfig,
   deps: GetChildConfigsDeps,
 ): WidgetConfig[] {
-  return widgetConfig.children?.map((id) => getWidgetConfig(id, deps)) ?? [];
+  const childConfigs =
+    widgetConfig.children?.map((id) => getWidgetConfig(id, deps)) ?? [];
+
+  return childConfigs;
 }
 
 export interface GetChildConfigsDeps {
@@ -218,7 +218,8 @@ export function getDescendantConfigs(
     {},
   );
 
-  return { ...currentLayerChildren, ...deeperDescendants };
+  const descendants = { ...currentLayerChildren, ...deeperDescendants };
+  return descendants;
 }
 
 export interface GetDescendantConfigsDeps {
@@ -346,14 +347,12 @@ export function getChildrenWithAdoptedChild(
   parent: ContainerConfig,
   child: WidgetConfig,
 ) {
-  if (hasChild(parent, child)) return parent.children;
-  return [...(parent.children ?? []), child.id];
+  const children = parent.children ?? [];
+  if (hasChild(parent, child)) return children;
+  return [...children, child.id];
 }
 
-export function hasChild(
-  parent: WidgetConfig,
-  child: WidgetConfig,
-): parent is WithRequired<WidgetConfig, "children"> {
+export function hasChild(parent: WidgetConfig, child: WidgetConfig) {
   return Boolean(parent.children?.includes(child.id));
 }
 

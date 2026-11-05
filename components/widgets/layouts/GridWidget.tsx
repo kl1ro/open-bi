@@ -1,4 +1,4 @@
-import { type ReactNode, useRef } from "react";
+import { type CSSProperties, type ReactNode, useRef } from "react";
 import { AnimatePresence, motion, type MotionProps } from "framer-motion";
 
 import Widget from "@/components/Widget";
@@ -72,7 +72,7 @@ function useGridWidgetState(props: GridConfig) {
   };
 }
 
-function getGridTemplateStyle(grid: GridConfig) {
+function getGridTemplateStyle(grid: GridConfig): CSSProperties {
   return {
     "--rows": `repeat(${grid.rows}, minmax(0, 1fr))`,
     "--cols": `repeat(${grid.columns}, minmax(0, 1fr))`,
@@ -168,7 +168,7 @@ interface GridItemContentProps {
   parentId: WidgetConfig["id"];
 }
 
-function getGridAreaStyle(itemConfig: GridItemConfig) {
+function getGridAreaStyle(itemConfig: GridItemConfig): CSSProperties {
   return {
     "--row-span": itemConfig.size.rowSpan,
     "--col-span": itemConfig.size.colSpan,

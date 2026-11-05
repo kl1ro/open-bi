@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect } from "react";
 import { toast } from "sonner";
 
@@ -9,6 +10,7 @@ import { useAppSelector, useAppStore } from "@/state/hooks";
 import type { AppStore } from "@/state/store";
 import { isSaveEvent } from "@/lib/keyboard";
 import {
+  CorruptedDashboardError,
   restoreDashboardFromLocalStorage,
   saveDashboardToLocalStorage,
 } from "@/lib/localstorage";
@@ -68,12 +70,19 @@ function tryRestoreDashboard(deps: TryRestoreDashboardDeps) {
     toast.success("Дэшборд восстановлен из предыдущей сессии");
   } catch (error) {
     console.error(error);
-    toast.error("Не удалось восстановить дэшборд из предыдущей сессии");
+    toast.error(getDashboardRestoreErrorMessage(error));
   }
 }
 
 interface TryRestoreDashboardDeps {
   store: AppStore;
+}
+
+function getDashboardRestoreErrorMessage(error: unknown) {
+  if (error instanceof CorruptedDashboardError)
+    return "Сохранённый дэшборд повреждён, поэтому он не был загружен";
+
+  return "Не удалось восстановить дэшборд из предыдущей сессии";
 }
 
 function useDashboardSaveEffectState() {

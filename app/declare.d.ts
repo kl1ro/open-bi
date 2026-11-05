@@ -2,7 +2,7 @@ import type YandexMaps from "yandex-maps";
 
 declare global {
   interface Window {
-    ymaps: typeof YandexMaps;
+    ymaps?: typeof YandexMaps;
   }
 }
 

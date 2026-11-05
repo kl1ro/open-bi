@@ -17,7 +17,6 @@ import {
   type ItemConfig,
 } from "@/lib/widget";
 import type DashboardConfig from "@/lib/dashboard";
-import type { WithRequired } from "@/lib/utils";
 import type { RootState } from "@/state/store";
 
 const initialDashboardState: DashboardConfig = {
@@ -27,6 +26,7 @@ const initialDashboardState: DashboardConfig = {
 const slice = createSlice({
   name: "dashboard",
   initialState: initialDashboardState,
+
   reducers: {
     setDashboard: handleDashboardSet,
     upsertWidget: handleWidgetUpsert,
@@ -89,9 +89,11 @@ interface WidgetRemovalPayload {
 }
 
 function unlinkWidgetFromParent(
-  child: WithRequired<WidgetConfig, "parentId">,
+  child: WidgetConfig | undefined,
   deps: UnlinkWidgetFromParentDeps,
 ) {
+  if (!child || !hasParentId(child)) return;
+
   const innerDeps = { ...deps, widgetConfigs: deps.state.widgetConfigs };
   const parent = getParentConfig(child, innerDeps);
   const updatedParent = getParentConfigWithDisownedChild(parent, child);
@@ -157,7 +159,7 @@ function removeWidgetWithDescendants(
   widgetConfig: WidgetConfig,
   deps: RemoveWidgetWithDescendantsDeps,
 ) {
-  if (hasParentId(widgetConfig)) unlinkWidgetFromParent(widgetConfig, deps);
+  unlinkWidgetFromParent(widgetConfig, deps);
   removeDescendantsFromState(widgetConfig, deps);
   removeWidgetFromState(widgetConfig, deps);
 }

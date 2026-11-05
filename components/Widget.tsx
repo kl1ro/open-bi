@@ -82,7 +82,7 @@ function getWidgetByType(widgetConfig: WidgetConfig) {
   }
 }
 
-export function getUnexpectedWidgetTypeError(widgetConfig: never) {
+function getUnexpectedWidgetTypeError(widgetConfig: never) {
   const type = (widgetConfig as { type?: unknown })?.type;
   return type ? new NonexistentWidgetTypeError({ type }) : new NoWidgetTypeError();
 }

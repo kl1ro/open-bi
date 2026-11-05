@@ -13,21 +13,24 @@ import {
 export default interface AbsoluteConfig extends AbstractLayoutConfig {
   layout: "absolute";
   children?: WidgetConfig["id"][];
-  arrangement?: Record<string, AbsoluteItemConfig>;
+  arrangement?: AbsoluteArrangement;
 }
 
 export function getAbsoluteConfigWithAdoptedChild(
   parent: AbsoluteConfig,
   child: WidgetConfig,
   deps: GetAbsoluteConfigWithAdoptedChildDeps,
-) {
+): AbsoluteConfig {
   if (hasChild(parent, child) && !deps.itemConfig) return parent;
-
   const absoluteItemConfig = ensureItemConfigParentTypeIsAbsolute(deps.itemConfig);
-  const innerDeps = { ...deps, itemConfig: absoluteItemConfig };
 
   const children = getChildrenWithAdoptedChild(parent, child);
-  const arrangement = getArrangementWithAdoptedChild(parent, child, innerDeps);
+
+  const arrangement = upsertAbsoluteItemToArrangement(
+    child.id,
+    absoluteItemConfig,
+    parent.arrangement,
+  );
 
   return { ...parent, children, arrangement };
 }
@@ -50,22 +53,18 @@ function ensureItemConfigParentTypeIsAbsolute(
   return itemConfig;
 }
 
-function getArrangementWithAdoptedChild(
-  parent: AbsoluteConfig,
-  child: WidgetConfig,
-  deps: GetArrangementWithAdoptedChildDeps,
-) {
-  return { ...parent.arrangement, [child.id]: deps.itemConfig };
-}
-
-interface GetArrangementWithAdoptedChildDeps {
-  itemConfig: AbsoluteItemConfig;
+function upsertAbsoluteItemToArrangement(
+  id: WidgetConfig["id"],
+  itemConfig: AbsoluteItemConfig,
+  arrangement?: AbsoluteArrangement,
+): AbsoluteArrangement {
+  return { ...arrangement, [id]: itemConfig };
 }
 
 export function getAbsoluteConfigWithDisownedChild(
   parent: AbsoluteConfig,
   child: WidgetConfig,
-) {
+): AbsoluteConfig {
   const children = getChildrenWithDisownedChild(parent, child);
   const arrangement = getRecordWithoutKey(parent.arrangement, child.id);
   return { ...parent, children, arrangement };
@@ -88,3 +87,5 @@ export interface AbsoluteItemSize {
   width?: number;
   height?: number;
 }
+
+export type AbsoluteArrangement = Record<WidgetConfig["id"], AbsoluteItemConfig>;
