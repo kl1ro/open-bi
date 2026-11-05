@@ -6,7 +6,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import type { FieldProps } from "@/lib/widget-form";
+import type { WidgetFormFieldProps } from "@/lib/widget-form";
 
 export default function NumberTextField(props: NumberTextFieldProps) {
   return (
@@ -33,7 +33,7 @@ export default function NumberTextField(props: NumberTextFieldProps) {
   );
 }
 
-interface NumberTextFieldProps extends FieldProps {
+interface NumberTextFieldProps extends WidgetFormFieldProps {
   name: "latitude" | "longitude" | "zoom";
   label: string;
 }

@@ -23,10 +23,10 @@ import { Button } from "@/components/ui/button";
 import type WidgetConfig from "@/lib/widget";
 import type { ItemConfig } from "@/lib/widget";
 import {
-  formSchema,
+  WIDGET_FORM_SCHEMA,
   getDefaultFormValues,
   getWidgetConfigFromFormValues,
-  type FormValues,
+  type WidgetFormValues,
 } from "@/lib/widget-form";
 import { upsertWidget } from "@/state/features/dashboard";
 import { useAppDispatch } from "@/state/hooks";
@@ -98,8 +98,8 @@ export interface CreateWidgetDialogProps {
 }
 
 function useCreateWidgetDialogState(props: CreateWidgetDialogProps) {
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<WidgetFormValues>({
+    resolver: zodResolver(WIDGET_FORM_SCHEMA),
     defaultValues: getDefaultFormValues("layout"),
   });
 
@@ -115,7 +115,7 @@ function useCreateWidgetDialogState(props: CreateWidgetDialogProps) {
 }
 
 function tryCreateWidgetFromFormValues(
-  values: FormValues,
+  values: WidgetFormValues,
   deps: TryCreateWidgetFromFormValuesDeps,
 ) {
   try {

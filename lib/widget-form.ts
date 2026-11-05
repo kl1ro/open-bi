@@ -10,7 +10,7 @@ import type GraphConfig from "@/lib/widgets/graph";
 import type MapConfig from "@/lib/widgets/map";
 import { MAP_VIEWS } from "@/lib/widgets/map";
 
-export function getDefaultFormValues(type: FormValues["type"]): FormValues {
+export function getDefaultFormValues(type: WidgetFormValues["type"]): WidgetFormValues {
   switch (type) {
     case "layout":
       return { type, columns: "4", rows: "1" };
@@ -36,7 +36,7 @@ export function getDefaultFormValues(type: FormValues["type"]): FormValues {
 }
 
 export function getWidgetConfigFromFormValues(
-  values: FormValues,
+  values: WidgetFormValues,
   deps: GetWidgetConfigFromFormValuesDeps,
 ): WidgetConfig {
   const id = deps.id ?? crypto.randomUUID();
@@ -70,7 +70,7 @@ function getUnexpectedFormTypeError(type: never) {
 }
 
 function getGridConfigFromFormValues(
-  values: LayoutFormValues,
+  values: LayoutWidgetFormValues,
   deps: GetGridConfigFromFormValuesDeps,
 ): GridConfig {
   return {
@@ -91,7 +91,7 @@ interface GetGridConfigFromFormValuesDeps {
 }
 
 function getTitleConfigFromFormValues(
-  values: TitleFormValues,
+  values: TitleWidgetFormValues,
   deps: GetTitleConfigFromFormValuesDeps,
 ): TitleConfig {
   return { id: deps.id, parentId: deps.parentId, type: "title", text: values.text };
@@ -103,7 +103,7 @@ interface GetTitleConfigFromFormValuesDeps {
 }
 
 function getGraphConfigFromFormValues(
-  values: GraphFormValues,
+  values: GraphWidgetFormValues,
   deps: GetGraphConfigFromFormValuesDeps,
 ): GraphConfig {
   return { id: deps.id, parentId: deps.parentId, type: "graph", graph: "line" };
@@ -115,7 +115,7 @@ interface GetGraphConfigFromFormValuesDeps {
 }
 
 function getMapConfigFromFormValues(
-  values: MapFormValues,
+  values: MapWidgetFormValues,
   deps: GetMapConfigFromFormValuesDeps,
 ): MapConfig {
   return {
@@ -161,11 +161,11 @@ export class NonexistentFormTypeError extends Error {
   }
 }
 
-export interface FieldProps {
-  form: UseFormReturn<FormValues>;
+export interface WidgetFormFieldProps {
+  form: UseFormReturn<WidgetFormValues>;
 }
 
-export const formSchema = z.discriminatedUnion("type", [
+export const WIDGET_FORM_SCHEMA = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("layout"),
     columns: z.enum(SPACING_OPTIONS),
@@ -200,8 +200,8 @@ function isNumberInRange(value: string, min: number, max: number) {
   return value.trim() !== "" && isNumber(number) && number >= min && number <= max;
 }
 
-export type FormValues = z.infer<typeof formSchema>;
-type LayoutFormValues = Extract<FormValues, { type: "layout" }>;
-type TitleFormValues = Extract<FormValues, { type: "title" }>;
-type GraphFormValues = Extract<FormValues, { type: "graph" }>;
-type MapFormValues = Extract<FormValues, { type: "map" }>;
+export type WidgetFormValues = z.infer<typeof WIDGET_FORM_SCHEMA>;
+type LayoutWidgetFormValues = Extract<WidgetFormValues, { type: "layout" }>;
+type TitleWidgetFormValues = Extract<WidgetFormValues, { type: "title" }>;
+type GraphWidgetFormValues = Extract<WidgetFormValues, { type: "graph" }>;
+type MapWidgetFormValues = Extract<WidgetFormValues, { type: "map" }>;

@@ -6,9 +6,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import type { FieldProps } from "@/lib/widget-form";
+import type { WidgetFormFieldProps } from "@/lib/widget-form";
 
-export default function TitleTextField(props: FieldProps) {
+export default function TitleTextField(props: WidgetFormFieldProps) {
   return (
     <FormField
       control={props.form.control}

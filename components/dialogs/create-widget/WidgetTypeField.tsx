@@ -13,12 +13,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  type FormValues,
-  type FieldProps,
+  type WidgetFormValues,
+  type WidgetFormFieldProps,
   getDefaultFormValues,
 } from "@/lib/widget-form";
 
-export default function WidgetTypeField(props: FieldProps) {
+export default function WidgetTypeField(props: WidgetFormFieldProps) {
   return (
     <FormField
       control={props.form.control}
@@ -60,8 +60,8 @@ const WIDGET_TYPE_LABELS = {
   title: "Заголовок",
   graph: "График",
   map: "Карта",
-} as const satisfies { [Type in FormValues["type"]]: string };
+} as const satisfies { [Type in WidgetFormValues["type"]]: string };
 
-function isFormType(type: string): type is FormValues["type"] {
+function isFormType(type: string): type is WidgetFormValues["type"] {
   return Object.hasOwn(WIDGET_TYPE_LABELS, type);
 }

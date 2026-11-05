@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { FieldProps } from "@/lib/widget-form";
+import type { WidgetFormFieldProps } from "@/lib/widget-form";
 import { SPACING_OPTIONS } from "@/lib/widgets/layouts/grid";
 
 export default function SpacingField(props: SpacingFieldProps) {
@@ -47,7 +47,7 @@ export default function SpacingField(props: SpacingFieldProps) {
   );
 }
 
-interface SpacingFieldProps extends FieldProps {
+interface SpacingFieldProps extends WidgetFormFieldProps {
   name: "columns" | "rows";
   label: string;
 }

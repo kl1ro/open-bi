@@ -12,10 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { FieldProps } from "@/lib/widget-form";
+import type { WidgetFormFieldProps } from "@/lib/widget-form";
 import { MAP_VIEWS, type MapView } from "@/lib/widgets/map";
 
-export default function MapViewField(props: FieldProps) {
+export default function MapViewField(props: WidgetFormFieldProps) {
   return (
     <FormField
       control={props.form.control}
