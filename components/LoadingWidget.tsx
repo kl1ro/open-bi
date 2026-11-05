@@ -7,7 +7,7 @@ import {
   FADE_OUT_ANIMATION,
 } from "@/lib/animation";
 
-export default function LoadingWidget() {
+export default function LoadingOverlay() {
   const state = useLoadingWidgetState();
   useLoadingWidgetEffects(state);
 

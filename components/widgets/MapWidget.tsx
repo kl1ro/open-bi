@@ -3,7 +3,7 @@ import { type RefObject, useEffect, useRef, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import type YandexMaps from "yandex-maps";
 
-import LoadingWidget from "@/components/LoadingWidget";
+import LoadingOverlay from "@/components/LoadingWidget";
 import type MapConfig from "@/lib/widgets/map";
 import type { MapView } from "@/lib/widgets/map";
 import { loadYandexMaps } from "@/lib/yandex-maps";
@@ -15,7 +15,7 @@ export default function MapWidget(props: MapConfig) {
   return (
     <div className="relative size-full">
       <div ref={state.container} className="size-full" />
-      <AnimatePresence>{!state.isMapReady.value && <LoadingWidget />}</AnimatePresence>
+      <AnimatePresence>{!state.isMapReady.value && <LoadingOverlay />}</AnimatePresence>
     </div>
   );
 }
