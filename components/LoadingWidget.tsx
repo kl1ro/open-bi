@@ -8,8 +8,8 @@ export default function LoadingWidget() {
   useLoadingWidgetEffects(state);
 
   return (
-    <div className="relative size-full flex justify-center items-center text-center overflow-hidden rounded-xl bg-white/5 ring-1 ring-inset ring-white/10 backdrop-blur-md">
-      <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent motion-safe:animate-glare-sweep" />
+    <div className="relative size-full flex justify-center items-center text-center overflow-hidden rounded-xl bg-white/5 ring-1 ring-inset ring-white/10 backdrop-blur-xl">
+      <div className="absolute inset-y-0 left-0 w-1/3 -skew-x-20 bg-linear-to-r from-transparent via-white/15 to-transparent motion-safe:animate-glare-sweep" />
 
       <AnimatePresence>
         {state.isTakingLong.value && (

@@ -50,11 +50,11 @@
 
   @keyframes glare-sweep {
     from {
-      transform: translateX(-100%);
+      transform: translateX(-150%) skewX(-20deg);
     }
 
     to {
-      transform: translateX(100%);
+      transform: translateX(350%) skewX(-20deg);
     }
   }
 }
