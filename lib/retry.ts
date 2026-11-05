@@ -2,8 +2,8 @@ export function retry<Result>(
   action: () => Promise<Result>,
   deps: RetryDeps,
 ): Promise<Result> {
-  const innerDeps = { ...deps, action };
-  return runAttempt(1, innerDeps);
+  const innerDeps = { ...deps, attempt: 1 };
+  return runAction(action, innerDeps);
 }
 
 export interface RetryDeps {
@@ -15,31 +15,32 @@ export interface RetryOptions {
   baseDelay: number;
 }
 
-function runAttempt<Result>(
-  attempt: number,
-  deps: RunAttemptDeps<Result>,
+function runAction<Result>(
+  action: () => Promise<Result>,
+  deps: RunActionDeps,
 ): Promise<Result> {
-  const result = deps.action();
-  return result.catch((error: unknown) => retryAttemptAfterError(attempt, error, deps));
+  const result = action();
+  return result.catch((error: unknown) => retryActionAfterError(action, error, deps));
 }
 
-interface RunAttemptDeps<Result> {
-  action: () => Promise<Result>;
+interface RunActionDeps {
+  attempt: number;
   options: RetryOptions;
 }
 
-async function retryAttemptAfterError<Result>(
-  attempt: number,
+async function retryActionAfterError<Result>(
+  action: () => Promise<Result>,
   error: unknown,
-  deps: RetryAttemptAfterErrorDeps<Result>,
+  deps: RetryActionAfterErrorDeps,
 ): Promise<Result> {
-  if (isLastAttempt(attempt, deps)) throw error;
-  await waitBeforeNextAttempt(attempt, deps);
-  return runAttempt(attempt + 1, deps);
+  if (isLastAttempt(deps.attempt, deps)) throw error;
+  await waitBeforeNextAttempt(deps.attempt, deps);
+  const innerDeps = { ...deps, attempt: deps.attempt + 1 };
+  return runAction(action, innerDeps);
 }
 
-interface RetryAttemptAfterErrorDeps<Result> {
-  action: () => Promise<Result>;
+interface RetryActionAfterErrorDeps {
+  attempt: number;
   options: RetryOptions;
 }
 
