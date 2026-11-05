@@ -1,7 +1,8 @@
-import { type RefObject, useEffect, useRef } from "react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import type YandexMaps from "yandex-maps";
 
+import LoadingWidget from "@/components/LoadingWidget";
 import type MapConfig from "@/lib/widgets/map";
 import type { MapView } from "@/lib/widgets/map";
 import { loadYandexMaps } from "@/lib/yandex-maps";
@@ -9,7 +10,18 @@ import { loadYandexMaps } from "@/lib/yandex-maps";
 export default function MapWidget(props: MapConfig) {
   const state = useMapWidgetState(props);
   useMapWidgetEffects(state);
-  return <div ref={state.container} className="size-full" />;
+
+  return (
+    <div className="relative size-full">
+      <div ref={state.container} className="size-full" />
+
+      {!state.isMapReady.value && (
+        <div className="absolute inset-0">
+          <LoadingWidget />
+        </div>
+      )}
+    </div>
+  );
 }
 
 function useMapWidgetState(props: MapConfig) {
@@ -17,6 +29,7 @@ function useMapWidgetState(props: MapConfig) {
     container: useRef<HTMLDivElement>(null),
     config: props,
     showBoundary: useErrorBoundary().showBoundary,
+    isMapReady: useIsMapReady(),
   };
 }
 
@@ -28,7 +41,15 @@ interface UseMapWidgetEffectsDeps {
   config: MapConfig;
   container: RefObject<HTMLDivElement | null>;
   showBoundary: (error: unknown) => void;
+  isMapReady: IsMapReadyState;
 }
+
+function useIsMapReady() {
+  const [value, set] = useState(false);
+  return { value, set };
+}
+
+type IsMapReadyState = ReturnType<typeof useIsMapReady>;
 
 function useMapMountEffect(deps: UseMapMountEffectDeps) {
   useEffect(
@@ -46,6 +67,7 @@ interface UseMapMountEffectDeps {
   config: MapConfig;
   container: RefObject<HTMLDivElement | null>;
   showBoundary: (error: unknown) => void;
+  isMapReady: IsMapReadyState;
 }
 
 function mountMapIntoContainer(
@@ -64,6 +86,7 @@ function mountMapIntoContainer(
       const innerDeps = { ...deps, yandexMaps };
       map = createMapInContainer(config, container.current, innerDeps);
       resizeObserver.observe(container.current);
+      deps.isMapReady.set(true);
     })
     .catch((error: unknown) => {
       if (!isUnmounted) deps.showBoundary(error);
@@ -78,6 +101,7 @@ function mountMapIntoContainer(
 
 interface MountMapIntoContainerDeps {
   showBoundary: (error: unknown) => void;
+  isMapReady: IsMapReadyState;
 }
 
 function fitMapToContainer(map: ymaps.Map | undefined) {
