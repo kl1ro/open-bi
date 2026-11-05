@@ -37,6 +37,14 @@ export interface GetResizePreviewDeps {
   itemsToRender: GridItemToRender[];
 }
 
+export function getResizeWithPointerDelta(
+  resize: GridResize,
+  event: PointerEvent<HTMLElement>,
+): GridResize {
+  const delta = getResizePointerDelta(resize, event);
+  return { ...resize, delta };
+}
+
 export function getResizePointerDelta(
   resize: GridResize,
   event: PointerEvent<HTMLElement>,

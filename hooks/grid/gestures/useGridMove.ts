@@ -7,11 +7,14 @@ import { occupySameCells, type GridItemToRender } from "@/lib/widgets/layouts/gr
 import {
   createGesture,
   isGestureInProgress,
-  getGesturePointerDelta,
   haveSameDelta,
 } from "@/lib/widgets/layouts/grid/gesture";
 import type GridMove from "@/lib/widgets/layouts/grid/move";
-import { getMovedItemConfig, getMovePreview } from "@/lib/widgets/layouts/grid/move";
+import {
+  getMovedItemConfig,
+  getMovePreview,
+  getMoveWithPointerDelta,
+} from "@/lib/widgets/layouts/grid/move";
 import { takeOverPointerEvent } from "@/lib/pointer";
 import bindDeps from "@/lib/deps";
 import { upsertWidget } from "@/state/features/dashboard";
@@ -77,9 +80,9 @@ interface TryStartMoveDeps {
 
 function continueMove(deps: ContinueMoveDeps) {
   if (!deps.move) return;
-  const delta = getGesturePointerDelta(deps.move, deps.event);
-  if (haveSameDelta(delta, deps.move.delta)) return;
-  deps.currentGesture.set({ ...deps.move, delta });
+  const continuedMove = getMoveWithPointerDelta(deps.move, deps.event);
+  if (haveSameDelta(continuedMove.delta, deps.move.delta)) return;
+  deps.currentGesture.set(continuedMove);
 }
 
 interface ContinueMoveDeps {
@@ -90,7 +93,8 @@ interface ContinueMoveDeps {
 
 function tryFinishMove(deps: TryFinishMoveDeps) {
   if (!deps.move) return;
-  tryApplyFinishedMove(deps.move, deps);
+  const finishedMove = getMoveWithPointerDelta(deps.move, deps.event);
+  tryApplyMove(finishedMove, deps);
   resetMove(deps);
 }
 
@@ -110,21 +114,18 @@ interface ResetMoveDeps {
   currentGesture: CurrentGridGestureState;
 }
 
-function tryApplyFinishedMove(move: GridMove, deps: TryApplyFinishedMoveDeps) {
+function tryApplyMove(move: GridMove, deps: TryApplyMoveDeps) {
   try {
-    const delta = getGesturePointerDelta(move, deps.event);
-    const finishedMove = { ...move, delta };
-    applyMove(finishedMove, deps);
+    applyMove(move, deps);
   } catch (error) {
     console.error(error);
     toast.error("Не удалось переместить виджет");
   }
 }
 
-interface TryApplyFinishedMoveDeps {
+interface TryApplyMoveDeps {
   grid: GridConfig;
   store: AppStore;
-  event: PointerEvent<HTMLElement>;
 }
 
 function applyMove(move: GridMove, deps: ApplyMoveDeps) {

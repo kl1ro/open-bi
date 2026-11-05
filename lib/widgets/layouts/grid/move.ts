@@ -1,3 +1,5 @@
+import type { PointerEvent } from "react";
+
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getRenderedGridItemKey,
@@ -5,6 +7,7 @@ import {
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
 import {
+  getGesturePointerDelta,
   hasDelta,
   isGestureOwner,
   type AbstractGridGesture,
@@ -29,6 +32,14 @@ export function getMovePreview(
 export interface GetMovePreviewDeps {
   grid: GridConfig;
   itemsToRender: GridItemToRender[];
+}
+
+export function getMoveWithPointerDelta(
+  move: GridMove,
+  event: PointerEvent<HTMLElement>,
+): GridMove {
+  const delta = getGesturePointerDelta(move, event);
+  return { ...move, delta };
 }
 
 export function getMovedItemConfig(

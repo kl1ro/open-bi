@@ -11,7 +11,7 @@ import {
 } from "@/lib/widgets/layouts/grid/gesture";
 import type GridResize from "@/lib/widgets/layouts/grid/resize";
 import {
-  getResizePointerDelta,
+  getResizeWithPointerDelta,
   getResizedItemConfig,
   getResizePreview,
   type GridResizeHandleConfig,
@@ -82,9 +82,9 @@ interface TryStartResizeDeps {
 
 function continueResize(deps: ContinueResizeDeps) {
   if (!deps.resize) return;
-  const delta = getResizePointerDelta(deps.resize, deps.event);
-  if (haveSameDelta(delta, deps.resize.delta)) return;
-  deps.currentGesture.set({ ...deps.resize, delta });
+  const continuedResize = getResizeWithPointerDelta(deps.resize, deps.event);
+  if (haveSameDelta(continuedResize.delta, deps.resize.delta)) return;
+  deps.currentGesture.set(continuedResize);
 }
 
 interface ContinueResizeDeps {
@@ -95,7 +95,8 @@ interface ContinueResizeDeps {
 
 function tryFinishResize(deps: TryFinishResizeDeps) {
   if (!deps.resize) return;
-  tryApplyFinishedResize(deps.resize, deps);
+  const finishedResize = getResizeWithPointerDelta(deps.resize, deps.event);
+  tryApplyResize(finishedResize, deps);
   resetResize(deps);
 }
 
@@ -115,21 +116,18 @@ interface ResetResizeDeps {
   currentGesture: CurrentGridGestureState;
 }
 
-function tryApplyFinishedResize(resize: GridResize, deps: TryApplyFinishedResizeDeps) {
+function tryApplyResize(resize: GridResize, deps: TryApplyResizeDeps) {
   try {
-    const delta = getResizePointerDelta(resize, deps.event);
-    const finishedResize = { ...resize, delta };
-    applyResize(finishedResize, deps);
+    applyResize(resize, deps);
   } catch (error) {
     console.error(error);
     toast.error("Не удалось изменить размер виджета");
   }
 }
 
-interface TryApplyFinishedResizeDeps {
+interface TryApplyResizeDeps {
   grid: GridConfig;
   store: AppStore;
-  event: PointerEvent<HTMLElement>;
 }
 
 function applyResize(resize: GridResize, deps: ApplyResizeDeps) {
