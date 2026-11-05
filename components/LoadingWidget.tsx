@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-import { FADE_IN_OUT_ANIMATION, combineAnimations } from "@/lib/animation";
+import { FADE_IN_OUT_ANIMATION } from "@/lib/animation";
 
 export default function LoadingWidget() {
   const state = useLoadingWidgetState();
@@ -14,7 +14,7 @@ export default function LoadingWidget() {
       <AnimatePresence>
         {state.isTakingLong.value && (
           <motion.p
-            {...combineAnimations([FADE_IN_OUT_ANIMATION])}
+            {...FADE_IN_OUT_ANIMATION}
             className="relative text-sm text-muted-foreground"
           >
             Загружается дольше обычного…
