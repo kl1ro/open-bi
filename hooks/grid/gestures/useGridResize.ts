@@ -2,7 +2,6 @@ import type { PointerEvent, RefObject } from "react";
 import { toast } from "sonner";
 
 import type { CurrentGridGestureState } from "@/hooks/grid/useGridGesture";
-import type { GridResizeHandleConfig } from "@/components/widgets/layouts/grid/GridResizeHandles";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import { occupySameCells, type GridItemToRender } from "@/lib/widgets/layouts/grid";
 import {
@@ -12,9 +11,10 @@ import {
 } from "@/lib/widgets/layouts/grid/gesture";
 import type GridResize from "@/lib/widgets/layouts/grid/resize";
 import {
-  getGridResizeDelta,
+  getResizeWithPointerDelta,
   getResizedItemConfig,
   getResizePreview,
+  type GridResizeHandleConfig,
 } from "@/lib/widgets/layouts/grid/resize";
 import { takeOverPointerEvent } from "@/lib/pointer";
 import bindDeps from "@/lib/deps";
@@ -82,9 +82,9 @@ interface TryStartResizeDeps {
 
 function continueResize(deps: ContinueResizeDeps) {
   if (!deps.resize) return;
-  const delta = getGridResizeDelta(deps.resize, deps);
-  if (haveSameDelta(delta, deps.resize.delta)) return;
-  deps.currentGesture.set({ ...deps.resize, delta });
+  const continuedResize = getResizeWithPointerDelta(deps.resize, deps.event);
+  if (haveSameDelta(continuedResize.delta, deps.resize.delta)) return;
+  deps.currentGesture.set(continuedResize);
 }
 
 interface ContinueResizeDeps {
@@ -94,18 +94,16 @@ interface ContinueResizeDeps {
 }
 
 function tryFinishResize(deps: TryFinishResizeDeps) {
-  if (!deps.resize) return;
-
   try {
-    const delta = getGridResizeDelta(deps.resize, deps);
-    const updatedResize = { ...deps.resize, delta };
-    applyResize(updatedResize, deps);
+    if (!deps.resize) return;
+    const finishedResize = getResizeWithPointerDelta(deps.resize, deps.event);
+    applyResize(finishedResize, deps);
   } catch (error) {
     console.error(error);
     toast.error("Не удалось изменить размер виджета");
+  } finally {
+    resetResize(deps);
   }
-
-  resetResize(deps);
 }
 
 interface TryFinishResizeDeps {
@@ -117,11 +115,13 @@ interface TryFinishResizeDeps {
 }
 
 function resetResize(deps: ResetResizeDeps) {
+  if (!deps.resize) return;
   deps.currentGesture.set(undefined);
 }
 
 interface ResetResizeDeps {
   currentGesture: CurrentGridGestureState;
+  resize?: GridResize;
 }
 
 function applyResize(resize: GridResize, deps: ApplyResizeDeps) {

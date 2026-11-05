@@ -7,11 +7,14 @@ import { occupySameCells, type GridItemToRender } from "@/lib/widgets/layouts/gr
 import {
   createGesture,
   isGestureInProgress,
-  getGridGestureDelta,
   haveSameDelta,
 } from "@/lib/widgets/layouts/grid/gesture";
 import type GridMove from "@/lib/widgets/layouts/grid/move";
-import { getMovedItemConfig, getMovePreview } from "@/lib/widgets/layouts/grid/move";
+import {
+  getMovedItemConfig,
+  getMovePreview,
+  getMoveWithPointerDelta,
+} from "@/lib/widgets/layouts/grid/move";
 import { takeOverPointerEvent } from "@/lib/pointer";
 import bindDeps from "@/lib/deps";
 import { upsertWidget } from "@/state/features/dashboard";
@@ -77,9 +80,9 @@ interface TryStartMoveDeps {
 
 function continueMove(deps: ContinueMoveDeps) {
   if (!deps.move) return;
-  const delta = getGridGestureDelta(deps.move, deps);
-  if (haveSameDelta(delta, deps.move.delta)) return;
-  deps.currentGesture.set({ ...deps.move, delta });
+  const continuedMove = getMoveWithPointerDelta(deps.move, deps.event);
+  if (haveSameDelta(continuedMove.delta, deps.move.delta)) return;
+  deps.currentGesture.set(continuedMove);
 }
 
 interface ContinueMoveDeps {
@@ -89,18 +92,16 @@ interface ContinueMoveDeps {
 }
 
 function tryFinishMove(deps: TryFinishMoveDeps) {
-  if (!deps.move) return;
-
   try {
-    const delta = getGridGestureDelta(deps.move, deps);
-    const updatedMove = { ...deps.move, delta };
-    applyMove(updatedMove, deps);
+    if (!deps.move) return;
+    const finishedMove = getMoveWithPointerDelta(deps.move, deps.event);
+    applyMove(finishedMove, deps);
   } catch (error) {
     console.error(error);
     toast.error("Не удалось переместить виджет");
+  } finally {
+    resetMove(deps);
   }
-
-  resetMove(deps);
 }
 
 interface TryFinishMoveDeps {
@@ -112,11 +113,13 @@ interface TryFinishMoveDeps {
 }
 
 function resetMove(deps: ResetMoveDeps) {
+  if (!deps.move) return;
   deps.currentGesture.set(undefined);
 }
 
 interface ResetMoveDeps {
   currentGesture: CurrentGridGestureState;
+  move?: GridMove;
 }
 
 function applyMove(move: GridMove, deps: ApplyMoveDeps) {

@@ -9,12 +9,15 @@ import type { AppStore } from "@/state/store";
 
 export default function useGridGesture(deps: UseGridGestureDeps) {
   const [value, set] = useState<GridGesture>();
-  const innerDeps = { ...deps, currentGesture: { value, set } };
+  const current = { value, set };
+  const innerDeps = { ...deps, currentGesture: current };
+  const [resize, move] = [useGridResize(innerDeps), useGridMove(innerDeps)];
 
   return {
-    current: { value, set },
-    resize: useGridResize(innerDeps),
-    move: useGridMove(innerDeps),
+    current,
+    resize,
+    move,
+    preview: [...resize.preview, ...move.preview],
   };
 }
 

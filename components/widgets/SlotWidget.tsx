@@ -12,7 +12,7 @@ export default function SlotWidget(props: SlotWidgetProps) {
   return (
     <>
       <button
-        onClick={() => state.setIsFormOpen(true)}
+        onClick={() => state.isFormOpen.set(true)}
         aria-label="Добавить виджет"
         className={cn(
           "size-full",
@@ -26,8 +26,8 @@ export default function SlotWidget(props: SlotWidgetProps) {
       </button>
 
       <CreateWidgetDialog
-        open={state.isFormOpen}
-        setOpen={state.setIsFormOpen}
+        open={state.isFormOpen.value}
+        setOpen={state.isFormOpen.set}
         id={props.id}
         parentId={props.parentId}
         itemConfig={props.itemConfig}
@@ -58,6 +58,12 @@ export interface ComputedChildSlotWidgetProps {
 }
 
 function useSlotWidgetState() {
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  return { isFormOpen, setIsFormOpen };
+  return {
+    isFormOpen: useIsFormOpen(),
+  };
+}
+
+function useIsFormOpen() {
+  const [value, set] = useState(false);
+  return { value, set };
 }

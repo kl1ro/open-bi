@@ -1,21 +1,64 @@
 import type { ApexOptions } from "apexcharts";
+import { AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
+import { useMemo, useState } from "react";
+
+import CurtainOverlay from "@/components/CurtainOverlay";
 
 const ApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
 
 export default function LineGraph() {
+  const state = useLineGraphState();
+
   return (
-    <div className="size-full grid bg-medium">
+    <div className="relative size-full grid bg-medium">
       <ApexChart
-        options={LINE_GRAPH_OPTIONS}
+        options={state.options}
         series={LINE_GRAPH_SERIES}
         type="line"
         height="100%"
       />
+
+      <AnimatePresence>{!state.isGraphReady.value && <CurtainOverlay />}</AnimatePresence>
     </div>
   );
+}
+
+function useLineGraphState() {
+  const deps = { isGraphReady: useIsGraphReady() };
+  return { ...deps, options: useLineGraphOptions(deps) };
+}
+
+function useIsGraphReady() {
+  const [value, set] = useState(false);
+  return { value, set };
+}
+
+type IsGraphReadyState = ReturnType<typeof useIsGraphReady>;
+
+function useLineGraphOptions(deps: UseLineGraphOptionsDeps) {
+  return useMemo(() => getLineGraphOptions(deps), []);
+}
+
+interface UseLineGraphOptionsDeps {
+  isGraphReady: IsGraphReadyState;
+}
+
+function getLineGraphOptions(deps: GetLineGraphOptionsDeps): ApexOptions {
+  return {
+    ...LINE_GRAPH_OPTIONS,
+
+    chart: {
+      ...LINE_GRAPH_OPTIONS.chart,
+      events: { mounted: () => deps.isGraphReady.set(true) },
+    },
+  };
+}
+
+interface GetLineGraphOptionsDeps {
+  isGraphReady: IsGraphReadyState;
 }
 
 const LINE_GRAPH_OPTIONS: ApexOptions = {

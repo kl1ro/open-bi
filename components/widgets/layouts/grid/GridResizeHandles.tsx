@@ -1,6 +1,9 @@
 import type { GridItemToRender } from "@/lib/widgets/layouts/grid";
 import { isGestureOwner } from "@/lib/widgets/layouts/grid/gesture";
-import type { GridResizeSide } from "@/lib/widgets/layouts/grid/resize";
+import type {
+  GridResizeHandleConfig,
+  GridResizeHandleKind,
+} from "@/lib/widgets/layouts/grid/resize";
 import { cn } from "@/lib/utils";
 import type { UseGridGestureInterface } from "@/hooks/grid/useGridGesture";
 
@@ -31,7 +34,7 @@ const RESIZE_HANDLES = [
     name: "top",
     kind: "edge",
     sides: ["top"],
-    cursor: "cursor-row-resize",
+    cursorClass: "cursor-row-resize",
     handleClass: "top-1.5 inset-x-8 h-2",
     gripClass: cn(EDGE_GRIP_CLASS, "h-1.5 w-1/4"),
     activeGripClass: EDGE_ACTIVE_GRIP_CLASS,
@@ -40,7 +43,7 @@ const RESIZE_HANDLES = [
     name: "bottom",
     kind: "edge",
     sides: ["bottom"],
-    cursor: "cursor-row-resize",
+    cursorClass: "cursor-row-resize",
     handleClass: "bottom-1.5 inset-x-8 h-2",
     gripClass: cn(EDGE_GRIP_CLASS, "h-1.5 w-1/4"),
     activeGripClass: EDGE_ACTIVE_GRIP_CLASS,
@@ -49,7 +52,7 @@ const RESIZE_HANDLES = [
     name: "left",
     kind: "edge",
     sides: ["left"],
-    cursor: "cursor-col-resize",
+    cursorClass: "cursor-col-resize",
     handleClass: "left-1.5 inset-y-8 w-2",
     gripClass: cn(EDGE_GRIP_CLASS, "w-1.5 h-1/4"),
     activeGripClass: EDGE_ACTIVE_GRIP_CLASS,
@@ -58,7 +61,7 @@ const RESIZE_HANDLES = [
     name: "right",
     kind: "edge",
     sides: ["right"],
-    cursor: "cursor-col-resize",
+    cursorClass: "cursor-col-resize",
     handleClass: "right-1.5 inset-y-8 w-2",
     gripClass: cn(EDGE_GRIP_CLASS, "w-1.5 h-1/4"),
     activeGripClass: EDGE_ACTIVE_GRIP_CLASS,
@@ -67,7 +70,7 @@ const RESIZE_HANDLES = [
     name: "top-left",
     kind: "corner",
     sides: ["top", "left"],
-    cursor: "cursor-nwse-resize",
+    cursorClass: "cursor-nwse-resize",
     handleClass: "top-1 left-1 size-6",
     gripClass: CORNER_GRIP_CLASS,
     activeGripClass: CORNER_ACTIVE_GRIP_CLASS,
@@ -76,7 +79,7 @@ const RESIZE_HANDLES = [
     name: "top-right",
     kind: "corner",
     sides: ["top", "right"],
-    cursor: "cursor-nesw-resize",
+    cursorClass: "cursor-nesw-resize",
     handleClass: "top-1 right-1 size-6",
     gripClass: cn(CORNER_GRIP_CLASS, "rotate-90"),
     activeGripClass: CORNER_ACTIVE_GRIP_CLASS,
@@ -85,7 +88,7 @@ const RESIZE_HANDLES = [
     name: "bottom-right",
     kind: "corner",
     sides: ["bottom", "right"],
-    cursor: "cursor-nwse-resize",
+    cursorClass: "cursor-nwse-resize",
     handleClass: "bottom-1 right-1 size-6",
     gripClass: cn(CORNER_GRIP_CLASS, "rotate-180"),
     activeGripClass: CORNER_ACTIVE_GRIP_CLASS,
@@ -94,24 +97,12 @@ const RESIZE_HANDLES = [
     name: "bottom-left",
     kind: "corner",
     sides: ["bottom", "left"],
-    cursor: "cursor-nesw-resize",
+    cursorClass: "cursor-nesw-resize",
     handleClass: "bottom-1 left-1 size-6",
     gripClass: cn(CORNER_GRIP_CLASS, "-rotate-90"),
     activeGripClass: CORNER_ACTIVE_GRIP_CLASS,
   },
 ] as const satisfies readonly GridResizeHandleConfig[];
-
-export type GridResizeHandleKind = "edge" | "corner";
-
-export interface GridResizeHandleConfig {
-  name: string;
-  kind: GridResizeHandleKind;
-  sides: readonly GridResizeSide[];
-  cursor: string;
-  handleClass: string;
-  gripClass: string;
-  activeGripClass: string;
-}
 
 function GridResizeHandle(props: GridResizeHandleProps) {
   const isActive = isGestureOwner(props.item, props.gesture.resize.value);
@@ -122,7 +113,7 @@ function GridResizeHandle(props: GridResizeHandleProps) {
         "absolute z-10 pointer-events-auto touch-none flex items-center justify-center",
         "opacity-0 group-hover/item:opacity-100 animated",
         props.handle.handleClass,
-        props.handle.cursor,
+        props.handle.cursorClass,
         isActive && "opacity-100",
       )}
       onPointerDown={(event) => props.gesture.resize.tryStart({ ...props, event })}
