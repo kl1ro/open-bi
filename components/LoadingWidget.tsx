@@ -1,7 +1,11 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-import { FADE_IN_OUT_ANIMATION, FADE_OUT_ANIMATION } from "@/lib/animation";
+import {
+  DELAYED_FADE_OUT_ANIMATION,
+  FADE_IN_OUT_ANIMATION,
+  FADE_OUT_ANIMATION,
+} from "@/lib/animation";
 
 export default function LoadingWidget() {
   const state = useLoadingWidgetState();
@@ -9,17 +13,18 @@ export default function LoadingWidget() {
 
   return (
     <motion.div
-      {...FADE_OUT_ANIMATION}
-      className="absolute inset-0 flex justify-center items-center text-center overflow-hidden rounded-xl bg-white/5 ring-1 ring-inset ring-white/10 backdrop-blur-xl"
+      {...DELAYED_FADE_OUT_ANIMATION}
+      className="absolute inset-0 overflow-hidden rounded-xl bg-white/5 ring-1 ring-inset ring-white/10 backdrop-blur-xl"
     >
-      <div className="relative size-full flex justify-center items-center">
+      <div className="relative size-full flex justify-center items-center text-center">
+        <motion.div {...FADE_OUT_ANIMATION} className="absolute inset-0 bg-dark" />
         <div className="absolute inset-y-0 left-0 w-1/3 -skew-x-20 bg-linear-to-r from-transparent via-white/15 to-transparent motion-safe:animate-glare-sweep" />
 
         <AnimatePresence>
           {state.isTakingLong.value && (
             <motion.p
               {...FADE_IN_OUT_ANIMATION}
-              className="text-sm text-muted-foreground"
+              className="relative text-sm text-muted-foreground"
             >
               Загружается дольше обычного…
             </motion.p>

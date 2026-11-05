@@ -34,6 +34,11 @@ export const FADE_OUT_ANIMATION = {
   transition: BEZIER_TRANSITION,
 } as const satisfies MotionProps;
 
+export const DELAYED_FADE_OUT_ANIMATION = {
+  ...FADE_OUT_ANIMATION,
+  transition: { opacity: { ...BEZIER_TRANSITION.opacity, delay: 0.7 } },
+} as const satisfies MotionProps;
+
 export const SPRING_RESIZE_ANIMATION = {
   layout: true,
   transition: { layout: { type: "spring", stiffness: 200, damping: 20 } },
