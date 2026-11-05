@@ -50,7 +50,7 @@ export default function GridWidget(props: GridConfig) {
       </AnimatePresence>
 
       <AnimatePresence>
-        {[...state.gesture.resize.preview, ...state.gesture.move.preview].map((area) => (
+        {state.gesture.preview.map((area) => (
           <PreviewHighlight key={area.key} area={area} />
         ))}
       </AnimatePresence>

@@ -11,11 +11,13 @@ export default function useGridGesture(deps: UseGridGestureDeps) {
   const [value, set] = useState<GridGesture>();
   const current = { value, set };
   const innerDeps = { ...deps, currentGesture: current };
+  const [resize, move] = [useGridResize(innerDeps), useGridMove(innerDeps)];
 
   return {
     current,
-    resize: useGridResize(innerDeps),
-    move: useGridMove(innerDeps),
+    resize,
+    move,
+    preview: [...resize.preview, ...move.preview],
   };
 }
 
