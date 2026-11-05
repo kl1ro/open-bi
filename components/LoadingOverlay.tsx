@@ -1,11 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-import {
-  DELAYED_FADE_OUT_ANIMATION,
-  FADE_IN_OUT_ANIMATION,
-  FADE_OUT_ANIMATION,
-} from "@/lib/animation";
+import { DELAYED_FADE_OUT_ANIMATION, FADE_IN_OUT_ANIMATION } from "@/lib/animation";
 
 export default function LoadingOverlay() {
   const state = useLoadingOverlayState();
@@ -17,7 +13,6 @@ export default function LoadingOverlay() {
       className="absolute inset-0 overflow-hidden rounded-xl bg-white/5 ring-1 ring-inset ring-white/10 backdrop-blur-xl"
     >
       <div className="relative size-full flex justify-center items-center text-center">
-        <motion.div {...FADE_OUT_ANIMATION} className="absolute inset-0 bg-medium" />
         <div className="absolute inset-y-0 left-0 w-1/3 -skew-x-20 bg-linear-to-r from-transparent via-white/15 to-transparent motion-safe:animate-glare-sweep" />
 
         <AnimatePresence>
