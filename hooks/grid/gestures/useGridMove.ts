@@ -92,10 +92,16 @@ interface ContinueMoveDeps {
 }
 
 function tryFinishMove(deps: TryFinishMoveDeps) {
-  if (!deps.move) return;
-  const finishedMove = getMoveWithPointerDelta(deps.move, deps.event);
-  tryApplyMove(finishedMove, deps);
-  resetMove(deps);
+  try {
+    if (!deps.move) return;
+    const finishedMove = getMoveWithPointerDelta(deps.move, deps.event);
+    applyMove(finishedMove, deps);
+  } catch (error) {
+    console.error(error);
+    toast.error("Не удалось переместить виджет");
+  } finally {
+    resetMove(deps);
+  }
 }
 
 interface TryFinishMoveDeps {
@@ -107,25 +113,13 @@ interface TryFinishMoveDeps {
 }
 
 function resetMove(deps: ResetMoveDeps) {
+  if (!deps.move) return;
   deps.currentGesture.set(undefined);
 }
 
 interface ResetMoveDeps {
   currentGesture: CurrentGridGestureState;
-}
-
-function tryApplyMove(move: GridMove, deps: TryApplyMoveDeps) {
-  try {
-    applyMove(move, deps);
-  } catch (error) {
-    console.error(error);
-    toast.error("Не удалось переместить виджет");
-  }
-}
-
-interface TryApplyMoveDeps {
-  grid: GridConfig;
-  store: AppStore;
+  move?: GridMove;
 }
 
 function applyMove(move: GridMove, deps: ApplyMoveDeps) {
