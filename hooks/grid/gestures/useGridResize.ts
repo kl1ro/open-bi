@@ -2,7 +2,6 @@ import type { PointerEvent, RefObject } from "react";
 import { toast } from "sonner";
 
 import type { CurrentGridGestureState } from "@/hooks/grid/useGridGesture";
-import type { GridResizeHandleConfig } from "@/components/widgets/layouts/grid/GridResizeHandles";
 import type GridConfig from "@/lib/widgets/layouts/grid";
 import { occupySameCells, type GridItemToRender } from "@/lib/widgets/layouts/grid";
 import {
@@ -15,6 +14,7 @@ import {
   getGridResizeDelta,
   getResizedItemConfig,
   getResizePreview,
+  type GridResizeHandleConfig,
 } from "@/lib/widgets/layouts/grid/resize";
 import { takeOverPointerEvent } from "@/lib/pointer";
 import bindDeps from "@/lib/deps";

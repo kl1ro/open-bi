@@ -1,6 +1,9 @@
 import type { GridItemToRender } from "@/lib/widgets/layouts/grid";
 import { isGestureOwner } from "@/lib/widgets/layouts/grid/gesture";
-import type { GridResizeSide } from "@/lib/widgets/layouts/grid/resize";
+import type {
+  GridResizeHandleConfig,
+  GridResizeHandleKind,
+} from "@/lib/widgets/layouts/grid/resize";
 import { cn } from "@/lib/utils";
 import type { UseGridGestureInterface } from "@/hooks/grid/useGridGesture";
 
@@ -100,18 +103,6 @@ const RESIZE_HANDLES = [
     activeGripClass: CORNER_ACTIVE_GRIP_CLASS,
   },
 ] as const satisfies readonly GridResizeHandleConfig[];
-
-export type GridResizeHandleKind = "edge" | "corner";
-
-export interface GridResizeHandleConfig {
-  name: string;
-  kind: GridResizeHandleKind;
-  sides: readonly GridResizeSide[];
-  cursor: string;
-  handleClass: string;
-  gripClass: string;
-  activeGripClass: string;
-}
 
 function GridResizeHandle(props: GridResizeHandleProps) {
   const isActive = isGestureOwner(props.item, props.gesture.resize.value);

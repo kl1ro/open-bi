@@ -243,3 +243,15 @@ interface GridResizeSideGeometry {
   position: keyof GridItemConfig["position"];
   span: keyof GridItemConfig["size"];
 }
+
+export type GridResizeHandleKind = "edge" | "corner";
+
+export interface GridResizeHandleConfig {
+  name: string;
+  kind: GridResizeHandleKind;
+  sides: readonly GridResizeSide[];
+  cursor: string;
+  handleClass: string;
+  gripClass: string;
+  activeGripClass: string;
+}
