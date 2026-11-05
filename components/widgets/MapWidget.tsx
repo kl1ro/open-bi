@@ -3,7 +3,7 @@ import { type RefObject, useEffect, useRef, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import type YandexMaps from "yandex-maps";
 
-import LoadingOverlay from "@/components/LoadingWidget";
+import LoadingOverlay from "@/components/LoadingOverlay";
 import type MapConfig from "@/lib/widgets/map";
 import type { MapView } from "@/lib/widgets/map";
 import { loadYandexMaps } from "@/lib/yandex-maps";

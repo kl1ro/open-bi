@@ -8,8 +8,8 @@ import {
 } from "@/lib/animation";
 
 export default function LoadingOverlay() {
-  const state = useLoadingWidgetState();
-  useLoadingWidgetEffects(state);
+  const state = useLoadingOverlayState();
+  useLoadingOverlayEffects(state);
 
   return (
     <motion.div
@@ -35,17 +35,17 @@ export default function LoadingOverlay() {
   );
 }
 
-function useLoadingWidgetState() {
+function useLoadingOverlayState() {
   return {
     isTakingLong: useIsTakingLong(),
   };
 }
 
-function useLoadingWidgetEffects(deps: UseLoadingWidgetEffectsDeps) {
+function useLoadingOverlayEffects(deps: UseLoadingOverlayEffectsDeps) {
   useLongLoadingNoticeEffect(deps);
 }
 
-interface UseLoadingWidgetEffectsDeps {
+interface UseLoadingOverlayEffectsDeps {
   isTakingLong: IsTakingLongState;
 }
 
