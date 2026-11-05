@@ -7,7 +7,7 @@ import { occupySameCells, type GridItemToRender } from "@/lib/widgets/layouts/gr
 import {
   createGesture,
   isGestureInProgress,
-  getGridGestureDelta,
+  getGesturePointerDelta,
   haveSameDelta,
 } from "@/lib/widgets/layouts/grid/gesture";
 import type GridMove from "@/lib/widgets/layouts/grid/move";
@@ -77,7 +77,7 @@ interface TryStartMoveDeps {
 
 function continueMove(deps: ContinueMoveDeps) {
   if (!deps.move) return;
-  const delta = getGridGestureDelta(deps.move, deps);
+  const delta = getGesturePointerDelta(deps.move, deps.event);
   if (haveSameDelta(delta, deps.move.delta)) return;
   deps.currentGesture.set({ ...deps.move, delta });
 }
@@ -112,7 +112,7 @@ interface ResetMoveDeps {
 
 function tryApplyFinishedMove(move: GridMove, deps: TryApplyFinishedMoveDeps) {
   try {
-    const delta = getGridGestureDelta(move, deps);
+    const delta = getGesturePointerDelta(move, deps.event);
     const finishedMove = { ...move, delta };
     applyMove(finishedMove, deps);
   } catch (error) {

@@ -11,7 +11,7 @@ import {
 } from "@/lib/widgets/layouts/grid/gesture";
 import type GridResize from "@/lib/widgets/layouts/grid/resize";
 import {
-  getGridResizeDelta,
+  getResizePointerDelta,
   getResizedItemConfig,
   getResizePreview,
   type GridResizeHandleConfig,
@@ -82,7 +82,7 @@ interface TryStartResizeDeps {
 
 function continueResize(deps: ContinueResizeDeps) {
   if (!deps.resize) return;
-  const delta = getGridResizeDelta(deps.resize, deps);
+  const delta = getResizePointerDelta(deps.resize, deps.event);
   if (haveSameDelta(delta, deps.resize.delta)) return;
   deps.currentGesture.set({ ...deps.resize, delta });
 }
@@ -117,7 +117,7 @@ interface ResetResizeDeps {
 
 function tryApplyFinishedResize(resize: GridResize, deps: TryApplyFinishedResizeDeps) {
   try {
-    const delta = getGridResizeDelta(resize, deps);
+    const delta = getResizePointerDelta(resize, deps.event);
     const finishedResize = { ...resize, delta };
     applyResize(finishedResize, deps);
   } catch (error) {

@@ -47,20 +47,16 @@ export interface CreateGestureDeps {
   widgetConfigs: WidgetConfigsById;
 }
 
-export function getGridGestureDelta(
+export function getGesturePointerDelta(
   gesture: AbstractGridGesture,
-  deps: GetGridGestureDeltaDeps,
+  event: PointerEvent<HTMLElement>,
 ): GridDelta {
   const [rows, columns] = [
-    (deps.event.clientY - gesture.startPoint.clientY) / gesture.cellPitch.height,
-    (deps.event.clientX - gesture.startPoint.clientX) / gesture.cellPitch.width,
+    (event.clientY - gesture.startPoint.clientY) / gesture.cellPitch.height,
+    (event.clientX - gesture.startPoint.clientX) / gesture.cellPitch.width,
   ];
 
   return { rows: Math.round(rows), columns: Math.round(columns) };
-}
-
-export interface GetGridGestureDeltaDeps {
-  event: PointerEvent<HTMLElement>;
 }
 
 function getGridContainer(deps: GetGridContainerDeps) {

@@ -7,7 +7,7 @@ import {
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
 import {
-  getGridGestureDelta,
+  getGesturePointerDelta,
   type GridDelta,
   hasDelta,
   isGestureOwner,
@@ -37,21 +37,17 @@ export interface GetResizePreviewDeps {
   itemsToRender: GridItemToRender[];
 }
 
-export function getGridResizeDelta(
+export function getResizePointerDelta(
   resize: GridResize,
-  deps: GetGridResizeDeltaDeps,
+  event: PointerEvent<HTMLElement>,
 ): GridDelta {
   const axes = new Set(resize.sides.map((side) => RESIZE_SIDES[side].axis));
-  const gestureDelta = getGridGestureDelta(resize, deps);
+  const gestureDelta = getGesturePointerDelta(resize, event);
 
   return {
     rows: axes.has("rows") ? gestureDelta.rows : 0,
     columns: axes.has("columns") ? gestureDelta.columns : 0,
   };
-}
-
-export interface GetGridResizeDeltaDeps {
-  event: PointerEvent<HTMLElement>;
 }
 
 export function getResizedItemConfig(
