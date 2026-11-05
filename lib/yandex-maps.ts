@@ -1,13 +1,14 @@
 import type YandexMaps from "yandex-maps";
 
-import { type RetryDeps, retry } from "@/lib/retry";
+import { type RetryOptions, retry } from "@/lib/retry";
 import { loadScript } from "@/lib/scripts";
 
 const YANDEX_MAPS_API_URL = "https://api-maps.yandex.ru/2.1/?lang=en_US";
-const YANDEX_MAPS_LOADING_RETRY: RetryDeps = { attempts: 3, baseDelay: 500 };
+const YANDEX_MAPS_LOADING_RETRY_OPTIONS: RetryOptions = { attempts: 3, baseDelay: 500 };
 
 export function loadYandexMaps(): Promise<typeof YandexMaps> {
-  return retry(loadYandexMapsOnce, YANDEX_MAPS_LOADING_RETRY);
+  const deps = { options: YANDEX_MAPS_LOADING_RETRY_OPTIONS };
+  return retry(loadYandexMapsOnce, deps);
 }
 
 async function loadYandexMapsOnce(): Promise<typeof YandexMaps> {

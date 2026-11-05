@@ -7,6 +7,10 @@ export function retry<Result>(
 }
 
 export interface RetryDeps {
+  options: RetryOptions;
+}
+
+export interface RetryOptions {
   attempts: number;
   baseDelay: number;
 }
@@ -21,8 +25,7 @@ function runAttempt<Result>(
 
 interface RunAttemptDeps<Result> {
   action: () => Promise<Result>;
-  attempts: number;
-  baseDelay: number;
+  options: RetryOptions;
 }
 
 async function retryAttemptAfterError<Result>(
@@ -37,16 +40,15 @@ async function retryAttemptAfterError<Result>(
 
 interface RetryAttemptAfterErrorDeps<Result> {
   action: () => Promise<Result>;
-  attempts: number;
-  baseDelay: number;
+  options: RetryOptions;
 }
 
 function isLastAttempt(attempt: number, deps: IsLastAttemptDeps) {
-  return attempt >= deps.attempts;
+  return attempt >= deps.options.attempts;
 }
 
 interface IsLastAttemptDeps {
-  attempts: number;
+  options: RetryOptions;
 }
 
 function waitBeforeNextAttempt(attempt: number, deps: WaitBeforeNextAttemptDeps) {
@@ -55,17 +57,17 @@ function waitBeforeNextAttempt(attempt: number, deps: WaitBeforeNextAttemptDeps)
 }
 
 interface WaitBeforeNextAttemptDeps {
-  baseDelay: number;
+  options: RetryOptions;
 }
 
 function getRetryDelay(attempt: number, deps: GetRetryDelayDeps) {
-  const exponentialDelay = deps.baseDelay * 2 ** (attempt - 1);
+  const exponentialDelay = deps.options.baseDelay * 2 ** (attempt - 1);
   const jitteredDelay = exponentialDelay * getJitterFactor();
   return jitteredDelay;
 }
 
 interface GetRetryDelayDeps {
-  baseDelay: number;
+  options: RetryOptions;
 }
 
 function wait(milliseconds: number) {
