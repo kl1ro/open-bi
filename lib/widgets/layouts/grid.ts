@@ -47,6 +47,15 @@ export interface GetGridConfigWithAdoptedChildDeps {
   itemConfig?: ItemConfig;
 }
 
+export function getGridConfigWithDisownedChild(
+  parent: GridConfig,
+  child: WidgetConfig,
+): GridConfig {
+  const children = getChildrenWithDisownedChild(parent, child);
+  const arrangement = getRecordWithoutKey(parent.arrangement, child.id);
+  return { ...parent, children, arrangement };
+}
+
 export function isGridChildRedundant(parent: GridConfig, child: WidgetConfig) {
   const itemConfig = getGridItemConfig(parent, child);
 
@@ -56,12 +65,33 @@ export function isGridChildRedundant(parent: GridConfig, child: WidgetConfig) {
   );
 }
 
-export function is1x1GridItem(itemConfig: GridItemConfig) {
-  return itemConfig.size.rowSpan === 1 && itemConfig.size.colSpan === 1;
+export function occupySameCells(first: GridItemConfig, second: GridItemConfig) {
+  return (
+    first.position.row === second.position.row &&
+    first.position.column === second.position.column &&
+    first.size.rowSpan === second.size.rowSpan &&
+    first.size.colSpan === second.size.colSpan
+  );
 }
 
-export function isGridItemCollapsed(itemConfig: GridItemConfig) {
-  return itemConfig.size.rowSpan === 0 || itemConfig.size.colSpan === 0;
+export function getGridItemsToRender(grid: GridConfig): GridItemToRender[] {
+  if (!grid.arrangement) return [];
+
+  const gridItemsToRender = [
+    ...getGridItemsFromArrangement(grid.arrangement),
+    ...getComputedGridSlots(grid),
+  ];
+
+  return gridItemsToRender;
+}
+
+export interface GridItemToRender {
+  itemConfig: GridItemConfig;
+  id?: WidgetConfig["id"];
+}
+
+export function getRenderedGridItemKey(item: GridItemToRender) {
+  return item.id ?? getGridCoordinateKey(item.itemConfig.position);
 }
 
 function ensureItemConfigParentTypeIsGrid(itemConfig?: ItemConfig) {
@@ -96,24 +126,6 @@ function rearrangeAroundItem(arrangement: GridArrangement, itemId: WidgetConfig[
   return resolvedArrangement;
 }
 
-export function occupySameCells(first: GridItemConfig, second: GridItemConfig) {
-  return (
-    first.position.row === second.position.row &&
-    first.position.column === second.position.column &&
-    first.size.rowSpan === second.size.rowSpan &&
-    first.size.colSpan === second.size.colSpan
-  );
-}
-
-export function getGridConfigWithDisownedChild(
-  parent: GridConfig,
-  child: WidgetConfig,
-): GridConfig {
-  const children = getChildrenWithDisownedChild(parent, child);
-  const arrangement = getRecordWithoutKey(parent.arrangement, child.id);
-  return { ...parent, children, arrangement };
-}
-
 export function getGridItemConfig(gridConfig: GridConfig, widgetConfig: WidgetConfig) {
   const itemConfig = gridConfig.arrangement?.[widgetConfig.id];
 
@@ -126,24 +138,12 @@ export function getGridItemConfig(gridConfig: GridConfig, widgetConfig: WidgetCo
   return itemConfig;
 }
 
-export function getGridItemsToRender(grid: GridConfig): GridItemToRender[] {
-  if (!grid.arrangement) return [];
-
-  const gridItemsToRender = [
-    ...getGridItemsFromArrangement(grid.arrangement),
-    ...getComputedGridSlots(grid),
-  ];
-
-  return gridItemsToRender;
+export function is1x1GridItem(itemConfig: GridItemConfig) {
+  return itemConfig.size.rowSpan === 1 && itemConfig.size.colSpan === 1;
 }
 
-export function getRenderedGridItemKey(item: GridItemToRender) {
-  return item.id ?? getGridCoordinateKey(item.itemConfig.position);
-}
-
-export interface GridItemToRender {
-  itemConfig: GridItemConfig;
-  id?: WidgetConfig["id"];
+export function isGridItemCollapsed(itemConfig: GridItemConfig) {
+  return itemConfig.size.rowSpan === 0 || itemConfig.size.colSpan === 0;
 }
 
 function getGridItemsFromArrangement(arrangement: GridArrangement): GridItemToRender[] {
@@ -163,6 +163,10 @@ function getComputedGridSlots(grid: GridConfig): GridItemToRender[] {
     .map((cell) => ({ itemConfig: create1x1GridItemConfig(cell) }));
 
   return computedSlots;
+}
+
+export function getGridCoordinateKey(cell: GridItemPosition): CoordinateKey {
+  return `${cell.row}-${cell.column}`;
 }
 
 export function getGridOccupancy(grid: GridConfig) {
@@ -185,10 +189,6 @@ function getGridCells(grid: GridConfig) {
     for (let column = 1; column <= grid.columns; column++) cells.push({ row, column });
 
   return cells;
-}
-
-export function getGridCoordinateKey(cell: GridItemPosition): CoordinateKey {
-  return `${cell.row}-${cell.column}`;
 }
 
 function create1x1GridItemConfig(cell: GridItemPosition): GridItemConfig {

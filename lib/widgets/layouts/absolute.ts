@@ -39,6 +39,15 @@ export interface GetAbsoluteConfigWithAdoptedChildDeps {
   itemConfig?: ItemConfig;
 }
 
+export function getAbsoluteConfigWithDisownedChild(
+  parent: AbsoluteConfig,
+  child: WidgetConfig,
+): AbsoluteConfig {
+  const children = getChildrenWithDisownedChild(parent, child);
+  const arrangement = getRecordWithoutKey(parent.arrangement, child.id);
+  return { ...parent, children, arrangement };
+}
+
 function ensureItemConfigParentTypeIsAbsolute(
   itemConfig?: ItemConfig,
 ): AbsoluteItemConfig {
@@ -59,15 +68,6 @@ function upsertAbsoluteItemToArrangement(
   arrangement?: AbsoluteArrangement,
 ): AbsoluteArrangement {
   return { ...arrangement, [id]: itemConfig };
-}
-
-export function getAbsoluteConfigWithDisownedChild(
-  parent: AbsoluteConfig,
-  child: WidgetConfig,
-): AbsoluteConfig {
-  const children = getChildrenWithDisownedChild(parent, child);
-  const arrangement = getRecordWithoutKey(parent.arrangement, child.id);
-  return { ...parent, children, arrangement };
 }
 
 export interface AbsoluteItemConfig {
