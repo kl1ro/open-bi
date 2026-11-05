@@ -95,16 +95,7 @@ interface ContinueResizeDeps {
 
 function tryFinishResize(deps: TryFinishResizeDeps) {
   if (!deps.resize) return;
-
-  try {
-    const delta = getGridResizeDelta(deps.resize, deps);
-    const updatedResize = { ...deps.resize, delta };
-    applyResize(updatedResize, deps);
-  } catch (error) {
-    console.error(error);
-    toast.error("Не удалось изменить размер виджета");
-  }
-
+  tryApplyFinishedResize(deps.resize, deps);
   resetResize(deps);
 }
 
@@ -122,6 +113,23 @@ function resetResize(deps: ResetResizeDeps) {
 
 interface ResetResizeDeps {
   currentGesture: CurrentGridGestureState;
+}
+
+function tryApplyFinishedResize(resize: GridResize, deps: TryApplyFinishedResizeDeps) {
+  try {
+    const delta = getGridResizeDelta(resize, deps);
+    const finishedResize = { ...resize, delta };
+    applyResize(finishedResize, deps);
+  } catch (error) {
+    console.error(error);
+    toast.error("Не удалось изменить размер виджета");
+  }
+}
+
+interface TryApplyFinishedResizeDeps {
+  grid: GridConfig;
+  store: AppStore;
+  event: PointerEvent<HTMLElement>;
 }
 
 function applyResize(resize: GridResize, deps: ApplyResizeDeps) {
