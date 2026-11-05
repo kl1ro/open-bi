@@ -1,14 +1,17 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-import { FADE_IN_OUT_ANIMATION } from "@/lib/animation";
+import { FADE_IN_OUT_ANIMATION, FADE_OUT_ANIMATION } from "@/lib/animation";
 
 export default function LoadingWidget() {
   const state = useLoadingWidgetState();
   useLoadingWidgetEffects(state);
 
   return (
-    <div className="relative size-full flex justify-center items-center text-center overflow-hidden rounded-xl bg-white/5 ring-1 ring-inset ring-white/10 backdrop-blur-xl">
+    <motion.div
+      {...FADE_OUT_ANIMATION}
+      className="relative size-full flex justify-center items-center text-center overflow-hidden rounded-xl bg-white/5 ring-1 ring-inset ring-white/10 backdrop-blur-xl"
+    >
       <div className="absolute inset-y-0 left-0 w-1/3 -skew-x-20 bg-linear-to-r from-transparent via-white/15 to-transparent motion-safe:animate-glare-sweep" />
 
       <AnimatePresence>
@@ -21,7 +24,7 @@ export default function LoadingWidget() {
           </motion.p>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
 

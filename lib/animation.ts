@@ -21,6 +21,19 @@ export const FADE_IN_OUT_ANIMATION = {
   transition: BEZIER_TRANSITION,
 } as const satisfies MotionProps;
 
+export const FADE_OUT_ANIMATION = {
+  initial: "visible",
+  animate: "visible",
+  exit: "exit",
+
+  variants: {
+    visible: { opacity: 1 },
+    exit: { opacity: 0, pointerEvents: "none" },
+  },
+
+  transition: BEZIER_TRANSITION,
+} as const satisfies MotionProps;
+
 export const SPRING_RESIZE_ANIMATION = {
   layout: true,
   transition: { layout: { type: "spring", stiffness: 200, damping: 20 } },

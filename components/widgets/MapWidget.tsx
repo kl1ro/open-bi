@@ -1,3 +1,4 @@
+import { AnimatePresence } from "framer-motion";
 import { type RefObject, useEffect, useRef, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import type YandexMaps from "yandex-maps";
@@ -15,11 +16,13 @@ export default function MapWidget(props: MapConfig) {
     <div className="relative size-full">
       <div ref={state.container} className="size-full" />
 
-      {!state.isMapReady.value && (
-        <div className="absolute inset-0">
-          <LoadingWidget />
-        </div>
-      )}
+      <AnimatePresence>
+        {!state.isMapReady.value && (
+          <div className="absolute inset-0">
+            <LoadingWidget />
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
