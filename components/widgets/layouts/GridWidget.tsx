@@ -1,5 +1,8 @@
 import { type CSSProperties, type ReactNode, useRef } from "react";
 import { AnimatePresence, motion, type MotionProps } from "framer-motion";
+import type GridConfig from "@kl1ro/mip-bi-core/widgets/layouts/grid";
+import type { GridItemConfig } from "@kl1ro/mip-bi-core/widgets/layouts/grid";
+import type WidgetConfig from "@kl1ro/mip-bi-core/widget";
 
 import Widget from "@/components/Widget";
 import SlotWidget from "@/components/widgets/SlotWidget";
@@ -8,16 +11,13 @@ import GridResizeHandles from "@/components/widgets/layouts/grid/GridResizeHandl
 import useGridGesture, {
   type UseGridGestureInterface,
 } from "@/hooks/grid/useGridGesture";
-import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getGridItemsToRender,
   getRenderedGridItemKey,
-  type GridItemConfig,
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
 import type GridPreviewArea from "@/lib/widgets/layouts/grid/preview";
 import type { GridPreviewRole } from "@/lib/widgets/layouts/grid/preview";
-import type WidgetConfig from "@/lib/widget";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/hooks";
 import {

@@ -1,4 +1,4 @@
-import type TitleConfig from "@/lib/widgets/title";
+import type TitleConfig from "@kl1ro/mip-bi-core/widgets/title";
 
 export default function TitleWidget(props: TitleConfig) {
   return (

@@ -1,18 +1,21 @@
-import type GridConfig from "@/lib/widgets/layouts/grid";
+import type GridConfig from "@kl1ro/mip-bi-core/widgets/layouts/grid";
 import {
   getGridConfigWithAdoptedChild,
   getGridItemConfig,
-  getRenderedGridItemKey,
   isGridItemCollapsed,
   occupySameCells,
   type GridItemConfig,
+} from "@kl1ro/mip-bi-core/widgets/layouts/grid";
+import { findItemsOverlap } from "@kl1ro/mip-bi-core/widgets/layouts/grid/overlap";
+
+import {
+  getRenderedGridItemKey,
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
 import {
   isGestureOwner,
   type AbstractGridGesture,
 } from "@/lib/widgets/layouts/grid/gesture";
-import { findItemsOverlap } from "@/lib/widgets/layouts/grid/overlap";
 
 export default interface GridPreviewArea {
   key: string;

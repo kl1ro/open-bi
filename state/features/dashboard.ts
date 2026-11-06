@@ -1,6 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-
-import type WidgetConfig from "@/lib/widget";
+import type WidgetConfig from "@kl1ro/mip-bi-core/widget";
 import {
   findWidgetConfig,
   getChildConfigs,
@@ -15,8 +14,9 @@ import {
   validateWidgetUpdate,
   widgetsHaveSameId,
   type ItemConfig,
-} from "@/lib/widget";
-import type DashboardConfig from "@/lib/dashboard";
+} from "@kl1ro/mip-bi-core/widget";
+import type DashboardConfig from "@kl1ro/mip-bi-core/dashboard";
+
 import type { RootState } from "@/state/store";
 
 const initialDashboardState: DashboardConfig = {

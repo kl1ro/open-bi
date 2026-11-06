@@ -1,6 +1,7 @@
 import { ErrorBoundary } from "react-error-boundary";
 import { toast } from "sonner";
 import type { ReactNode } from "react";
+import type WidgetConfig from "@kl1ro/mip-bi-core/widget";
 
 import BrokenWidget from "@/components/BrokenWidget";
 import GraphWidget from "@/components/widgets/GraphWidget";
@@ -8,7 +9,6 @@ import LayoutWidget from "@/components/widgets/LayoutWidget";
 import TitleWidget from "@/components/widgets/TitleWidget";
 import MapWidget from "@/components/widgets/MapWidget";
 import SlotWidget from "@/components/widgets/SlotWidget";
-import type WidgetConfig from "@/lib/widget";
 import { selectWidgetConfig } from "@/state/features/dashboard";
 import { useAppSelector } from "@/state/hooks";
 

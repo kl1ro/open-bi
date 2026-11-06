@@ -1,9 +1,18 @@
 import type { FallbackProps } from "react-error-boundary";
+import {
+  ItemConfigNotFoundError,
+  WidgetConfigNotFoundError,
+} from "@kl1ro/mip-bi-core/widget";
+import {
+  NoLayoutTypeError,
+  NonexistentLayoutTypeError,
+} from "@kl1ro/mip-bi-core/widgets/layout";
+import {
+  NoGraphTypeError,
+  NonexistentGraphTypeError,
+} from "@kl1ro/mip-bi-core/widgets/graph";
 
 import { NoWidgetTypeError, NonexistentWidgetTypeError } from "@/components/Widget";
-import { ItemConfigNotFoundError, WidgetConfigNotFoundError } from "@/lib/widget";
-import { NoLayoutTypeError, NonexistentLayoutTypeError } from "@/lib/widgets/layout";
-import { NoGraphTypeError, NonexistentGraphTypeError } from "@/lib/widgets/graph";
 import { YandexMapsNotLoadedError } from "@/lib/yandex-maps";
 
 export default function BrokenWidget(props: FallbackProps) {

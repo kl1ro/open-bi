@@ -1,9 +1,10 @@
 import type { PointerEvent } from "react";
+import type GridConfig from "@kl1ro/mip-bi-core/widgets/layouts/grid";
+import type { GridItemConfig } from "@kl1ro/mip-bi-core/widgets/layouts/grid";
+import { findItemsOverlap } from "@kl1ro/mip-bi-core/widgets/layouts/grid/overlap";
 
-import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getRenderedGridItemKey,
-  type GridItemConfig,
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
 import {
@@ -13,7 +14,6 @@ import {
   isGestureOwner,
   type AbstractGridGesture,
 } from "@/lib/widgets/layouts/grid/gesture";
-import { findItemsOverlap } from "@/lib/widgets/layouts/grid/overlap";
 import type GridPreviewArea from "@/lib/widgets/layouts/grid/preview";
 import { getDragPreview, type GridPreviewRole } from "@/lib/widgets/layouts/grid/preview";
 import { clamp } from "@/lib/utils";

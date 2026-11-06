@@ -1,16 +1,16 @@
 import type { PointerEvent, RefObject } from "react";
+import type GridConfig from "@kl1ro/mip-bi-core/widgets/layouts/grid";
+import type { GridItemConfig } from "@kl1ro/mip-bi-core/widgets/layouts/grid";
+import type WidgetConfig from "@kl1ro/mip-bi-core/widget";
+import { getWidgetConfig, type WidgetConfigsById } from "@kl1ro/mip-bi-core/widget";
+import { createSlotConfig } from "@kl1ro/mip-bi-core/widgets/slot";
 
-import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getRenderedGridItemKey,
-  type GridItemConfig,
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
 import type GridMove from "@/lib/widgets/layouts/grid/move";
 import type GridResize from "@/lib/widgets/layouts/grid/resize";
-import type WidgetConfig from "@/lib/widget";
-import { getWidgetConfig, type WidgetConfigsById } from "@/lib/widget";
-import { createSlotConfig } from "@/lib/widgets/slot";
 
 type GridGesture = GridResize | GridMove;
 
