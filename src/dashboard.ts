@@ -34,7 +34,7 @@ export function getDashboardWithAppliedWidget(
   if (hasMovedFromParent(oldWidgetConfig, widgetConfig))
     updated = getDashboardWithWidgetUnlinkedFromParent(updated, oldWidgetConfig);
 
-  updated = getDashboardWithLinkedWidget(updated, widgetConfig, itemConfig);
+  updated = getDashboardWithWidgetLinkedToParent(updated, widgetConfig, itemConfig);
 
   if (oldWidgetConfig && isTurningToSlot(oldWidgetConfig, widgetConfig))
     updated = getDashboardWithoutChildren(updated, oldWidgetConfig);
@@ -66,7 +66,7 @@ function getDashboardWithWidgetUnlinkedFromParent(
   return getDashboardWithUpsertedWidget(dashboard, updatedParent);
 }
 
-function getDashboardWithLinkedWidget(
+function getDashboardWithWidgetLinkedToParent(
   dashboard: DashboardConfig,
   child: WidgetConfig,
   itemConfig?: ItemConfig,
