@@ -37,13 +37,13 @@ export function getDashboardWithAppliedWidget(
   updated = getDashboardWithWidgetLinkedToParent(updated, widgetConfig, itemConfig);
 
   if (oldWidgetConfig && isTurningToSlot(oldWidgetConfig, widgetConfig))
-    updated = getDashboardWithoutChildren(updated, oldWidgetConfig);
+    updated = getDashboardWithoutWidgetChildren(updated, oldWidgetConfig);
 
   if (!hasParentId(widgetConfig) && !isRootConfig(widgetConfig, updated))
     updated = getDashboardWithNewRoot(updated, widgetConfig);
   else updated = getDashboardWithUpsertedWidget(updated, widgetConfig);
 
-  updated = getDashboardWithoutRedundantSiblings(updated, widgetConfig);
+  updated = getDashboardWithoutRedundantWidgetSiblings(updated, widgetConfig);
   return updated;
 }
 
@@ -52,7 +52,7 @@ export function getDashboardWithoutWidgetBranch(
   widgetConfig: WidgetConfig,
 ): DashboardConfig {
   const unlinked = getDashboardWithWidgetUnlinkedFromParent(dashboard, widgetConfig);
-  const withoutDescendants = getDashboardWithoutDescendants(unlinked, widgetConfig);
+  const withoutDescendants = getDashboardWithoutWidgetDescendants(unlinked, widgetConfig);
   return getDashboardWithRemovedWidget(withoutDescendants, widgetConfig);
 }
 
@@ -78,7 +78,7 @@ function getDashboardWithWidgetLinkedToParent(
   return getDashboardWithUpsertedWidget(dashboard, updatedParent);
 }
 
-function getDashboardWithoutChildren(
+function getDashboardWithoutWidgetChildren(
   dashboard: DashboardConfig,
   widgetConfig: WidgetConfig,
 ): DashboardConfig {
@@ -123,16 +123,16 @@ function getDashboardWithUpsertedWidget(
   return { ...dashboard, widgetConfigs };
 }
 
-function getDashboardWithoutRedundantSiblings(
+function getDashboardWithoutRedundantWidgetSiblings(
   dashboard: DashboardConfig,
   oneOfChildren: WidgetConfig,
 ): DashboardConfig {
   if (!hasParentId(oneOfChildren)) return dashboard;
   const parent = getParentConfig(oneOfChildren, dashboard);
-  return getDashboardWithoutRedundantChildren(dashboard, parent);
+  return getDashboardWithoutRedundantWidgetChildren(dashboard, parent);
 }
 
-function getDashboardWithoutDescendants(
+function getDashboardWithoutWidgetDescendants(
   dashboard: DashboardConfig,
   widgetConfig: WidgetConfig,
 ): DashboardConfig {
@@ -166,7 +166,7 @@ export interface FindRootConfigDeps {
   rootId?: WidgetConfig["id"];
 }
 
-function getDashboardWithoutRedundantChildren(
+function getDashboardWithoutRedundantWidgetChildren(
   dashboard: DashboardConfig,
   parent: WidgetConfig,
 ): DashboardConfig {
