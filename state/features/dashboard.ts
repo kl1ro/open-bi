@@ -55,7 +55,8 @@ function handleWidgetRemoval(
 ) {
   const { id } = action.payload;
   const dashboard = current(state);
-  const widgetConfig = findWidgetConfig(id, dashboard);
+  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const widgetConfig = findWidgetConfig(id, deps);
   if (!widgetConfig) return;
   return getDashboardWithoutWidgetBranch(dashboard, widgetConfig);
 }
@@ -65,7 +66,8 @@ interface WidgetRemovalPayload {
 }
 
 export function selectRootConfig(state: RootState): WidgetConfig | undefined {
-  return findRootConfig(state.dashboard);
+  const deps = { dashboard: state.dashboard };
+  return findRootConfig(deps);
 }
 
 export function selectWidgetConfig(
