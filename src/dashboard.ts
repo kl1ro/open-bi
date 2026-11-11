@@ -131,9 +131,9 @@ function getDashboardWithNewRoot(
   dashboard: DashboardConfig,
   widgetConfig: WidgetConfig,
 ): DashboardConfig {
-  const pruned = getDashboardWithoutWidgetsOutside(dashboard, widgetConfig);
-  const upserted = getDashboardWithUpsertedWidget(pruned, widgetConfig);
-  return getDashboardWithRootId(upserted, widgetConfig.id);
+  const descendants = getDescendantConfigs(widgetConfig, dashboard);
+  const widgetConfigs = { ...descendants, [widgetConfig.id]: { ...widgetConfig } };
+  return { widgetConfigs, rootId: widgetConfig.id };
 }
 
 function getDashboardWithUpsertedWidget(
@@ -195,30 +195,4 @@ export function findRootConfig(deps: FindRootConfigDeps): WidgetConfig | undefin
 export interface FindRootConfigDeps {
   widgetConfigs: WidgetConfigsById;
   rootId?: WidgetConfig["id"];
-}
-
-function getDashboardWithoutWidgetsOutside(
-  dashboard: DashboardConfig,
-  subtreeRoot: WidgetConfig,
-): DashboardConfig {
-  const descendants = getDescendantConfigs(subtreeRoot, dashboard);
-  const keptIds = new Set([subtreeRoot.id, ...Object.keys(descendants)]);
-
-  const outside = Object.values(dashboard.widgetConfigs).filter(
-    (config) => !keptIds.has(config.id),
-  );
-
-  const withoutOutside = outside.reduce(
-    (prev, config) => getDashboardWithoutWidget(prev, config),
-    dashboard,
-  );
-
-  return withoutOutside;
-}
-
-function getDashboardWithRootId(
-  dashboard: DashboardConfig,
-  newId: WidgetConfig["id"] | undefined,
-): DashboardConfig {
-  return { ...dashboard, rootId: newId };
 }
