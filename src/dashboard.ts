@@ -43,7 +43,7 @@ export function getDashboardWithAppliedWidget(
     updated = getDashboardWithNewRoot(updated, widgetConfig);
   else updated = getDashboardWithUpsertedWidget(updated, widgetConfig);
 
-  updated = getDashboardWithoutRedundantWidgetSiblings(updated, widgetConfig);
+  updated = getDashboardWithoutWidgetRedundantSiblings(updated, widgetConfig);
   return updated;
 }
 
@@ -123,13 +123,13 @@ function getDashboardWithUpsertedWidget(
   return { ...dashboard, widgetConfigs };
 }
 
-function getDashboardWithoutRedundantWidgetSiblings(
+function getDashboardWithoutWidgetRedundantSiblings(
   dashboard: DashboardConfig,
   oneOfChildren: WidgetConfig,
 ): DashboardConfig {
   if (!hasParentId(oneOfChildren)) return dashboard;
   const parent = getParentConfig(oneOfChildren, dashboard);
-  return getDashboardWithoutRedundantWidgetChildren(dashboard, parent);
+  return getDashboardWithoutWidgetRedundantChildren(dashboard, parent);
 }
 
 function getDashboardWithoutWidgetDescendants(
@@ -166,7 +166,7 @@ export interface FindRootConfigDeps {
   rootId?: WidgetConfig["id"];
 }
 
-function getDashboardWithoutRedundantWidgetChildren(
+function getDashboardWithoutWidgetRedundantChildren(
   dashboard: DashboardConfig,
   parent: WidgetConfig,
 ): DashboardConfig {
