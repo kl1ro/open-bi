@@ -53,7 +53,7 @@ export function getDashboardWithoutWidgetBranch(
 ): DashboardConfig {
   const unlinked = getDashboardWithUnlinkedWidget(dashboard, widgetConfig);
   const withoutDescendants = getDashboardWithoutDescendants(unlinked, widgetConfig);
-  return getDashboardWithoutWidget(withoutDescendants, widgetConfig);
+  return getDashboardWithRemovedWidget(withoutDescendants, widgetConfig);
 }
 
 function getDashboardWithUnlinkedWidget(
@@ -139,14 +139,14 @@ function getDashboardWithoutDescendants(
   const descendants = Object.values(getDescendantConfigs(widgetConfig, dashboard));
 
   const withoutDescendants = descendants.reduce(
-    (prev, descendant) => getDashboardWithoutWidget(prev, descendant),
+    (prev, descendant) => getDashboardWithRemovedWidget(prev, descendant),
     dashboard,
   );
 
   return withoutDescendants;
 }
 
-function getDashboardWithoutWidget(
+function getDashboardWithRemovedWidget(
   dashboard: DashboardConfig,
   widgetConfig: WidgetConfig,
 ): DashboardConfig {
