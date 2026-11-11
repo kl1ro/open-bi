@@ -4,8 +4,8 @@ import { findWidgetConfig, type ItemConfig } from "@kl1ro/mip-bi-core/widget";
 import type DashboardConfig from "@kl1ro/mip-bi-core/dashboard";
 import {
   findRootConfig,
-  getDashboardWithRemovedWidget,
-  getDashboardWithUpsertedWidget,
+  getDashboardWithAppliedWidget,
+  getDashboardWithoutWidgetBranch,
 } from "@kl1ro/mip-bi-core/dashboard";
 
 import type { RootState } from "@/state/store";
@@ -40,8 +40,7 @@ function handleWidgetUpsert(
   action: PayloadAction<WidgetUpsertPayload>,
 ) {
   const { itemConfig, widgetConfig } = action.payload;
-  const deps = { itemConfig };
-  return getDashboardWithUpsertedWidget(current(state), widgetConfig, deps);
+  return getDashboardWithAppliedWidget(current(state), widgetConfig, itemConfig);
 }
 
 interface WidgetUpsertPayload {
@@ -54,7 +53,10 @@ function handleWidgetRemoval(
   action: PayloadAction<WidgetRemovalPayload>,
 ) {
   const { id } = action.payload;
-  return getDashboardWithRemovedWidget(current(state), id);
+  const dashboard = current(state);
+  const widgetConfig = findWidgetConfig(id, dashboard);
+  if (!widgetConfig) return;
+  return getDashboardWithoutWidgetBranch(dashboard, widgetConfig);
 }
 
 interface WidgetRemovalPayload {
