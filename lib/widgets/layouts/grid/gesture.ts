@@ -1,8 +1,9 @@
 import type { PointerEvent, RefObject } from "react";
+import type DashboardConfig from "@kl1ro/mip-bi-core/dashboard";
 import type GridConfig from "@kl1ro/mip-bi-core/widgets/layouts/grid";
 import type { GridItemConfig } from "@kl1ro/mip-bi-core/widgets/layouts/grid";
 import type WidgetConfig from "@kl1ro/mip-bi-core/widget";
-import { getWidgetConfig, type WidgetConfigsById } from "@kl1ro/mip-bi-core/widget";
+import { getWidgetConfig } from "@kl1ro/mip-bi-core/widget";
 import { createSlotConfig } from "@kl1ro/mip-bi-core/widgets/slot";
 
 import {
@@ -44,7 +45,7 @@ export interface CreateGestureDeps {
   item: GridItemToRender;
   grid: GridConfig;
   container: RefObject<HTMLDivElement | null>;
-  widgetConfigs: WidgetConfigsById;
+  dashboard: DashboardConfig;
 }
 
 export function getGesturePointerDelta(
@@ -87,7 +88,7 @@ function getGestureOwner(
 
 interface GetGestureOwnerDeps {
   grid: GridConfig;
-  widgetConfigs: WidgetConfigsById;
+  dashboard: DashboardConfig;
 }
 
 function measureCellPitch(deps: MeasureCellPitchDeps): GridCellPitch {

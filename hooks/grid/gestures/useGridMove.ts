@@ -58,7 +58,7 @@ function tryStartMove(deps: TryStartMoveDeps) {
   try {
     const innerDeps = {
       ...deps,
-      widgetConfigs: deps.store.getState().dashboard.widgetConfigs,
+      dashboard: deps.store.getState().dashboard,
     };
 
     const gesture = createGesture(innerDeps);
