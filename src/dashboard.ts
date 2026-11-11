@@ -32,7 +32,7 @@ export function getDashboardWithAppliedWidget(
   let updated = dashboard;
 
   if (hasMovedFromParent(oldWidgetConfig, widgetConfig))
-    updated = getDashboardWithUnlinkedWidget(updated, oldWidgetConfig);
+    updated = getDashboardWithWidgetUnlinkedFromParent(updated, oldWidgetConfig);
 
   updated = getDashboardWithLinkedWidget(updated, widgetConfig, itemConfig);
 
@@ -51,12 +51,12 @@ export function getDashboardWithoutWidgetBranch(
   dashboard: DashboardConfig,
   widgetConfig: WidgetConfig,
 ): DashboardConfig {
-  const unlinked = getDashboardWithUnlinkedWidget(dashboard, widgetConfig);
+  const unlinked = getDashboardWithWidgetUnlinkedFromParent(dashboard, widgetConfig);
   const withoutDescendants = getDashboardWithoutDescendants(unlinked, widgetConfig);
   return getDashboardWithRemovedWidget(withoutDescendants, widgetConfig);
 }
 
-function getDashboardWithUnlinkedWidget(
+function getDashboardWithWidgetUnlinkedFromParent(
   dashboard: DashboardConfig,
   child: WidgetConfig | undefined,
 ): DashboardConfig {
