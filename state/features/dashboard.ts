@@ -40,7 +40,8 @@ function handleWidgetUpsert(
   action: PayloadAction<WidgetUpsertPayload>,
 ) {
   const { itemConfig, widgetConfig } = action.payload;
-  return getDashboardWithAppliedWidget(current(state), widgetConfig, itemConfig);
+  const dashboard = current(state);
+  return getDashboardWithAppliedWidget(dashboard, widgetConfig, itemConfig);
 }
 
 interface WidgetUpsertPayload {
