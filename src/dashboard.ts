@@ -26,7 +26,8 @@ export function getDashboardWithAppliedWidget(
   widgetConfig: WidgetConfig,
   itemConfig?: ItemConfig,
 ): DashboardConfig {
-  const oldWidgetConfig = findWidgetConfig(widgetConfig.id, dashboard);
+  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const oldWidgetConfig = findWidgetConfig(widgetConfig.id, deps);
   validateWidgetUpdate(oldWidgetConfig, widgetConfig);
 
   let updated = dashboard;
@@ -39,7 +40,9 @@ export function getDashboardWithAppliedWidget(
   if (oldWidgetConfig && isTurningToSlot(oldWidgetConfig, widgetConfig))
     updated = getDashboardWithoutWidgetChildren(updated, oldWidgetConfig);
 
-  if (!hasParentId(widgetConfig) && !isRootConfig(widgetConfig, updated))
+  const innerDeps = { dashboard: updated };
+
+  if (!hasParentId(widgetConfig) && !isRootConfig(widgetConfig, innerDeps))
     updated = getDashboardWithNewRoot(updated, widgetConfig);
   else updated = getDashboardWithUpsertedWidget(updated, widgetConfig);
 
@@ -61,7 +64,8 @@ function getDashboardWithWidgetUnlinkedFromParent(
   child: WidgetConfig | undefined,
 ): DashboardConfig {
   if (!child || !hasParentId(child)) return dashboard;
-  const parent = getParentConfig(child, dashboard);
+  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const parent = getParentConfig(child, deps);
   const updatedParent = getParentConfigWithDisownedChild(parent, child);
   return getDashboardWithUpsertedWidget(dashboard, updatedParent);
 }
@@ -72,8 +76,8 @@ function getDashboardWithWidgetLinkedToParent(
   itemConfig?: ItemConfig,
 ): DashboardConfig {
   if (!hasParentId(child)) return dashboard;
-  const parent = getParentConfig(child, dashboard);
-  const deps = { itemConfig };
+  const deps = { widgetConfigs: dashboard.widgetConfigs, itemConfig };
+  const parent = getParentConfig(child, deps);
   const updatedParent = getParentConfigWithAdoptedChild(parent, child, deps);
   return getDashboardWithUpsertedWidget(dashboard, updatedParent);
 }
@@ -82,7 +86,8 @@ function getDashboardWithoutWidgetChildren(
   dashboard: DashboardConfig,
   widgetConfig: WidgetConfig,
 ): DashboardConfig {
-  const children = getChildConfigs(widgetConfig, dashboard);
+  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const children = getChildConfigs(widgetConfig, deps);
 
   const withoutChildren = children.reduce(
     (prev, child) => getDashboardWithoutWidgetBranch(prev, child),
@@ -98,15 +103,15 @@ export function isRootConfig(widgetConfig: WidgetConfig, deps: IsRootConfigDeps)
 }
 
 export interface IsRootConfigDeps {
-  widgetConfigs: WidgetConfigsById;
-  rootId?: WidgetConfig["id"];
+  dashboard: DashboardConfig;
 }
 
 function getDashboardWithNewRoot(
   dashboard: DashboardConfig,
   widgetConfig: WidgetConfig,
 ): DashboardConfig {
-  const descendants = getDescendantConfigs(widgetConfig, dashboard);
+  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const descendants = getDescendantConfigs(widgetConfig, deps);
   const widgetConfigs = { ...descendants, [widgetConfig.id]: { ...widgetConfig } };
   return { widgetConfigs, rootId: widgetConfig.id };
 }
@@ -128,7 +133,8 @@ function getDashboardWithoutWidgetRedundantSiblings(
   oneOfChildren: WidgetConfig,
 ): DashboardConfig {
   if (!hasParentId(oneOfChildren)) return dashboard;
-  const parent = getParentConfig(oneOfChildren, dashboard);
+  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const parent = getParentConfig(oneOfChildren, deps);
   return getDashboardWithoutWidgetRedundantChildren(dashboard, parent);
 }
 
@@ -136,7 +142,8 @@ function getDashboardWithoutWidgetDescendants(
   dashboard: DashboardConfig,
   widgetConfig: WidgetConfig,
 ): DashboardConfig {
-  const descendants = Object.values(getDescendantConfigs(widgetConfig, dashboard));
+  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const descendants = Object.values(getDescendantConfigs(widgetConfig, deps));
 
   const withoutDescendants = descendants.reduce(
     (prev, descendant) => getDashboardWithRemovedWidget(prev, descendant),
@@ -150,28 +157,30 @@ function getDashboardWithRemovedWidget(
   dashboard: DashboardConfig,
   widgetConfig: WidgetConfig,
 ): DashboardConfig {
-  const rootId = isRootConfig(widgetConfig, dashboard) ? undefined : dashboard.rootId;
+  const deps = { dashboard };
+  const rootId = isRootConfig(widgetConfig, deps) ? undefined : dashboard.rootId;
   const widgetConfigs = { ...dashboard.widgetConfigs };
   delete widgetConfigs[widgetConfig.id];
   return { widgetConfigs, rootId };
 }
 
 export function findRootConfig(deps: FindRootConfigDeps): WidgetConfig | undefined {
-  if (!deps.rootId) return;
-  return findWidgetConfig(deps.rootId, deps);
+  if (!deps.dashboard.rootId) return;
+  const innerDeps = { ...deps, widgetConfigs: deps.dashboard.widgetConfigs };
+  return findWidgetConfig(deps.dashboard.rootId, innerDeps);
 }
 
 export interface FindRootConfigDeps {
-  widgetConfigs: WidgetConfigsById;
-  rootId?: WidgetConfig["id"];
+  dashboard: DashboardConfig;
 }
 
 function getDashboardWithoutWidgetRedundantChildren(
   dashboard: DashboardConfig,
   parent: WidgetConfig,
 ): DashboardConfig {
-  const children = getChildConfigs(parent, dashboard);
-  const redundant = children.filter((child) => isRedundant(child, dashboard));
+  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const children = getChildConfigs(parent, deps);
+  const redundant = children.filter((child) => isRedundant(child, deps));
 
   const withoutRedundant = redundant.reduce(
     (prev, child) => getDashboardWithoutWidgetBranch(prev, child),
