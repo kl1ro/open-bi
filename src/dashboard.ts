@@ -26,7 +26,7 @@ export function getDashboardWithAppliedWidget(
   widgetConfig: WidgetConfig,
   itemConfig?: ItemConfig,
 ): DashboardConfig {
-  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const deps = { dashboard };
   const oldWidgetConfig = findWidgetConfig(widgetConfig.id, deps);
   validateWidgetUpdate(oldWidgetConfig, widgetConfig);
 
@@ -40,7 +40,7 @@ export function getDashboardWithAppliedWidget(
   if (oldWidgetConfig && isTurningToSlot(oldWidgetConfig, widgetConfig))
     updated = getDashboardWithoutWidgetChildren(updated, oldWidgetConfig);
 
-  const innerDeps = { dashboard: updated };
+  const innerDeps = { ...deps, dashboard: updated };
 
   if (!hasParentId(widgetConfig) && !isRootConfig(widgetConfig, innerDeps))
     updated = getDashboardWithNewRoot(updated, widgetConfig);
@@ -64,7 +64,7 @@ function getDashboardWithWidgetUnlinkedFromParent(
   child: WidgetConfig | undefined,
 ): DashboardConfig {
   if (!child || !hasParentId(child)) return dashboard;
-  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const deps = { dashboard };
   const parent = getParentConfig(child, deps);
   const updatedParent = getParentConfigWithDisownedChild(parent, child);
   return getDashboardWithUpsertedWidget(dashboard, updatedParent);
@@ -76,7 +76,7 @@ function getDashboardWithWidgetLinkedToParent(
   itemConfig?: ItemConfig,
 ): DashboardConfig {
   if (!hasParentId(child)) return dashboard;
-  const deps = { widgetConfigs: dashboard.widgetConfigs, itemConfig };
+  const deps = { dashboard, itemConfig };
   const parent = getParentConfig(child, deps);
   const updatedParent = getParentConfigWithAdoptedChild(parent, child, deps);
   return getDashboardWithUpsertedWidget(dashboard, updatedParent);
@@ -86,7 +86,7 @@ function getDashboardWithoutWidgetChildren(
   dashboard: DashboardConfig,
   widgetConfig: WidgetConfig,
 ): DashboardConfig {
-  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const deps = { dashboard };
   const children = getChildConfigs(widgetConfig, deps);
 
   const withoutChildren = children.reduce(
@@ -110,7 +110,7 @@ function getDashboardWithNewRoot(
   dashboard: DashboardConfig,
   widgetConfig: WidgetConfig,
 ): DashboardConfig {
-  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const deps = { dashboard };
   const descendants = getDescendantConfigs(widgetConfig, deps);
   const widgetConfigs = { ...descendants, [widgetConfig.id]: { ...widgetConfig } };
   return { widgetConfigs, rootId: widgetConfig.id };
@@ -133,7 +133,7 @@ function getDashboardWithoutWidgetRedundantSiblings(
   oneOfChildren: WidgetConfig,
 ): DashboardConfig {
   if (!hasParentId(oneOfChildren)) return dashboard;
-  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const deps = { dashboard };
   const parent = getParentConfig(oneOfChildren, deps);
   return getDashboardWithoutWidgetRedundantChildren(dashboard, parent);
 }
@@ -142,7 +142,7 @@ function getDashboardWithoutWidgetDescendants(
   dashboard: DashboardConfig,
   widgetConfig: WidgetConfig,
 ): DashboardConfig {
-  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const deps = { dashboard };
   const descendants = Object.values(getDescendantConfigs(widgetConfig, deps));
 
   const withoutDescendants = descendants.reduce(
@@ -166,8 +166,7 @@ function getDashboardWithRemovedWidget(
 
 export function findRootConfig(deps: FindRootConfigDeps): WidgetConfig | undefined {
   if (!deps.dashboard.rootId) return;
-  const innerDeps = { ...deps, widgetConfigs: deps.dashboard.widgetConfigs };
-  return findWidgetConfig(deps.dashboard.rootId, innerDeps);
+  return findWidgetConfig(deps.dashboard.rootId, deps);
 }
 
 export interface FindRootConfigDeps {
@@ -178,7 +177,7 @@ function getDashboardWithoutWidgetRedundantChildren(
   dashboard: DashboardConfig,
   parent: WidgetConfig,
 ): DashboardConfig {
-  const deps = { widgetConfigs: dashboard.widgetConfigs };
+  const deps = { dashboard };
   const children = getChildConfigs(parent, deps);
   const redundant = children.filter((child) => isRedundant(child, deps));
 

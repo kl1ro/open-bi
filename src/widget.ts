@@ -1,3 +1,4 @@
+import type DashboardConfig from "@/dashboard";
 import type GraphConfig from "@/widgets/graph";
 import type LayoutConfig from "@/widgets/layout";
 import {
@@ -82,7 +83,7 @@ export function getWidgetConfig(id: WidgetConfig["id"], deps: GetWidgetConfigDep
 }
 
 export interface GetWidgetConfigDeps {
-  widgetConfigs: WidgetConfigsById;
+  dashboard: DashboardConfig;
 }
 
 export class WidgetConfigNotFoundError extends Error {
@@ -106,11 +107,11 @@ export function findWidgetConfig(
   id: WidgetConfig["id"],
   deps: FindWidgetConfigDeps,
 ): WidgetConfig | undefined {
-  return deps.widgetConfigs[id];
+  return deps.dashboard.widgetConfigs[id];
 }
 
 export interface FindWidgetConfigDeps {
-  widgetConfigs: WidgetConfigsById;
+  dashboard: DashboardConfig;
 }
 
 export function getParentConfig(
@@ -129,7 +130,7 @@ export function getParentConfig(
 }
 
 export interface GetParentConfigDeps {
-  widgetConfigs: WidgetConfigsById;
+  dashboard: DashboardConfig;
 }
 
 export class ParentConfigNotFoundError extends WidgetConfigNotFoundError {
@@ -163,7 +164,7 @@ export function findParentConfig(
 }
 
 export interface FindParentConfigDeps {
-  widgetConfigs: WidgetConfigsById;
+  dashboard: DashboardConfig;
 }
 
 export function hasParentId(
@@ -196,7 +197,7 @@ export function getChildConfigs(
 }
 
 export interface GetChildConfigsDeps {
-  widgetConfigs: WidgetConfigsById;
+  dashboard: DashboardConfig;
 }
 
 export function getDescendantConfigs(
@@ -223,7 +224,7 @@ export function getDescendantConfigs(
 }
 
 export interface GetDescendantConfigsDeps {
-  widgetConfigs: WidgetConfigsById;
+  dashboard: DashboardConfig;
 }
 
 export function widgetsHaveSameId(first?: WidgetConfig, second?: WidgetConfig) {
@@ -322,7 +323,7 @@ export function isRedundant(widgetConfig: WidgetConfig, deps: IsRedundantDeps) {
 }
 
 export interface IsRedundantDeps {
-  widgetConfigs: WidgetConfigsById;
+  dashboard: DashboardConfig;
 }
 
 export function widgetsHaveSameType(first?: WidgetConfig, second?: WidgetConfig) {
