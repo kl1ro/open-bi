@@ -39,7 +39,10 @@ export function getDashboardWithAppliedWidget(
   if (oldWidgetConfig && isTurningToSlot(oldWidgetConfig, widgetConfig))
     updated = getDashboardWithoutChildren(updated, oldWidgetConfig);
 
-  updated = getDashboardWithPlacedWidget(updated, widgetConfig);
+  if (!hasParentId(widgetConfig) && !isRootConfig(widgetConfig, updated))
+    updated = getDashboardWithNewRoot(updated, widgetConfig);
+  else updated = getDashboardWithUpsertedWidget(updated, widgetConfig);
+
   updated = getDashboardWithoutRedundantSiblings(updated, widgetConfig);
   return updated;
 }
@@ -60,7 +63,7 @@ function getDashboardWithUnlinkedWidget(
   if (!child || !hasParentId(child)) return dashboard;
   const parent = getParentConfig(child, dashboard);
   const updatedParent = getParentConfigWithDisownedChild(parent, child);
-  return getDashboardWithPlacedWidget(dashboard, updatedParent);
+  return getDashboardWithUpsertedWidget(dashboard, updatedParent);
 }
 
 function getDashboardWithLinkedWidget(
@@ -72,7 +75,7 @@ function getDashboardWithLinkedWidget(
   const parent = getParentConfig(child, dashboard);
   const deps = { itemConfig };
   const updatedParent = getParentConfigWithAdoptedChild(parent, child, deps);
-  return getDashboardWithPlacedWidget(dashboard, updatedParent);
+  return getDashboardWithUpsertedWidget(dashboard, updatedParent);
 }
 
 function getDashboardWithoutChildren(
@@ -87,34 +90,6 @@ function getDashboardWithoutChildren(
   );
 
   return withoutChildren;
-}
-
-function getDashboardWithPlacedWidget(
-  dashboard: DashboardConfig,
-  widgetConfig: WidgetConfig,
-): DashboardConfig {
-  if (!hasParentId(widgetConfig) && !isRootConfig(widgetConfig, dashboard))
-    return getDashboardWithNewRoot(dashboard, widgetConfig);
-
-  return getDashboardWithUpsertedWidget(dashboard, widgetConfig);
-}
-
-function getDashboardWithoutRedundantSiblings(
-  dashboard: DashboardConfig,
-  oneOfChildren: WidgetConfig,
-): DashboardConfig {
-  if (!hasParentId(oneOfChildren)) return dashboard;
-  const parent = getParentConfig(oneOfChildren, dashboard);
-  return getDashboardWithoutRedundantChildren(dashboard, parent);
-}
-
-function getDashboardWithoutBranch(
-  dashboard: DashboardConfig,
-  widgetConfig: WidgetConfig,
-): DashboardConfig {
-  const unlinked = getDashboardWithUnlinkedWidget(dashboard, widgetConfig);
-  const withoutDescendants = getDashboardWithoutDescendants(unlinked, widgetConfig);
-  return getDashboardWithoutWidget(withoutDescendants, widgetConfig);
 }
 
 export function isRootConfig(widgetConfig: WidgetConfig, deps: IsRootConfigDeps) {
@@ -146,6 +121,34 @@ function getDashboardWithUpsertedWidget(
   };
 
   return { ...dashboard, widgetConfigs };
+}
+
+function getDashboardWithoutRedundantSiblings(
+  dashboard: DashboardConfig,
+  oneOfChildren: WidgetConfig,
+): DashboardConfig {
+  if (!hasParentId(oneOfChildren)) return dashboard;
+  const parent = getParentConfig(oneOfChildren, dashboard);
+  return getDashboardWithoutRedundantChildren(dashboard, parent);
+}
+
+function getDashboardWithoutBranch(
+  dashboard: DashboardConfig,
+  widgetConfig: WidgetConfig,
+): DashboardConfig {
+  const unlinked = getDashboardWithUnlinkedWidget(dashboard, widgetConfig);
+  const withoutDescendants = getDashboardWithoutDescendants(unlinked, widgetConfig);
+  return getDashboardWithoutWidget(withoutDescendants, widgetConfig);
+}
+
+export function findRootConfig(deps: FindRootConfigDeps): WidgetConfig | undefined {
+  if (!deps.rootId) return;
+  return findWidgetConfig(deps.rootId, deps);
+}
+
+export interface FindRootConfigDeps {
+  widgetConfigs: WidgetConfigsById;
+  rootId?: WidgetConfig["id"];
 }
 
 function getDashboardWithoutRedundantChildren(
@@ -185,14 +188,4 @@ function getDashboardWithoutWidget(
   const widgetConfigs = { ...dashboard.widgetConfigs };
   delete widgetConfigs[widgetConfig.id];
   return { widgetConfigs, rootId };
-}
-
-export function findRootConfig(deps: FindRootConfigDeps): WidgetConfig | undefined {
-  if (!deps.rootId) return;
-  return findWidgetConfig(deps.rootId, deps);
-}
-
-export interface FindRootConfigDeps {
-  widgetConfigs: WidgetConfigsById;
-  rootId?: WidgetConfig["id"];
 }
