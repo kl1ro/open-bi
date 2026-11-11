@@ -40,9 +40,9 @@ export function getDashboardWithAppliedWidget(
   if (oldWidgetConfig && isTurningToSlot(oldWidgetConfig, widgetConfig))
     updated = getDashboardWithoutWidgetChildren(updated, oldWidgetConfig);
 
-  const innerDeps = { ...deps, dashboard: updated };
+  deps.dashboard = updated;
 
-  if (!hasParentId(widgetConfig) && !isRootConfig(widgetConfig, innerDeps))
+  if (!hasParentId(widgetConfig) && !isRootConfig(widgetConfig, deps))
     updated = getDashboardWithNewRoot(updated, widgetConfig);
   else updated = getDashboardWithUpsertedWidget(updated, widgetConfig);
 
