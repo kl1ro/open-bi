@@ -1,4 +1,9 @@
 import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
 
-@Module({})
+import { validateEnvironment } from "./environment.js";
+
+@Module({
+  imports: [ConfigModule.forRoot({ validate: validateEnvironment })],
+})
 export class AppModule {}
