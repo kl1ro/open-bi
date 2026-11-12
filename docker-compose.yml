@@ -34,9 +34,16 @@ services:
       interval: 5s
       retries: 10
 
+  redis:
+    image: redis:8
+
+    volumes:
+      - redis-data:/data
+
 secrets:
   node_auth_token:
     environment: NODE_AUTH_TOKEN
 
 volumes:
   postgres-data:
+  redis-data:
