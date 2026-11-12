@@ -1,5 +1,7 @@
 services:
   api:
+    image: ghcr.io/kl1ro/mip-bi-back:${API_TAG:-latest}
+
     build:
       context: .
       secrets:
