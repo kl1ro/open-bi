@@ -1,5 +1,12 @@
 import { Expose, plainToInstance, Type } from "class-transformer";
-import { IsInt, Max, Min, validateSync, type ValidationError } from "class-validator";
+import {
+  IsInt,
+  IsUrl,
+  Max,
+  Min,
+  validateSync,
+  type ValidationError,
+} from "class-validator";
 
 export default class Environment {
   @Expose({ name: "PORT" })
@@ -8,6 +15,10 @@ export default class Environment {
   @Min(1)
   @Max(65535)
   public port = 3000;
+
+  @Expose({ name: "DATABASE_URL" })
+  @IsUrl({ protocols: ["postgres", "postgresql"], require_tld: false })
+  public databaseUrl: string;
 }
 
 export function validateEnvironment(variables: Record<string, unknown>): Environment {
