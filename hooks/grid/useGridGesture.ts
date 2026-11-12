@@ -1,8 +1,8 @@
 import { type Dispatch, type RefObject, type SetStateAction, useState } from "react";
+import type GridConfig from "@kl1ro/mip-bi-core/widgets/layouts/grid";
 
 import useGridResize from "@/hooks/grid/gestures/useGridResize";
 import useGridMove from "@/hooks/grid/gestures/useGridMove";
-import type GridConfig from "@/lib/widgets/layouts/grid";
 import type { GridItemToRender } from "@/lib/widgets/layouts/grid";
 import type GridGesture from "@/lib/widgets/layouts/grid/gesture";
 import type { AppStore } from "@/state/store";

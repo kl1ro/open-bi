@@ -1,7 +1,6 @@
 import { z } from "zod";
-
-import type DashboardConfig from "@/lib/dashboard";
-import { MAP_VIEWS } from "@/lib/widgets/map";
+import type DashboardConfig from "@kl1ro/mip-bi-core/dashboard";
+import { MAP_VIEWS } from "@kl1ro/mip-bi-core/widgets/map";
 
 const WIDGET_ID_SCHEMA = z.string();
 

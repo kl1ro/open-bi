@@ -1,6 +1,7 @@
+import type GraphConfig from "@kl1ro/mip-bi-core/widgets/graph";
+import { getUnexpectedGraphTypeError } from "@kl1ro/mip-bi-core/widgets/graph";
+
 import LineGraph from "@/components/widgets/graphs/LineGraph";
-import type GraphConfig from "@/lib/widgets/graph";
-import { getUnexpectedGraphTypeError } from "@/lib/widgets/graph";
 
 export default function GraphWidget(props: GraphConfig) {
   switch (props.graph) {

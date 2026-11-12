@@ -1,10 +1,10 @@
 import { useState } from "react";
+import type SlotConfig from "@kl1ro/mip-bi-core/widgets/slot";
+import type WidgetConfig from "@kl1ro/mip-bi-core/widget";
+import type { ItemConfig } from "@kl1ro/mip-bi-core/widget";
 
 import CreateWidgetDialog from "@/components/dialogs/CreateWidgetDialog";
 import { cn } from "@/lib/utils";
-import type SlotConfig from "@/lib/widgets/slot";
-import type WidgetConfig from "@/lib/widget";
-import type { ItemConfig } from "@/lib/widget";
 
 export default function SlotWidget(props: SlotWidgetProps) {
   const state = useSlotWidgetState();

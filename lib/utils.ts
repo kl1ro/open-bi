@@ -13,34 +13,10 @@ export function isNumber(suspect: unknown) {
   return typeof suspect === "number" && !Number.isNaN(suspect);
 }
 
-export function getRecordWithoutKey<Value>(
-  record: Record<string, Value> | undefined,
-  key: string,
-): Record<string, Value> | undefined {
-  if (!record) return;
-
-  const recordWithoutKey = Object.fromEntries(
-    Object.entries(record).filter(([recordKey]) => recordKey !== key),
-  );
-
-  return recordWithoutKey;
-}
-
-export function haveSameElements<Value>(first?: Value[], second?: Value[]) {
-  if (!first || !second) return first === second;
-
-  return (
-    first.every((value) => second.includes(value)) &&
-    second.every((value) => first.includes(value))
-  );
-}
-
 export function isPlainObject(suspect: unknown): suspect is object {
   if (typeof suspect !== "object" || !suspect) return false;
   const prototype: unknown = Object.getPrototypeOf(suspect);
   return prototype === Object.prototype || !prototype;
 }
-
-export type WithRequired<Type, Key extends keyof Type> = Type & Required<Pick<Type, Key>>;
 
 export type CoordinateKey = `${number}-${number}`;

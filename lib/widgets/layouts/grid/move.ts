@@ -1,9 +1,9 @@
 import type { PointerEvent } from "react";
+import type GridConfig from "@kl1ro/mip-bi-core/widgets/layouts/grid";
+import type { GridItemConfig } from "@kl1ro/mip-bi-core/widgets/layouts/grid";
 
-import type GridConfig from "@/lib/widgets/layouts/grid";
 import {
   getRenderedGridItemKey,
-  type GridItemConfig,
   type GridItemToRender,
 } from "@/lib/widgets/layouts/grid";
 import {

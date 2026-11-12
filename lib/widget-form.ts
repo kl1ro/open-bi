@@ -1,14 +1,14 @@
 import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
+import type WidgetConfig from "@kl1ro/mip-bi-core/widget";
+import type GridConfig from "@kl1ro/mip-bi-core/widgets/layouts/grid";
+import type TitleConfig from "@kl1ro/mip-bi-core/widgets/title";
+import type GraphConfig from "@kl1ro/mip-bi-core/widgets/graph";
+import type MapConfig from "@kl1ro/mip-bi-core/widgets/map";
+import { MAP_VIEWS } from "@kl1ro/mip-bi-core/widgets/map";
 
 import { isNumber } from "@/lib/utils";
-import type WidgetConfig from "@/lib/widget";
-import type GridConfig from "@/lib/widgets/layouts/grid";
 import { SPACING_OPTIONS } from "@/lib/widgets/layouts/grid";
-import type TitleConfig from "@/lib/widgets/title";
-import type GraphConfig from "@/lib/widgets/graph";
-import type MapConfig from "@/lib/widgets/map";
-import { MAP_VIEWS } from "@/lib/widgets/map";
 
 export function getDefaultFormValues(type: WidgetFormValues["type"]): WidgetFormValues {
   switch (type) {

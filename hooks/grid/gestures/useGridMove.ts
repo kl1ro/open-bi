@@ -1,9 +1,10 @@
 import type { PointerEvent, RefObject } from "react";
 import { toast } from "sonner";
+import type GridConfig from "@kl1ro/mip-bi-core/widgets/layouts/grid";
+import { occupySameCells } from "@kl1ro/mip-bi-core/widgets/layouts/grid";
 
 import type { CurrentGridGestureState } from "@/hooks/grid/useGridGesture";
-import type GridConfig from "@/lib/widgets/layouts/grid";
-import { occupySameCells, type GridItemToRender } from "@/lib/widgets/layouts/grid";
+import type { GridItemToRender } from "@/lib/widgets/layouts/grid";
 import {
   createGesture,
   isGestureInProgress,
@@ -57,7 +58,7 @@ function tryStartMove(deps: TryStartMoveDeps) {
   try {
     const innerDeps = {
       ...deps,
-      widgetConfigs: deps.store.getState().dashboard.widgetConfigs,
+      dashboard: deps.store.getState().dashboard,
     };
 
     const gesture = createGesture(innerDeps);

@@ -2,11 +2,11 @@ import { AnimatePresence } from "framer-motion";
 import { type RefObject, useEffect, useRef, useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import type YandexMaps from "yandex-maps";
+import type MapConfig from "@kl1ro/mip-bi-core/widgets/map";
+import type { MapView } from "@kl1ro/mip-bi-core/widgets/map";
 
 import CurtainOverlay from "@/components/CurtainOverlay";
 import LoadingOverlay from "@/components/LoadingOverlay";
-import type MapConfig from "@/lib/widgets/map";
-import type { MapView } from "@/lib/widgets/map";
 import { loadYandexMaps } from "@/lib/yandex-maps";
 
 export default function MapWidget(props: MapConfig) {

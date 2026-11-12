@@ -1,3 +1,5 @@
+import { MAP_VIEWS, type MapView } from "@kl1ro/mip-bi-core/widgets/map";
+
 import {
   FormControl,
   FormField,
@@ -13,7 +15,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { WidgetFormFieldProps } from "@/lib/widget-form";
-import { MAP_VIEWS, type MapView } from "@/lib/widgets/map";
 
 export default function MapViewField(props: WidgetFormFieldProps) {
   return (

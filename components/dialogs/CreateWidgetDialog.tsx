@@ -4,6 +4,8 @@ import type { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import type WidgetConfig from "@kl1ro/mip-bi-core/widget";
+import type { ItemConfig } from "@kl1ro/mip-bi-core/widget";
 
 import MapViewField from "@/components/dialogs/create-widget/MapViewField";
 import NumberTextField from "@/components/dialogs/create-widget/NumberTextField";
@@ -20,8 +22,6 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import type WidgetConfig from "@/lib/widget";
-import type { ItemConfig } from "@/lib/widget";
 import {
   WIDGET_FORM_SCHEMA,
   getDefaultFormValues,
