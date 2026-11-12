@@ -1,5 +1,5 @@
 import type DashboardConfig from "@kl1ro/mip-bi-core/dashboard";
-import { DASHBOARD_CONFIG_SCHEMA } from "@kl1ro/mip-bi-core/dashboard-schema";
+import { DASHBOARD_CONFIG_SCHEMA } from "@kl1ro/mip-bi-core/schemas/dashboard";
 
 const DASHBOARD_LOCALSTORAGE_KEY = "dashboard";
 
