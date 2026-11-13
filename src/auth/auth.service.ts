@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { Injectable } from "@nestjs/common";
 import * as argon2 from "argon2";
 import type { Request } from "express";
@@ -57,9 +59,11 @@ async function createUser(credentials: CredentialsDto): Promise<User> {
 }
 
 async function verifyUserPassword(user: User | undefined, password: string) {
-  if (!user) return false;
-  return argon2.verify(user.passwordHash, password);
+  const passwordHash = user?.passwordHash ?? DUMMY_PASSWORD_HASH;
+  return argon2.verify(passwordHash, password);
 }
+
+const DUMMY_PASSWORD_HASH = await hashPassword(randomUUID());
 
 async function hashPassword(password: string) {
   return argon2.hash(password);
