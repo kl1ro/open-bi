@@ -38,12 +38,12 @@ export class MikroOrmUserRepository extends UserRepository {
     try {
       await this.entityManager.insert(USER_SCHEMA, user);
     } catch (error) {
-      throw convertInsertUserError(error, user);
+      throw interpretInsertUserError(error, user);
     }
   }
 }
 
-function convertInsertUserError(error: unknown, user: User): Error {
+function interpretInsertUserError(error: unknown, user: User): Error {
   if (isEmailUniqueViolation(error))
     return new EmailTakenError({ email: user.email, cause: error });
 
