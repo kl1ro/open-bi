@@ -63,11 +63,23 @@ interface CreateSessionOptionsDeps {
 }
 
 async function connectRedisClient(deps: ConnectRedisClientDeps) {
-  return createClient({ url: deps.redisUrl }).connect();
+  try {
+    return await createClient({ url: deps.redisUrl }).connect();
+  } catch (error) {
+    throw new ConnectRedisClientError({ cause: error });
+  }
 }
 
 interface ConnectRedisClientDeps {
   redisUrl: string;
+}
+
+export class ConnectRedisClientError extends Error {
+  public name = ConnectRedisClientError.name;
+
+  public constructor(options: ErrorOptions) {
+    super("Failed to connect to Redis", options);
+  }
 }
 
 export async function startUserSession(user: User, deps: StartUserSessionDeps) {
