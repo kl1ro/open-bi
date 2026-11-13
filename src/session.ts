@@ -1,5 +1,5 @@
 import { RedisStore } from "connect-redis";
-import type { Response } from "express";
+import type { Request, Response } from "express";
 import session, { type Session, type SessionOptions } from "express-session";
 import { createClient } from "redis";
 
@@ -61,6 +61,15 @@ async function connectRedisClient(deps: ConnectRedisClientDeps) {
 
 interface ConnectRedisClientDeps {
   redisUrl: string;
+}
+
+export async function startUserSession(user: User, deps: StartUserSessionDeps) {
+  await startSession(deps.request.session);
+  attachUserToSession(user, deps.request.session);
+}
+
+export interface StartUserSessionDeps {
+  request: Request;
 }
 
 export function startSession(session: Session): Promise<void> {
