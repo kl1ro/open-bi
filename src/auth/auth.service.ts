@@ -25,7 +25,7 @@ export class AuthService {
 
   public async loadSignedInUser(id: User["id"]): Promise<User> {
     const user = await this.userRepository.loadUserById(id);
-    if (!user) throw new SignedInUserNotFoundError({ id });
+    if (!user) throw new UserNotFoundError({ id });
     return user;
   }
 }
@@ -38,12 +38,12 @@ export class InvalidCredentialsError extends Error {
   }
 }
 
-export class SignedInUserNotFoundError extends Error {
-  public name = SignedInUserNotFoundError.name;
+export class UserNotFoundError extends Error {
+  public name = UserNotFoundError.name;
   public id: User["id"];
 
   public constructor(options: ErrorOptions & { id: User["id"] }) {
-    super(`The signed-in user with id of ${options.id} doesn't exist`, options);
+    super(`User with id of ${options.id} doesn't exist`, options);
     this.id = options.id;
   }
 }
