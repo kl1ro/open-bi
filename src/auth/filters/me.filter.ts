@@ -8,7 +8,7 @@ import { BaseExceptionFilter } from "@nestjs/core";
 
 import { UserNotFoundError } from "../auth.service.js";
 
-export function UseSignedInUserFilter() {
+export function UseMeFilter() {
   return UseFilters(UserNotFoundFilter);
 }
 

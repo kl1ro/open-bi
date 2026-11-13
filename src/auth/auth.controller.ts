@@ -18,7 +18,7 @@ import { AuthService } from "./auth.service.js";
 import { CredentialsDto } from "./credentials.dto.js";
 import { UseSignInFilter } from "./filters/sign-in.filter.js";
 import { UseSignUpFilter } from "./filters/sign-up.filter.js";
-import { UseSignedInUserFilter } from "./filters/signed-in-user.filter.js";
+import { UseMeFilter } from "./filters/me.filter.js";
 import { SignedInGuard, SignedInUserId } from "./signed-in.guard.js";
 
 @Controller("auth")
@@ -62,9 +62,9 @@ export class AuthController {
 
   @Get("me")
   @UseGuards(SignedInGuard)
-  @UseSignedInUserFilter()
-  public async getSignedInUser(@SignedInUserId() id: User["id"]): Promise<UserView> {
-    const user = await this.authService.loadSignedInUser(id);
-    return convertUserToView(user);
+  @UseMeFilter()
+  public async getMe(@SignedInUserId() id: User["id"]): Promise<UserView> {
+    const me = await this.authService.loadSignedInUser(id);
+    return convertUserToView(me);
   }
 }
