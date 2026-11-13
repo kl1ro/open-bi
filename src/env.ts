@@ -1,5 +1,6 @@
-import { Expose, plainToInstance, Type } from "class-transformer";
+import { Expose, plainToInstance, Transform, Type } from "class-transformer";
 import {
+  IsBoolean,
   IsInt,
   IsString,
   IsUrl,
@@ -30,6 +31,23 @@ export default class Environment {
   @IsString()
   @MinLength(32)
   public sessionSecret: string;
+
+  @Expose({ name: "COOKIE_SECURE" })
+  @Transform(convertVariableToBoolean)
+  @IsBoolean()
+  public cookieSecure: boolean;
+
+  @Expose({ name: "TRUST_PROXY" })
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  public trustProxy: number;
+}
+
+function convertVariableToBoolean(params: { value: unknown }) {
+  if (params.value === "true") return true;
+  if (params.value === "false") return false;
+  return params.value;
 }
 
 export function validateEnvironment(variables: Record<string, unknown>): Environment {

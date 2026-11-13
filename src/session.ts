@@ -23,6 +23,7 @@ export async function createSessionMiddleware(deps: CreateSessionMiddlewareDeps)
 export interface CreateSessionMiddlewareDeps {
   redisUrl: string;
   sessionSecret: string;
+  cookieSecure: boolean;
 }
 
 async function createRedisSessionStore(
@@ -47,12 +48,18 @@ function createSessionOptions(
     resave: false,
     saveUninitialized: false,
     rolling: true,
-    cookie: { httpOnly: true, sameSite: "lax", maxAge: SESSION_LIFETIME },
+    cookie: {
+      httpOnly: true,
+      secure: deps.cookieSecure,
+      sameSite: "lax",
+      maxAge: SESSION_LIFETIME,
+    },
   };
 }
 
 interface CreateSessionOptionsDeps {
   sessionSecret: string;
+  cookieSecure: boolean;
 }
 
 async function connectRedisClient(deps: ConnectRedisClientDeps) {
