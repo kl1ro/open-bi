@@ -7,7 +7,6 @@ import {
   Post,
   Req,
   Res,
-  UseFilters,
   UseGuards,
 } from "@nestjs/common";
 import type { Request, Response } from "express";
@@ -15,13 +14,13 @@ import type { Request, Response } from "express";
 import { clearSessionCookie, destroySession, startNewSession } from "../session.js";
 import type User from "../users/user.js";
 import { convertUserToView, type UserView } from "../users/user.js";
-import { EmailTakenFilter, InvalidCredentialsFilter } from "./auth-error.filter.js";
+import { UseAuthFilter } from "./auth-error.filter.js";
 import { AuthService } from "./auth.service.js";
 import { CredentialsDto } from "./credentials.dto.js";
 import { SignedInGuard, SignedInUserId } from "./signed-in.guard.js";
 
 @Controller("auth")
-@UseFilters(EmailTakenFilter, InvalidCredentialsFilter)
+@UseAuthFilter()
 export class AuthController {
   public constructor(private readonly authService: AuthService) {}
 
