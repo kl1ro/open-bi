@@ -16,15 +16,17 @@ import type User from "../users/user.js";
 import { convertUserToView, type UserView } from "../users/user.js";
 import { AuthService } from "./auth.service.js";
 import { CredentialsDto } from "./credentials.dto.js";
-import { UseAuthFilter } from "./filters/auth.filter.js";
+import { UseSignInFilter } from "./filters/sign-in.filter.js";
+import { UseSignUpFilter } from "./filters/sign-up.filter.js";
+import { UseSignedInUserFilter } from "./filters/signed-in-user.filter.js";
 import { SignedInGuard, SignedInUserId } from "./signed-in.guard.js";
 
 @Controller("auth")
-@UseAuthFilter()
 export class AuthController {
   public constructor(private readonly authService: AuthService) {}
 
   @Post("sign-up")
+  @UseSignUpFilter()
   public async signUp(
     @Body() credentials: CredentialsDto,
     @Req() request: Request,
@@ -36,6 +38,7 @@ export class AuthController {
   }
 
   @Post("sign-in")
+  @UseSignInFilter()
   @HttpCode(HttpStatus.OK)
   public async signIn(
     @Body() credentials: CredentialsDto,
@@ -59,6 +62,7 @@ export class AuthController {
 
   @Get("me")
   @UseGuards(SignedInGuard)
+  @UseSignedInUserFilter()
   public async getSignedInUser(@SignedInUserId() id: User["id"]): Promise<UserView> {
     const user = await this.authService.loadSignedInUser(id);
     return convertUserToView(user);
