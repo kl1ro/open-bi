@@ -79,6 +79,10 @@ export class StartSessionError extends Error {
   }
 }
 
+export function attachUserToSession(user: User, session: Session) {
+  session.userId = user.id;
+}
+
 export function destroySession(session: Session): Promise<void> {
   return new Promise((resolve, reject) => {
     session.destroy((error: unknown) =>
