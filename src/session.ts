@@ -88,7 +88,7 @@ export class StartSessionError extends Error {
   }
 }
 
-export function attachUserToSession(user: User, session: Session) {
+export function attachUserToSession(user: User, session: Request["session"]) {
   session.userId = user.id;
 }
 
