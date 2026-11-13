@@ -1,13 +1,27 @@
 import {
+  applyDecorators,
   Catch,
   ConflictException,
   UnauthorizedException,
+  UseFilters,
   type ArgumentsHost,
 } from "@nestjs/common";
 import { BaseExceptionFilter } from "@nestjs/core";
 
 import { EmailTakenError } from "../users/user.repository.js";
 import { InvalidCredentialsError } from "./auth.service.js";
+
+export function UseAuthFilter() {
+  return applyDecorators(UseSignUpFilter(), UseSignInFilter());
+}
+
+export function UseSignUpFilter() {
+  return UseFilters(EmailTakenFilter);
+}
+
+export function UseSignInFilter() {
+  return UseFilters(InvalidCredentialsFilter);
+}
 
 @Catch(EmailTakenError)
 export class EmailTakenFilter extends BaseExceptionFilter {
