@@ -1,6 +1,6 @@
 import { RedisStore } from "connect-redis";
 import type { Request, Response } from "express";
-import session, { type SessionOptions } from "express-session";
+import expressSession, { type SessionOptions } from "express-session";
 import { createClient } from "redis";
 
 import type User from "./users/user.js";
@@ -17,7 +17,7 @@ const SESSION_LIFETIME = 30 * 24 * 60 * 60 * 1000;
 export async function createSessionMiddleware(deps: CreateSessionMiddlewareDeps) {
   const store = await createRedisSessionStore(deps);
   const options = createSessionOptions(store, deps);
-  return session(options);
+  return expressSession(options);
 }
 
 export interface CreateSessionMiddlewareDeps {
