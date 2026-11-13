@@ -26,10 +26,22 @@ export class UserInsertFailedError extends Error {
   }
 }
 
-export class UserLoadFailedError extends Error {
-  public name = UserLoadFailedError.name;
+export class UserLoadByEmailFailedError extends Error {
+  public name = UserLoadByEmailFailedError.name;
+  public email: User["email"];
 
-  public constructor(options: ErrorOptions) {
-    super("Failed to load a user", options);
+  public constructor(options: ErrorOptions & { email: User["email"] }) {
+    super(`Failed to load the user with the email ${options.email}`, options);
+    this.email = options.email;
+  }
+}
+
+export class UserLoadByIdFailedError extends Error {
+  public name = UserLoadByIdFailedError.name;
+  public id: User["id"];
+
+  public constructor(options: ErrorOptions & { id: User["id"] }) {
+    super(`Failed to load the user with id of ${options.id}`, options);
+    this.id = options.id;
   }
 }
