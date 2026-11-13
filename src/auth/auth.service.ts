@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import * as argon2 from "argon2";
-import { v7 as uuidv7 } from "uuid";
 import type { Request } from "express";
+import { v7 as uuidv7 } from "uuid";
 
 import { getSessionUserId } from "../session.js";
 import type User from "../users/user.js";
