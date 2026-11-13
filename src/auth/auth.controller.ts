@@ -12,14 +12,13 @@ import {
 import type { Request, Response } from "express";
 
 import { clearSessionCookie, destroySession, startUserSession } from "../session.js";
-import type User from "../users/user.js";
 import { convertUserToView, type UserView } from "../users/user.js";
 import { AuthService } from "./auth.service.js";
 import { CredentialsDto } from "./credentials.dto.js";
 import { UseSignInFilter } from "./filters/sign-in.filter.js";
 import { UseSignUpFilter } from "./filters/sign-up.filter.js";
 import { UseMeFilter } from "./filters/me.filter.js";
-import { SignedInGuard, SignedInUserId } from "./signed-in.guard.js";
+import { SignedInGuard } from "./signed-in.guard.js";
 
 @Controller("auth")
 export class AuthController {
@@ -63,8 +62,8 @@ export class AuthController {
   @Get("me")
   @UseGuards(SignedInGuard)
   @UseMeFilter()
-  public async getMe(@SignedInUserId() id: User["id"]): Promise<UserView> {
-    const me = await this.authService.loadSignedInUser(id);
+  public async getMe(@Req() request: Request): Promise<UserView> {
+    const me = await this.authService.loadMe(request);
     return convertUserToView(me);
   }
 }

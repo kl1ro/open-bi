@@ -1,5 +1,4 @@
 import {
-  createParamDecorator,
   Injectable,
   UnauthorizedException,
   type CanActivate,
@@ -16,10 +15,6 @@ export class SignedInGuard implements CanActivate {
     return true;
   }
 }
-
-export const SignedInUserId = createParamDecorator(
-  (data: unknown, context: ExecutionContext) => getSignedInUserId(context),
-);
 
 function getSignedInUserId(context: ExecutionContext): User["id"] {
   const request = context.switchToHttp().getRequest<Request>();

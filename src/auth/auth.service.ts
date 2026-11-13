@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import * as argon2 from "argon2";
 import { v7 as uuidv7 } from "uuid";
+import type { Request } from "express";
 
 import type User from "../users/user.js";
 import { UserRepository } from "../users/user.repository.js";
@@ -23,9 +24,10 @@ export class AuthService {
     return user;
   }
 
-  public async loadSignedInUser(id: User["id"]): Promise<User> {
-    const user = await this.userRepository.loadUserById(id);
-    if (!user) throw new UserNotFoundError({ id });
+  public async loadMe(request: Request): Promise<User> {
+    const myId = request.session.id;
+    const user = await this.userRepository.loadUserById(myId);
+    if (!user) throw new UserNotFoundError({ id: myId });
     return user;
   }
 }
