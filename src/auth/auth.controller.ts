@@ -14,9 +14,9 @@ import type { Request, Response } from "express";
 import { clearSessionCookie, destroySession, startNewSession } from "../session.js";
 import type User from "../users/user.js";
 import { convertUserToView, type UserView } from "../users/user.js";
-import { UseAuthFilter } from "./filters/auth.filter.js";
 import { AuthService } from "./auth.service.js";
 import { CredentialsDto } from "./credentials.dto.js";
+import { UseAuthFilter } from "./filters/auth.filter.js";
 import { SignedInGuard, SignedInUserId } from "./signed-in.guard.js";
 
 @Controller("auth")

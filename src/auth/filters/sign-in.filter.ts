@@ -1,4 +1,9 @@
-import { ArgumentsHost, Catch, UnauthorizedException, UseFilters } from "@nestjs/common";
+import {
+  Catch,
+  UnauthorizedException,
+  UseFilters,
+  type ArgumentsHost,
+} from "@nestjs/common";
 import { BaseExceptionFilter } from "@nestjs/core";
 
 import { InvalidCredentialsError } from "../auth.service.js";

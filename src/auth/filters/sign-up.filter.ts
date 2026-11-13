@@ -1,4 +1,4 @@
-import { ArgumentsHost, Catch, ConflictException, UseFilters } from "@nestjs/common";
+import { Catch, ConflictException, UseFilters, type ArgumentsHost } from "@nestjs/common";
 import { BaseExceptionFilter } from "@nestjs/core";
 
 import { EmailTakenError } from "../../users/user.repository.js";
