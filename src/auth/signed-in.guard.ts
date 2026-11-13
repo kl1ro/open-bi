@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import type { Request } from "express";
 
+import { findSessionUserId } from "../session.js";
 import type User from "../users/user.js";
 
 @Injectable()
@@ -18,6 +19,7 @@ export class SignedInGuard implements CanActivate {
 
 function getSignedInUserId(context: ExecutionContext): User["id"] {
   const request = context.switchToHttp().getRequest<Request>();
-  if (!request.session.userId) throw new UnauthorizedException();
-  return request.session.userId;
+  const userId = findSessionUserId(request.session);
+  if (!userId) throw new UnauthorizedException();
+  return userId;
 }
