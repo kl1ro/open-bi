@@ -12,6 +12,8 @@ services:
       DATABASE_URL: postgres://mip_bi:${POSTGRES_PASSWORD}@postgres:5432/mip_bi
       REDIS_URL: redis://redis:6379
       SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET}
+      COOKIE_SECURE: "false"
+      TRUST_PROXY: 0
 
     ports:
       - "3000:3000"
