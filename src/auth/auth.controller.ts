@@ -30,8 +30,8 @@ export class AuthController {
     @Body() credentials: CredentialsDto,
     @Req() request: Request,
   ): Promise<UserView> {
-    const user = await this.authService.signUp(credentials);
     const deps = { request };
+    const user = await this.authService.signUp(credentials);
     await startUserSession(user, deps);
     return convertUserToView(user);
   }
@@ -43,8 +43,8 @@ export class AuthController {
     @Body() credentials: CredentialsDto,
     @Req() request: Request,
   ): Promise<UserView> {
-    const user = await this.authService.signIn(credentials);
     const deps = { request };
+    const user = await this.authService.signIn(credentials);
     await startUserSession(user, deps);
     return convertUserToView(user);
   }
