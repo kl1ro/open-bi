@@ -1,29 +1,24 @@
 import {
   Catch,
   ConflictException,
-  InternalServerErrorException,
   UnauthorizedException,
   type ArgumentsHost,
-  type HttpException,
 } from "@nestjs/common";
 import { BaseExceptionFilter } from "@nestjs/core";
 
 import { EmailTakenError } from "../users/user.repository.js";
 import { InvalidCredentialsError } from "./auth.service.js";
 
-@Catch(EmailTakenError, InvalidCredentialsError)
-export class AuthErrorFilter extends BaseExceptionFilter {
-  public catch(error: unknown, host: ArgumentsHost) {
-    super.catch(convertAuthErrorToHttpException(error), host);
+@Catch(EmailTakenError)
+export class EmailTakenFilter extends BaseExceptionFilter {
+  public catch(error: EmailTakenError, host: ArgumentsHost) {
+    super.catch(new ConflictException("This email is already taken"), host);
   }
 }
 
-function convertAuthErrorToHttpException(error: unknown): HttpException {
-  if (error instanceof EmailTakenError)
-    return new ConflictException("This email is already taken");
-
-  if (error instanceof InvalidCredentialsError)
-    return new UnauthorizedException("Wrong email or password");
-
-  return new InternalServerErrorException();
+@Catch(InvalidCredentialsError)
+export class InvalidCredentialsFilter extends BaseExceptionFilter {
+  public catch(error: InvalidCredentialsError, host: ArgumentsHost) {
+    super.catch(new UnauthorizedException("Wrong email or password"), host);
+  }
 }
