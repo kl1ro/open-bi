@@ -3,6 +3,7 @@ import * as argon2 from "argon2";
 import { v7 as uuidv7 } from "uuid";
 import type { Request } from "express";
 
+import { getSessionUserId } from "../session.js";
 import type User from "../users/user.js";
 import { UserRepository } from "../users/user.repository.js";
 import type { CredentialsDto } from "./credentials.dto.js";
@@ -25,7 +26,7 @@ export class AuthService {
   }
 
   public async loadMe(request: Request): Promise<User> {
-    const myId = request.session.id;
+    const myId = getSessionUserId(request.session);
     const user = await this.userRepository.loadUserById(myId);
     if (!user) throw new UserNotFoundError({ id: myId });
     return user;

@@ -92,6 +92,24 @@ export function attachUserToSession(user: User, session: Request["session"]) {
   session.userId = user.id;
 }
 
+export function getSessionUserId(session: Request["session"]): User["id"] {
+  const userId = findSessionUserId(session);
+  if (!userId) throw new NotSignedInError();
+  return userId;
+}
+
+export class NotSignedInError extends Error {
+  public name = NotSignedInError.name;
+
+  public constructor(options?: ErrorOptions) {
+    super("No user is attached to the session", options);
+  }
+}
+
+export function findSessionUserId(session: Request["session"]): User["id"] | undefined {
+  return session.userId;
+}
+
 export function destroySession(session: Session): Promise<void> {
   return new Promise((resolve, reject) => {
     session.destroy((error: unknown) =>
