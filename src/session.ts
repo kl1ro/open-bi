@@ -1,6 +1,6 @@
 import { RedisStore } from "connect-redis";
 import type { Request, Response } from "express";
-import session, { type Session, type SessionOptions } from "express-session";
+import session, { type SessionOptions } from "express-session";
 import { createClient } from "redis";
 
 import type User from "./users/user.js";
@@ -79,7 +79,7 @@ export interface StartUserSessionDeps {
   request: Request;
 }
 
-export function startSession(session: Session): Promise<void> {
+export function startSession(session: Request["session"]): Promise<void> {
   return new Promise((resolve, reject) => {
     session.regenerate((error: unknown) =>
       error ? reject(new StartSessionError({ cause: error })) : resolve(),
@@ -117,7 +117,7 @@ export function findSessionUserId(session: Request["session"]): User["id"] | und
   return session.userId;
 }
 
-export function destroySession(session: Session): Promise<void> {
+export function destroySession(session: Request["session"]): Promise<void> {
   return new Promise((resolve, reject) => {
     session.destroy((error: unknown) =>
       error ? reject(new DestroySessionError({ cause: error })) : resolve(),
