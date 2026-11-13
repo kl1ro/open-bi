@@ -63,19 +63,19 @@ interface ConnectRedisClientDeps {
   redisUrl: string;
 }
 
-export function startNewSession(session: Session): Promise<void> {
+export function startSession(session: Session): Promise<void> {
   return new Promise((resolve, reject) => {
     session.regenerate((error: unknown) =>
-      error ? reject(new StartNewSessionError({ cause: error })) : resolve(),
+      error ? reject(new StartSessionError({ cause: error })) : resolve(),
     );
   });
 }
 
-export class StartNewSessionError extends Error {
-  public name = StartNewSessionError.name;
+export class StartSessionError extends Error {
+  public name = StartSessionError.name;
 
   public constructor(options: ErrorOptions) {
-    super("Failed to start a new session", options);
+    super("Failed to start the session", options);
   }
 }
 
