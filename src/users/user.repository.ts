@@ -16,8 +16,8 @@ export class EmailTakenError extends Error {
   }
 }
 
-export class InsertUserError extends Error {
-  public name = InsertUserError.name;
+export class UserInsertFailedError extends Error {
+  public name = UserInsertFailedError.name;
   public id: User["id"];
 
   public constructor(options: ErrorOptions & { id: User["id"] }) {
@@ -26,8 +26,8 @@ export class InsertUserError extends Error {
   }
 }
 
-export class LoadUserError extends Error {
-  public name = LoadUserError.name;
+export class UserLoadFailedError extends Error {
+  public name = UserLoadFailedError.name;
 
   public constructor(options: ErrorOptions) {
     super("Failed to load a user", options);
