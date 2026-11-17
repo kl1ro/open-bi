@@ -4,8 +4,9 @@ import { Injectable } from "@nestjs/common";
 import type User from "../user.js";
 import {
   EmailTakenError,
-  InsertUserError,
-  LoadUserError,
+  UserInsertFailedError,
+  UserLoadByEmailFailedError,
+  UserLoadByIdFailedError,
   UserRepository,
 } from "../user.repository.js";
 import { USER_SCHEMA, USERS_EMAIL_UNIQUE } from "./user.schema.js";
@@ -21,7 +22,7 @@ export class MikroOrmUserRepository extends UserRepository {
       const user = await this.entityManager.findOne(USER_SCHEMA, { email });
       return user ?? undefined;
     } catch (error) {
-      throw new LoadUserError({ cause: error });
+      throw new UserLoadByEmailFailedError({ email, cause: error });
     }
   }
 
@@ -30,7 +31,7 @@ export class MikroOrmUserRepository extends UserRepository {
       const user = await this.entityManager.findOne(USER_SCHEMA, { id });
       return user ?? undefined;
     } catch (error) {
-      throw new LoadUserError({ cause: error });
+      throw new UserLoadByIdFailedError({ id, cause: error });
     }
   }
 
@@ -47,7 +48,7 @@ function interpretInsertUserError(error: unknown, user: User): Error {
   if (isEmailUniqueViolation(error))
     return new EmailTakenError({ email: user.email, cause: error });
 
-  return new InsertUserError({ id: user.id, cause: error });
+  return new UserInsertFailedError({ id: user.id, cause: error });
 }
 
 function isEmailUniqueViolation(error: unknown) {
