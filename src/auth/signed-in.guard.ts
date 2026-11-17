@@ -17,6 +17,10 @@ function ensureSignedIn(context: ExecutionContext) {
 }
 
 function getSessionFromContext(context: ExecutionContext): Request["session"] {
-  const request = context.switchToHttp().getRequest<Request>();
+  const request = getRequestFromContext(context);
   return request.session;
+}
+
+function getRequestFromContext(context: ExecutionContext) {
+  return context.switchToHttp().getRequest<Request>();
 }
