@@ -28,5 +28,6 @@ import { UsersModule } from "./users/users.module.js";
 export class AppModule {}
 
 function createMikroOrmConfigFromEnvironment(config: ConfigService<Environment, true>) {
-  return createMikroOrmConfig(config.get("databaseUrl", { infer: true }));
+  const deps = { databaseUrl: config.get("databaseUrl", { infer: true }) };
+  return createMikroOrmConfig(deps);
 }
