@@ -15,6 +15,7 @@ import { UsersModule } from "./users/users.module.js";
     ConfigModule.forRoot({ validate: validateEnvironment }),
 
     MikroOrmModule.forRootAsync({
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: createMikroOrmConfigFromEnvironment,
       driver: PostgreSqlDriver,
