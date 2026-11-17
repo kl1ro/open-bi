@@ -16,7 +16,8 @@ const SESSION_LIFETIME = 30 * 24 * 60 * 60 * 1000;
 
 export async function createSessionMiddleware(deps: CreateSessionMiddlewareDeps) {
   const store = await createRedisSessionStore(deps);
-  const options = createSessionOptions(store, deps);
+  const innerDeps = { ...deps, store };
+  const options = createSessionOptions(innerDeps);
   return expressSession(options);
 }
 
@@ -37,17 +38,15 @@ interface CreateRedisSessionStoreDeps {
   redisUrl: string;
 }
 
-function createSessionOptions(
-  store: RedisStore,
-  deps: CreateSessionOptionsDeps,
-): SessionOptions {
+function createSessionOptions(deps: CreateSessionOptionsDeps): SessionOptions {
   return {
-    store,
+    store: deps.store,
     name: SESSION_COOKIE_NAME,
     secret: deps.sessionSecret,
     resave: false,
     saveUninitialized: false,
     rolling: true,
+
     cookie: {
       httpOnly: true,
       secure: deps.cookieSecure,
@@ -58,6 +57,7 @@ function createSessionOptions(
 }
 
 interface CreateSessionOptionsDeps {
+  store: RedisStore;
   sessionSecret: string;
   cookieSecure: boolean;
 }
@@ -127,6 +127,16 @@ export class NotSignedInError extends Error {
 
 export function findSessionUserId(session: Request["session"]): User["id"] | undefined {
   return session.userId;
+}
+
+export async function endUserSession(deps: EndUserSessionDeps) {
+  await destroySession(deps.request.session);
+  clearSessionCookie(deps.response);
+}
+
+export interface EndUserSessionDeps {
+  request: Request;
+  response: Response;
 }
 
 export function destroySession(session: Request["session"]): Promise<void> {
