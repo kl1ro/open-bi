@@ -66,7 +66,7 @@ async function connectRedisClient(deps: ConnectRedisClientDeps) {
   try {
     return await createClient({ url: deps.redisUrl }).connect();
   } catch (error) {
-    throw new ConnectRedisClientError({ cause: error });
+    throw new RedisConnectionFailedError({ cause: error });
   }
 }
 
@@ -74,8 +74,8 @@ interface ConnectRedisClientDeps {
   redisUrl: string;
 }
 
-export class ConnectRedisClientError extends Error {
-  public name = ConnectRedisClientError.name;
+export class RedisConnectionFailedError extends Error {
+  public name = RedisConnectionFailedError.name;
 
   public constructor(options: ErrorOptions) {
     super("Failed to connect to Redis", options);
@@ -94,13 +94,13 @@ export interface StartUserSessionDeps {
 export function startSession(session: Request["session"]): Promise<void> {
   return new Promise((resolve, reject) => {
     session.regenerate((error: unknown) =>
-      error ? reject(new StartSessionError({ cause: error })) : resolve(),
+      error ? reject(new SessionStartFailedError({ cause: error })) : resolve(),
     );
   });
 }
 
-export class StartSessionError extends Error {
-  public name = StartSessionError.name;
+export class SessionStartFailedError extends Error {
+  public name = SessionStartFailedError.name;
 
   public constructor(options: ErrorOptions) {
     super("Failed to start the session", options);
@@ -132,13 +132,13 @@ export function findSessionUserId(session: Request["session"]): User["id"] | und
 export function destroySession(session: Request["session"]): Promise<void> {
   return new Promise((resolve, reject) => {
     session.destroy((error: unknown) =>
-      error ? reject(new DestroySessionError({ cause: error })) : resolve(),
+      error ? reject(new SessionDestructionFailedError({ cause: error })) : resolve(),
     );
   });
 }
 
-export class DestroySessionError extends Error {
-  public name = DestroySessionError.name;
+export class SessionDestructionFailedError extends Error {
+  public name = SessionDestructionFailedError.name;
 
   public constructor(options: ErrorOptions) {
     super("Failed to destroy the session", options);
