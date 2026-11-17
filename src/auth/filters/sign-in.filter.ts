@@ -14,7 +14,7 @@ export function UseSignInFilter() {
 
 @Catch(InvalidCredentialsError)
 export class InvalidCredentialsFilter extends BaseExceptionFilter {
-  public catch(error: InvalidCredentialsError, host: ArgumentsHost) {
+  public catch(error: unknown, host: ArgumentsHost) {
     super.catch(new UnauthorizedException("Wrong email or password"), host);
   }
 }
