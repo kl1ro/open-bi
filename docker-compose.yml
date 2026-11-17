@@ -27,6 +27,9 @@ services:
     profiles: [migrate]
     command: ["npx", "mikro-orm", "migration:up", "--config", "dist/mikro-orm.config.js"]
 
+    environment:
+      MIKRO_ORM_CLI_PREFER_TS: "false"
+
     depends_on:
       postgres:
         condition: service_healthy
