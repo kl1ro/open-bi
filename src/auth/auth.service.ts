@@ -27,8 +27,8 @@ export class AuthService {
     return user;
   }
 
-  public async loadMe(request: Request): Promise<User> {
-    const myId = getSessionUserId(request.session);
+  public async loadMe(session: Request["session"]): Promise<User> {
+    const myId = getSessionUserId(session);
     const user = await this.userRepository.loadUserById(myId);
     if (!user) throw new UserNotFoundError({ id: myId });
     return user;
