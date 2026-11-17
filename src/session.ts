@@ -48,6 +48,7 @@ function createSessionOptions(
     resave: false,
     saveUninitialized: false,
     rolling: true,
+
     cookie: {
       httpOnly: true,
       secure: deps.cookieSecure,
