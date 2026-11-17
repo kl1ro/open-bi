@@ -63,7 +63,7 @@ export class AuthController {
   @UseGuards(SignedInGuard)
   @UseMeFilter()
   public async getMe(@Req() request: Request): Promise<UserView> {
-    const me = await this.authService.loadMe(request);
+    const me = await this.authService.loadMe(request.session);
     return convertUserToView(me);
   }
 }
