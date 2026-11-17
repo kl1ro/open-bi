@@ -1,6 +1,7 @@
 import { Injectable, type CanActivate, type ExecutionContext } from "@nestjs/common";
 import type { Request } from "express";
 
+import { getRequestFromContext } from "../http.js";
 import { getSessionUserId } from "../session.js";
 
 @Injectable()
@@ -19,8 +20,4 @@ function ensureSignedIn(context: ExecutionContext) {
 function getSessionFromContext(context: ExecutionContext): Request["session"] {
   const request = getRequestFromContext(context);
   return request.session;
-}
-
-function getRequestFromContext(context: ExecutionContext) {
-  return context.switchToHttp().getRequest<Request>();
 }
