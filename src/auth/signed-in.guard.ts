@@ -1,7 +1,7 @@
 import { Injectable, type CanActivate, type ExecutionContext } from "@nestjs/common";
 import type { Request } from "express";
 
-import { getRequestFromContext } from "../http.js";
+import { getRequestFromContext } from "../lib/http.js";
 import { getSessionUserId } from "../session.js";
 
 @Injectable()
