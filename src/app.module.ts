@@ -3,12 +3,12 @@ import { PostgreSqlDriver } from "@mikro-orm/postgresql";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 
+import { AuthModule } from "./auth/auth.module.js";
 import type Environment from "./env.js";
 import { validateEnvironment } from "./env.js";
 import { HealthModule } from "./health/health.module.js";
 import { createMikroOrmConfig } from "./mikro-orm.js";
 import { UsersModule } from "./users/users.module.js";
-import { AuthModule } from "./auth/auth.module.js";
 
 @Module({
   imports: [
