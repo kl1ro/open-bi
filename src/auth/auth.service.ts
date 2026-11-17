@@ -2,10 +2,8 @@ import { randomUUID } from "node:crypto";
 
 import { Injectable } from "@nestjs/common";
 import * as argon2 from "argon2";
-import type { Request } from "express";
 import { v7 as uuidv7 } from "uuid";
 
-import { getSessionUserId } from "../session.js";
 import type User from "../users/user.js";
 import { UserRepository } from "../users/user.repository.js";
 import type { CredentialsDto } from "./credentials.dto.js";
@@ -21,16 +19,9 @@ export class AuthService {
   }
 
   public async signIn(credentials: CredentialsDto): Promise<User> {
-    const user = await this.userRepository.loadUserByEmail(credentials.email);
+    const user = await this.userRepository.findUserByEmail(credentials.email);
     const isPasswordCorrect = await verifyUserPassword(user, credentials.password);
     if (!user || !isPasswordCorrect) throw new InvalidCredentialsError();
-    return user;
-  }
-
-  public async loadMe(session: Request["session"]): Promise<User> {
-    const myId = getSessionUserId(session);
-    const user = await this.userRepository.loadUserById(myId);
-    if (!user) throw new UserNotFoundError({ id: myId });
     return user;
   }
 }
@@ -40,16 +31,6 @@ export class InvalidCredentialsError extends Error {
 
   public constructor(options?: ErrorOptions) {
     super("The email or the password is wrong", options);
-  }
-}
-
-export class UserNotFoundError extends Error {
-  public name = UserNotFoundError.name;
-  public id: User["id"];
-
-  public constructor(options: ErrorOptions & { id: User["id"] }) {
-    super(`User with id of ${options.id} doesn't exist`, options);
-    this.id = options.id;
   }
 }
 

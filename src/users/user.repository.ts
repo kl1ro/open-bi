@@ -1,9 +1,15 @@
 import type User from "./user.js";
 
 export abstract class UserRepository {
-  public abstract loadUserByEmail(email: User["email"]): Promise<User | undefined>;
-  public abstract loadUserById(id: User["id"]): Promise<User | undefined>;
+  public abstract findUserByEmail(email: User["email"]): Promise<User | undefined>;
+  public abstract findUserById(id: User["id"]): Promise<User | undefined>;
   public abstract insertUser(user: User): Promise<void>;
+
+  public async getUserById(id: User["id"]): Promise<User> {
+    const user = await this.findUserById(id);
+    if (!user) throw new UserNotFoundError({ id });
+    return user;
+  }
 }
 
 export class EmailTakenError extends Error {
@@ -42,6 +48,16 @@ export class UserLoadByIdFailedError extends Error {
 
   public constructor(options: ErrorOptions & { id: User["id"] }) {
     super(`Failed to load the user with id of ${options.id}`, options);
+    this.id = options.id;
+  }
+}
+
+export class UserNotFoundError extends Error {
+  public name = UserNotFoundError.name;
+  public id: User["id"];
+
+  public constructor(options: ErrorOptions & { id: User["id"] }) {
+    super(`User with id of ${options.id} doesn't exist`, options);
     this.id = options.id;
   }
 }
