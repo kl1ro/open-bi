@@ -10,19 +10,12 @@ import { NotSignedInError } from "../../session.js";
 import { UserNotFoundError } from "../auth.service.js";
 
 export function UseMeFilter() {
-  return UseFilters(UserNotFoundFilter, NotSignedInFilter);
+  return UseFilters(NotSignedInFilter);
 }
 
-@Catch(UserNotFoundError)
-export class UserNotFoundFilter extends BaseExceptionFilter {
-  public catch(error: UserNotFoundError, host: ArgumentsHost) {
-    super.catch(new UnauthorizedException("Not signed in"), host);
-  }
-}
-
-@Catch(NotSignedInError)
+@Catch(NotSignedInError, UserNotFoundError)
 export class NotSignedInFilter extends BaseExceptionFilter {
-  public catch(error: NotSignedInError, host: ArgumentsHost) {
+  public catch(error: NotSignedInError | UserNotFoundError, host: ArgumentsHost) {
     super.catch(new UnauthorizedException("Not signed in"), host);
   }
 }
