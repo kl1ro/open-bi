@@ -129,6 +129,16 @@ export function findSessionUserId(session: Request["session"]): User["id"] | und
   return session.userId;
 }
 
+export async function endUserSession(deps: EndUserSessionDeps) {
+  await destroySession(deps.request.session);
+  clearSessionCookie(deps.response);
+}
+
+export interface EndUserSessionDeps {
+  request: Request;
+  response: Response;
+}
+
 export function destroySession(session: Request["session"]): Promise<void> {
   return new Promise((resolve, reject) => {
     session.destroy((error: unknown) =>

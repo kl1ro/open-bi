@@ -11,7 +11,7 @@ import {
 } from "@nestjs/common";
 import type { Request, Response } from "express";
 
-import { clearSessionCookie, destroySession, startUserSession } from "../session.js";
+import { endUserSession, startUserSession } from "../session.js";
 import { convertUserToView, type UserView } from "../users/user.js";
 import { AuthService } from "./auth.service.js";
 import { CredentialsDto } from "./credentials.dto.js";
@@ -55,8 +55,8 @@ export class AuthController {
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    await destroySession(request.session);
-    clearSessionCookie(response);
+    const deps = { request, response };
+    await endUserSession(deps);
   }
 
   @Get("me")
