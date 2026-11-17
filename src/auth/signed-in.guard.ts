@@ -12,6 +12,11 @@ export class SignedInGuard implements CanActivate {
 }
 
 function ensureSignedIn(context: ExecutionContext) {
+  const session = getSessionFromContext(context);
+  getSessionUserId(session);
+}
+
+function getSessionFromContext(context: ExecutionContext): Request["session"] {
   const request = context.switchToHttp().getRequest<Request>();
-  getSessionUserId(request.session);
+  return request.session;
 }
