@@ -2,7 +2,6 @@ import { Injectable, type CanActivate, type ExecutionContext } from "@nestjs/com
 import type { Request } from "express";
 
 import { getSessionUserId } from "../session.js";
-import type User from "../users/user.js";
 
 @Injectable()
 export class SignedInGuard implements CanActivate {
@@ -12,7 +11,7 @@ export class SignedInGuard implements CanActivate {
   }
 }
 
-function ensureSignedIn(context: ExecutionContext): User["id"] {
+function ensureSignedIn(context: ExecutionContext) {
   const request = context.switchToHttp().getRequest<Request>();
-  return getSessionUserId(request.session);
+  getSessionUserId(request.session);
 }
