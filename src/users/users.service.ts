@@ -9,7 +9,7 @@ import { UserRepository } from "./user.repository.js";
 export class UsersService {
   public constructor(private readonly userRepository: UserRepository) {}
 
-  public async loadMe(session: Request["session"]): Promise<User> {
+  public async getMe(session: Request["session"]): Promise<User> {
     const myId = getSessionUserId(session);
     return this.userRepository.getUserById(myId);
   }
