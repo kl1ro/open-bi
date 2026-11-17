@@ -3,9 +3,9 @@ import { defineConfig, type Options } from "@mikro-orm/postgresql";
 
 import { USER_SCHEMA } from "./users/mikro-orm/user.schema.js";
 
-export function createMikroOrmConfig(databaseUrl: string): Options {
+export function createMikroOrmConfig(deps: CreateMikroOrmConfigDeps): Options {
   return defineConfig({
-    clientUrl: databaseUrl,
+    clientUrl: deps.databaseUrl,
     entities: [USER_SCHEMA],
     extensions: [Migrator],
 
@@ -14,4 +14,8 @@ export function createMikroOrmConfig(databaseUrl: string): Options {
       pathTs: "src/migrations",
     },
   });
+}
+
+export interface CreateMikroOrmConfigDeps {
+  databaseUrl: string;
 }
