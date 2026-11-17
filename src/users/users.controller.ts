@@ -14,7 +14,7 @@ export class UsersController {
   @UseGuards(SignedInGuard)
   @UseMeFilter()
   public async getMe(@Req() request: Request): Promise<UserView> {
-    const me = await this.usersService.loadMe(request.session);
+    const me = await this.usersService.getMe(request.session);
     return convertUserToView(me);
   }
 }
