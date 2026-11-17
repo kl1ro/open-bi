@@ -1,29 +1,34 @@
+x-api-image: &api-image
+  image: ghcr.io/kl1ro/mip-bi-back:${API_TAG:-latest}
+
+  build:
+    context: .
+    secrets:
+      - node_auth_token
+
 services:
   api:
-    image: ghcr.io/kl1ro/mip-bi-back:${API_TAG:-latest}
-
-    build:
-      context: .
-      secrets:
-        - node_auth_token
-
-    environment:
-      PORT: 3000
-      DATABASE_URL: postgres://mip_bi:${POSTGRES_PASSWORD}@postgres:5432/mip_bi
-      REDIS_URL: redis://redis:6379
-      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET}
-      COOKIE_SECURE: "false"
-      TRUST_PROXY: 0
+    <<: *api-image
+    env_file: .env
 
     ports:
       - "3000:3000"
 
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
       redis:
         condition: service_started
+
+  migrate:
+    <<: *api-image
+    env_file: .env
+    command: ["npx", "mikro-orm", "migration:up", "--config", "dist/mikro-orm.config.js"]
+
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   postgres:
     image: postgres:17
