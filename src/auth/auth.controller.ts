@@ -12,13 +12,13 @@ import {
 import type { Request, Response } from "express";
 
 import { endUserSession, startUserSession } from "../session.js";
+import { SignedInGuard } from "../signed-in.guard.js";
 import { convertUserToView, type UserView } from "../users/user.js";
 import { AuthService } from "./auth.service.js";
 import { CredentialsDto } from "./credentials.dto.js";
 import { UseMeFilter } from "./filters/me.filter.js";
 import { UseSignInFilter } from "./filters/sign-in.filter.js";
 import { UseSignUpFilter } from "./filters/sign-up.filter.js";
-import { SignedInGuard } from "./signed-in.guard.js";
 
 @Controller("auth")
 export class AuthController {
