@@ -9,7 +9,7 @@ export function UseSignUpFilter() {
 
 @Catch(EmailTakenError)
 export class EmailTakenFilter extends BaseExceptionFilter {
-  public catch(error: EmailTakenError, host: ArgumentsHost) {
+  public catch(error: unknown, host: ArgumentsHost) {
     super.catch(new ConflictException("This email is already taken"), host);
   }
 }
