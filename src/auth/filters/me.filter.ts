@@ -15,7 +15,7 @@ export function UseMeFilter() {
 
 @Catch(NotSignedInError, UserNotFoundError)
 export class NotSignedInFilter extends BaseExceptionFilter {
-  public catch(error: NotSignedInError | UserNotFoundError, host: ArgumentsHost) {
+  public catch(error: unknown, host: ArgumentsHost) {
     super.catch(new UnauthorizedException("Not signed in"), host);
   }
 }
