@@ -35,6 +35,8 @@ services:
         condition: service_healthy
 
   studio:
+    image: ghcr.io/kl1ro/mip-bi-back-studio:${STUDIO_TAG:-latest}
+
     build:
       context: .
       dockerfile: studio.Dockerfile
