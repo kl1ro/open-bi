@@ -34,6 +34,21 @@ services:
       postgres:
         condition: service_healthy
 
+  studio:
+    build:
+      context: .
+      dockerfile: studio.Dockerfile
+
+    env_file: .env
+    profiles: [studio]
+
+    ports:
+      - "127.0.0.1:5555:5556"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   postgres:
     image: postgres:17
 
