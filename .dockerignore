@@ -1,5 +1,5 @@
 .git
 apps/back
-apps/front/node_modules
+**/node_modules
 **/.next
 **/.env*
