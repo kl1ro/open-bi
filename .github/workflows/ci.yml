@@ -167,10 +167,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: apps/back
-
     steps:
       - run: echo "Migrations are not set up yet"
 
@@ -179,10 +175,6 @@ jobs:
     needs: migrate
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: apps/back
 
     steps:
       - run: echo "Deployment is not set up yet"
@@ -268,10 +260,6 @@ jobs:
     needs: front-build
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: apps/front
 
     steps:
       - run: echo "Deployment is not set up yet"
