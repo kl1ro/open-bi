@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "noEmit": true,
+    "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "mip-bi-back/users/user.js": ["ports/user.d.ts"],
+      "mip-bi-back/users/user.repository.js": ["ports/user.repository.d.ts"],
+      "mip-bi-back/users/user.schema.js": ["ports/user.schema.d.ts"]
+    }
+  },
+  "include": ["src"]
+}

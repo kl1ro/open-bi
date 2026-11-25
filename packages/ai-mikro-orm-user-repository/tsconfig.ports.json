@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "ports",
+    "rootDir": "../../apps/back/src/users",
+    "baseUrl": ".",
+    "paths": {
+      "@mikro-orm/postgresql": ["./node_modules/@mikro-orm/postgresql/index.d.ts"]
+    }
+  },
+  "files": [
+    "../../apps/back/src/users/user.ts",
+    "../../apps/back/src/users/user.repository.ts",
+    "../../apps/back/src/users/user.schema.ts"
+  ]
+}
