@@ -63,6 +63,7 @@ jobs:
 
   back-test:
     name: Back test
+    needs: core-build
     runs-on: ubuntu-latest
 
     defaults:
