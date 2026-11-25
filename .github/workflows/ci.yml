@@ -61,9 +61,62 @@ jobs:
           if-no-files-found: error
           path: packages/core/dist
 
+  ai-mikro-orm-user-repository-test:
+    name: Ai mikro orm user repository test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: packages/ai-mikro-orm-user-repository
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: packages/ai-mikro-orm-user-repository/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run lint
+
+  ai-mikro-orm-user-repository-build:
+    name: Ai mikro orm user repository build
+    needs: ai-mikro-orm-user-repository-test
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      actions: write
+
+    defaults:
+      run:
+        working-directory: packages/ai-mikro-orm-user-repository
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: packages/ai-mikro-orm-user-repository/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ai-mikro-orm-user-repository
+          if-no-files-found: error
+          path: packages/ai-mikro-orm-user-repository/dist
+
   back-test:
     name: Back test
-    needs: core-build
+    needs: [core-build, ai-mikro-orm-user-repository-build]
     runs-on: ubuntu-latest
 
     defaults:
