@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
+import { MikroOrmUserRepository } from "@ai/mikro-orm-user-repository";
 
-import { MikroOrmUserRepository } from "./mikro-orm/user.repository.js";
 import { UserRepository } from "./user.repository.js";
 import { UsersController } from "./users.controller.js";
 import { UsersService } from "./users.service.js";

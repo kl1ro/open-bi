@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@kl1ro/mip-bi-core": "file:../../packages/core",
+		"@ai/mikro-orm-user-repository": "file:../../packages/ai-mikro-orm-user-repository",
     "@mikro-orm/cli": "^7.2.9",
     "@mikro-orm/core": "^7.2.9",
     "@mikro-orm/migrations": "^7.2.9",
