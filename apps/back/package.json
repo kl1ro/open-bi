@@ -25,6 +25,7 @@
     "migration:down": "dotenv -- mikro-orm migration:down"
   },
   "dependencies": {
+    "@kl1ro/mip-bi-core": "file:../../packages/core",
     "@mikro-orm/cli": "^7.2.9",
     "@mikro-orm/core": "^7.2.9",
     "@mikro-orm/migrations": "^7.2.9",

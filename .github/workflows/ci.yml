@@ -70,8 +70,17 @@ jobs:
       run:
         working-directory: apps/back
 
+    permissions:
+      contents: read
+      actions: read
+
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: core
+          path: packages/core/dist
 
       - uses: actions/setup-node@v4
         with:
@@ -80,8 +89,6 @@ jobs:
           cache-dependency-path: apps/back/package-lock.json
 
       - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - run: npm run lint
 
@@ -95,9 +102,15 @@ jobs:
     permissions:
       contents: read
       packages: write
+      actions: read
 
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: core
+          path: packages/core/dist
 
       - uses: docker/setup-buildx-action@v3
 
@@ -110,15 +123,13 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: apps/back
+          context: .
+          file: apps/back/Dockerfile
           push: ${{ github.ref == 'refs/heads/main' }}
 
           tags: |
             ghcr.io/kl1ro/open-bi-back:${{ github.sha }}
             ghcr.io/kl1ro/open-bi-back:latest
-
-          secrets: |
-            node_auth_token=${{ secrets.GITHUB_TOKEN }}
 
   studio:
     name: Studio
