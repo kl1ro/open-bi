@@ -7,6 +7,10 @@ permissions:
   contents: read
   packages: read
 
+defaults:
+  run:
+    working-directory: apps/back
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -18,6 +22,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: apps/back/package-lock.json
 
       - run: npm ci
         env:
@@ -49,12 +54,12 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: .
+          context: apps/back
           push: ${{ github.ref == 'refs/heads/main' }}
 
           tags: |
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
-            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/kl1ro/open-bi-back:${{ github.sha }}
+            ghcr.io/kl1ro/open-bi-back:latest
 
           secrets: |
             node_auth_token=${{ secrets.GITHUB_TOKEN }}
@@ -80,13 +85,13 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: .
-          file: studio.Dockerfile
+          context: apps/back
+          file: apps/back/studio.Dockerfile
           push: ${{ github.ref == 'refs/heads/main' }}
 
           tags: |
-            ghcr.io/${{ github.repository }}-studio:${{ github.sha }}
-            ghcr.io/${{ github.repository }}-studio:latest
+            ghcr.io/kl1ro/open-bi-back-studio:${{ github.sha }}
+            ghcr.io/kl1ro/open-bi-back-studio:latest
 
   migrate:
     needs: build
