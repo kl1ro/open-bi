@@ -6,10 +6,16 @@ x-api-image: &api-image
     secrets:
       - node_auth_token
 
+x-database-url: &database-url
+  DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+
 services:
   api:
     <<: *api-image
     env_file: .env
+
+    environment:
+      <<: *database-url
 
     ports:
       - "3000:3000"
@@ -28,6 +34,7 @@ services:
     command: ["npx", "mikro-orm", "migration:up", "--config", "dist/mikro-orm.config.js"]
 
     environment:
+      <<: *database-url
       MIKRO_ORM_CLI_PREFER_TS: "false"
 
     depends_on:
@@ -44,6 +51,9 @@ services:
     env_file: .env
     profiles: [studio]
 
+    environment:
+      <<: *database-url
+
     ports:
       - "127.0.0.1:5555:5556"
 
@@ -55,15 +65,15 @@ services:
     image: postgres:17
 
     environment:
-      POSTGRES_DB: mip_bi
-      POSTGRES_USER: mip_bi
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
 
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mip_bi -d mip_bi"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       retries: 10
 
