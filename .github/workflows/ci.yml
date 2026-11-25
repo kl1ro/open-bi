@@ -1,0 +1,277 @@
+name: CI
+
+on:
+  push:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  core-test:
+    name: Core test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: packages/core
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: packages/core/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run lint
+
+  core-build:
+    name: Core build
+    needs: core-test
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      actions: write
+
+    defaults:
+      run:
+        working-directory: packages/core
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: packages/core/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: core
+          if-no-files-found: error
+          path: packages/core/dist
+
+  back-test:
+    name: Back test
+    needs: core-build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/back
+
+    permissions:
+      contents: read
+      actions: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: core
+          path: packages/core/dist
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/back/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run build
+
+  back-build:
+    name: Back build
+    needs: back-test
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      actions: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: core
+          path: packages/core/dist
+
+      - uses: docker/setup-buildx-action@v3
+
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/back/Dockerfile
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+          tags: |
+            ghcr.io/kl1ro/open-bi-back:${{ github.sha }}
+            ghcr.io/kl1ro/open-bi-back:latest
+
+  studio:
+    name: Studio
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: apps/back
+          file: apps/back/studio.Dockerfile
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+          tags: |
+            ghcr.io/kl1ro/open-bi-back-studio:${{ github.sha }}
+            ghcr.io/kl1ro/open-bi-back-studio:latest
+
+  migrate:
+    name: Migrate
+    needs: back-build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/back
+
+    steps:
+      - run: echo "Migrations are not set up yet"
+
+  back-deploy:
+    name: Back deploy
+    needs: migrate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/back
+
+    steps:
+      - run: echo "Deployment is not set up yet"
+
+  front-test:
+    name: Front test
+    needs: core-build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: read
+      actions: read
+
+    defaults:
+      run:
+        working-directory: apps/front
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: core
+          path: packages/core/dist
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/front/package-lock.json
+
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: npm run lint
+
+      - run: npm run build
+
+  front-build:
+    name: Front build
+    needs: front-test
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      actions: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: core
+          path: packages/core/dist
+
+      - uses: docker/setup-buildx-action@v3
+
+      - if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/front/Dockerfile
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+          tags: |
+            ghcr.io/kl1ro/open-bi-front:${{ github.sha }}
+            ghcr.io/kl1ro/open-bi-front:latest
+
+          secrets: |
+            node_auth_token=${{ secrets.GITHUB_TOKEN }}
+
+  front-deploy:
+    name: Front deploy
+    needs: front-build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/front
+
+    steps:
+      - run: echo "Deployment is not set up yet"

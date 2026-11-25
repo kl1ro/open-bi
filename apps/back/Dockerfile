@@ -1,18 +1,19 @@
 # syntax=docker/dockerfile:1
 
 FROM node:22-alpine AS build
-WORKDIR /app
+WORKDIR /repo
 RUN npm install -g npm@11
-COPY package.json package-lock.json .npmrc ./
-RUN --mount=type=secret,id=node_auth_token,env=NODE_AUTH_TOKEN npm ci
-COPY . .
+COPY packages packages
+COPY apps/back apps/back
+WORKDIR /repo/apps/back
+RUN npm ci
 RUN npm run build && npm prune --omit=dev
 
 FROM node:22-alpine
-WORKDIR /app
+WORKDIR /repo/apps/back
 ENV NODE_ENV=production
-COPY --from=build /app/package.json ./
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
+COPY --from=build /repo/apps/back/package.json ./
+COPY --from=build /repo/apps/back/node_modules ./node_modules
+COPY --from=build /repo/apps/back/dist ./dist
 EXPOSE 3000
 CMD ["node", "dist/main.js"]
