@@ -1,0 +1,82 @@
+x-api-image: &api-image
+  image: ghcr.io/kl1ro/mip-bi-back:${API_TAG:-latest}
+
+  build:
+    context: .
+    secrets:
+      - node_auth_token
+
+services:
+  api:
+    <<: *api-image
+    env_file: .env
+
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+      redis:
+        condition: service_started
+
+  migrate:
+    <<: *api-image
+    env_file: .env
+    profiles: [migrate]
+    command: ["npx", "mikro-orm", "migration:up", "--config", "dist/mikro-orm.config.js"]
+
+    environment:
+      MIKRO_ORM_CLI_PREFER_TS: "false"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  studio:
+    image: ghcr.io/kl1ro/mip-bi-back-studio:${STUDIO_TAG:-latest}
+
+    build:
+      context: .
+      dockerfile: studio.Dockerfile
+
+    env_file: .env
+    profiles: [studio]
+
+    ports:
+      - "127.0.0.1:5555:5556"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17
+
+    environment:
+      POSTGRES_DB: mip_bi
+      POSTGRES_USER: mip_bi
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mip_bi -d mip_bi"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:8
+
+    volumes:
+      - redis-data:/data
+
+secrets:
+  node_auth_token:
+    environment: NODE_AUTH_TOKEN
+
+volumes:
+  postgres-data:
+  redis-data:
