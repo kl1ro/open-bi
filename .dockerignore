@@ -1,0 +1,5 @@
+.git
+apps/back
+apps/front/node_modules
+**/.next
+**/.env*

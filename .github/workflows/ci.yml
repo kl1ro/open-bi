@@ -244,9 +244,8 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: apps/front
-          build-contexts: |
-            corepkg=packages/core
+          context: .
+          file: apps/front/Dockerfile
           push: ${{ github.ref == 'refs/heads/main' }}
 
           tags: |
