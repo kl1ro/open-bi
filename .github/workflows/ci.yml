@@ -62,7 +62,7 @@ jobs:
           path: packages/core/dist
 
   ai-mikro-orm-user-repository-build:
-    name: Ai user repository build
+    name: AI user repository build
     runs-on: ubuntu-latest
 
     permissions:
@@ -93,7 +93,7 @@ jobs:
           path: packages/ai-mikro-orm-user-repository/dist
 
   ai-mikro-orm-user-repository-test:
-    name: Ai user repository test
+    name: AI user repo test
     needs: ai-mikro-orm-user-repository-build
     runs-on: ubuntu-latest
     steps:
