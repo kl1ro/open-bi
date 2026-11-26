@@ -96,11 +96,6 @@ jobs:
     name: Ai user repository test
     needs: ai-mikro-orm-user-repository-build
     runs-on: ubuntu-latest
-    env:
-      POSTGRES_USER: open-bi
-      POSTGRES_PASSWORD: open-bi
-      POSTGRES_DB: open-bi
-      DATABASE_URL: postgres://open-bi:open-bi@localhost:5432/open-bi
     steps:
       - uses: actions/checkout@v4
 
@@ -120,7 +115,7 @@ jobs:
         run: |
           cp .env.example .env
           docker compose up -d --wait postgres
-          docker build -f test.Dockerfile -t open-bi-back-test .
+          docker build -f test.Dockerfile -t open-bi-back-test ../..
           docker run --rm \
             --network back_default \
             --env-file .env \
