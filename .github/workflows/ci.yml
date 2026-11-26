@@ -104,16 +104,13 @@ jobs:
           name: ai-mikro-orm-user-repository
           path: packages/ai-mikro-orm-user-repository/dist
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: apps/back/package-lock.json
-
       - name: Test package from the app
         working-directory: apps/back
         run: |
           cp .env.example .env
+          set -a
+          source .env
+          set +a
           docker compose up -d --wait postgres
           docker build -f test.Dockerfile -t open-bi-back-test ../..
           docker run --rm \
