@@ -88,7 +88,7 @@ jobs:
             -e COOKIE_SECURE \
             -e TRUST_PROXY \
             open-bi-back-test \
-            sh -c "npx mikro-orm migration:up --config dist/mikro-orm.config.js && npx vitest run src/users/repository/user.repository.test.ts"
+            sh -c "npx mikro-orm migration:up --config src/mikro-orm.config.ts && npx vitest run src/users/repository/user.repository.test.ts"
 
   ai-mikro-orm-user-repository-build:
     name: AI user repository build
