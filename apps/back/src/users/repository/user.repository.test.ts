@@ -10,7 +10,7 @@ import { EmailTakenError, UserRepository } from "./user.repository.js";
 let orm: MikroORM;
 let repository: UserRepository;
 
-describe("MikroOrmUserRepository", () => {
+describe("User repository", () => {
   setupOrm();
   cleanupBeforeEachTest();
 
