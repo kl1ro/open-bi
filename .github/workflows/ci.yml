@@ -115,7 +115,15 @@ jobs:
           docker build -f test.Dockerfile -t open-bi-back-test ../..
           docker run --rm \
             --network back_default \
-            --env-file .env \
+            -e POSTGRES_USER \
+            -e POSTGRES_PASSWORD \
+            -e POSTGRES_DB \
+            -e PORT \
+            -e DATABASE_URL \
+            -e REDIS_URL \
+            -e SESSION_SECRET \
+            -e COOKIE_SECURE \
+            -e TRUST_PROXY \
             open-bi-back-test \
             sh -c "npx mikro-orm migration:up --config dist/mikro-orm.config.js && npx vitest run src/users/repository/user.repository.test.ts"
   
