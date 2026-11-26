@@ -9,9 +9,9 @@ export const USER_SCHEMA = new EntitySchema<User>({
   tableName: "users",
 
   properties: {
-    id: { type: "uuid", primary: true },
+    id: { type: "uuid", primary: true, defaultRaw: "uuidv7()" },
     email: { type: "string", unique: USERS_EMAIL_UNIQUE },
     passwordHash: { type: "string" },
-    createdAt: { type: "datetime" },
+    createdAt: { type: "datetime", defaultRaw: "now()" },
   },
 });
