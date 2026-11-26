@@ -114,14 +114,17 @@ jobs:
           cache: npm
           cache-dependency-path: apps/back/package-lock.json
 
-      - name: Test it from the app
+      - name: Test package from the app
         working-directory: apps/back
         run: |
-          npm ci
-          npm run build
-          docker compose up -d postgres
-          npx mikro-orm migration:up --config dist/mikro-orm.config.js
-          npx vitest run src/users/user.repository.test.ts
+          cp .env.example .env
+          docker compose up -d --wait postgres
+          docker build -f test.Dockerfile -t open-bi-back-test .
+          docker run --rm \
+            --network back_default \
+            --env-file .env \
+            open-bi-back-test \
+            sh -c "npx mikro-orm migration:up --config dist/mikro-orm.config.js && npx vitest run src/users/repository/user.repository.test.ts"
   
   back-test:
     name: Back test
