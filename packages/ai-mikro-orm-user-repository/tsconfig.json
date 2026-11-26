@@ -14,9 +14,9 @@
     "rootDir": "src",
     "baseUrl": ".",
     "paths": {
-      "mip-bi-back/users/repository/user.js": ["ports/repository/user.d.ts"],
-      "mip-bi-back/users/repository/user.repository.js": ["ports/repository/user.repository.d.ts"],
-      "mip-bi-back/users/repository/user.schema.js": ["ports/repository/user.schema.d.ts"]
+      "open-bi-back/users/repository/user.js": ["ports/repository/user.d.ts"],
+      "open-bi-back/users/repository/user.repository.js": ["ports/repository/user.repository.d.ts"],
+      "open-bi-back/users/repository/user.schema.js": ["ports/repository/user.schema.d.ts"]
     }
   },
   "include": ["src"]

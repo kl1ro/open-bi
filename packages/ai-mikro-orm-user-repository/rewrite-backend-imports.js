@@ -14,7 +14,7 @@ async function rewriteBackendImport(entry) {
   const runtimeRoot = entry.endsWith(".d.ts")
     ? "../../../../src/"
     : "../../../../dist/";
-  const rewritten = source.replaceAll("mip-bi-back/", runtimeRoot);
+  const rewritten = source.replaceAll("open-bi-back/", runtimeRoot);
   if (rewritten === source) return;
 
   await writeFile(filePath, rewritten);
