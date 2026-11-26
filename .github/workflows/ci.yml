@@ -63,7 +63,6 @@ jobs:
 
   ai-mikro-orm-user-repository-build:
     name: Ai mikro orm user repository build
-    needs: ai-mikro-orm-user-repository-test
     runs-on: ubuntu-latest
 
     permissions:
