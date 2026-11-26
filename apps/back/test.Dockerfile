@@ -7,4 +7,3 @@ COPY packages packages
 COPY apps/back apps/back
 WORKDIR /repo/apps/back
 RUN npm ci
-RUN npm run build
