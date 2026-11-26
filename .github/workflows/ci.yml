@@ -67,11 +67,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: ai-mikro-orm-user-repository
-          path: packages/ai-mikro-orm-user-repository/dist
-
       - name: Test package from the app
         working-directory: apps/back
         run: |
