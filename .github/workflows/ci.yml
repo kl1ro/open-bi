@@ -168,6 +168,7 @@ jobs:
   back-build:
     name: Back build
     needs: back-test
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     permissions:
@@ -294,6 +295,7 @@ jobs:
   front-build:
     name: Front build
     needs: front-test
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     permissions:
