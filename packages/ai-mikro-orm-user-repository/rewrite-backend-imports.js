@@ -12,8 +12,8 @@ async function rewriteBackendImport(entry) {
   const filePath = path.join(distDirectory, entry);
   const source = await readFile(filePath, "utf8");
   const runtimeRoot = entry.endsWith(".d.ts")
-    ? "../../../apps/back/src/"
-    : "../../../apps/back/dist/src/";
+    ? "../../../../src/"
+    : "../../../../dist/src/";
   const rewritten = source.replaceAll("mip-bi-back/", runtimeRoot);
   if (rewritten === source) return;
 
