@@ -27,5 +27,6 @@ export default defineConfig({
     globals: true,
     root: "./",
     include: ["**/*.test.ts"],
+    reporters: ["verbose"],
   },
 });
