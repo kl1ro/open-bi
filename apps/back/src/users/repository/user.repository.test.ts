@@ -4,7 +4,7 @@ import type { AiMikroOrmUserRepository } from "@ai/mikro-orm-user-repository";
 import { Test } from "@nestjs/testing";
 import { MikroOrmModule } from "@mikro-orm/nestjs";
 
-import config from "../../mikro-orm.config.js";
+import { devConfig } from "../../mikro-orm.config.js";
 import { UsersModule } from "../users.module.js";
 import { UserRepository } from "./user.repository.js";
 
@@ -23,7 +23,7 @@ describe("MikroOrmUserRepository", () => {
 function setupOrm() {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [MikroOrmModule.forRoot(config), UsersModule],
+      imports: [MikroOrmModule.forRoot(devConfig), UsersModule],
     }).compile();
 
     orm = moduleRef.get(MikroORM);
