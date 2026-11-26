@@ -4,8 +4,8 @@ import { Injectable } from "@nestjs/common";
 import * as argon2 from "argon2";
 import { v7 as uuidv7 } from "uuid";
 
-import type User from "../users/user.js";
-import { UserRepository } from "../users/user.repository.js";
+import type User from "../users/repository/user.js";
+import { UserRepository } from "../users/repository/user.repository.js";
 import type { CredentialsDto } from "./credentials.dto.js";
 
 @Injectable()
