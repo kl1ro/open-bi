@@ -5,4 +5,7 @@ import { createMikroOrmConfig } from "./mikro-orm.js";
 
 const environment = validateEnvironment(process.env);
 const deps = { databaseUrl: environment.databaseUrl };
-export default createMikroOrmConfig(deps);
+
+const config = createMikroOrmConfig(deps);
+export const devConfig: typeof config = { ...config, allowGlobalContext: true };
+export default config;

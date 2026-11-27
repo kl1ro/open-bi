@@ -1,12 +1,32 @@
+import { fileURLToPath } from "node:url";
+
 import { defineConfig } from "vitest/config";
 
+const BACK_SOURCE = fileURLToPath(new URL("./src/", import.meta.url));
+
 export default defineConfig({
-  // Resolves the path aliases declared in tsconfig.json, including the ones
-  // added by `nest g library`. Requires Vite 8, which ships this option.
-  resolve: { tsconfigPaths: true },
+  resolve: {
+    tsconfigPaths: true,
+    alias: [
+      {
+        find: "@ai/mikro-orm-user-repository",
+        replacement: fileURLToPath(
+          new URL(
+            "../../packages/ai-mikro-orm-user-repository/src/mikro-orm-user-repository.ts",
+            import.meta.url,
+          ),
+        ),
+      },
+      {
+        find: /^open-bi-back\/(.*)\.js$/,
+        replacement: `${BACK_SOURCE}$1.ts`,
+      },
+    ],
+  },
   test: {
     globals: true,
     root: "./",
-    include: ["**/*.spec.ts"],
+    include: ["**/*.test.ts"],
+    reporters: ["verbose"],
   },
 });

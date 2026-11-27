@@ -20,12 +20,13 @@
     "test:cov": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
-    "migration:create": "dotenv -- mikro-orm migration:create",
-    "migration:up": "dotenv -- mikro-orm migration:up",
-    "migration:down": "dotenv -- mikro-orm migration:down"
+    "migration:create": "dotenv run -- mikro-orm migration:create",
+    "migration:up": "dotenv run -- mikro-orm migration:up",
+    "migration:down": "dotenv run -- mikro-orm migration:down"
   },
   "dependencies": {
     "@kl1ro/mip-bi-core": "file:../../packages/core",
+		"@ai/mikro-orm-user-repository": "file:../../packages/ai-mikro-orm-user-repository",
     "@mikro-orm/cli": "^7.2.9",
     "@mikro-orm/core": "^7.2.9",
     "@mikro-orm/migrations": "^7.2.9",

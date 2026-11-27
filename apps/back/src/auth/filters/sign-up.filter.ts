@@ -1,7 +1,7 @@
 import { Catch, ConflictException, UseFilters, type ArgumentsHost } from "@nestjs/common";
 import { BaseExceptionFilter } from "@nestjs/core";
 
-import { EmailTakenError } from "../../users/user.repository.js";
+import { EmailTakenError } from "../../users/repository/user.repository.js";
 
 export function UseSignUpFilter() {
   return UseFilters(EmailTakenFilter);

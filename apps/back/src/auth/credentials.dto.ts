@@ -1,7 +1,7 @@
 import { Transform } from "class-transformer";
 import { IsEmail, IsString, MinLength } from "class-validator";
 
-import type User from "../users/user.js";
+import type User from "../users/repository/user.js";
 
 export class CredentialsDto {
   @Transform(normalizeEmail)

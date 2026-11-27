@@ -7,7 +7,7 @@ import {
 import { BaseExceptionFilter } from "@nestjs/core";
 
 import { NotSignedInError } from "../../session.js";
-import { UserNotFoundError } from "../user.repository.js";
+import { UserNotFoundError } from "../repository/user.repository.js";
 
 export function UseMeFilter() {
   return UseFilters(NotSignedInFilter);

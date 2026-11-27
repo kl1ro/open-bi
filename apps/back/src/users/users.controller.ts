@@ -3,7 +3,7 @@ import type { Request } from "express";
 
 import { SignedInGuard } from "../auth/guards/signed-in.guard.js";
 import { UseMeFilter } from "./filters/me.filter.js";
-import { convertUserToView, type UserView } from "./user.js";
+import { convertUserToView, type UserView } from "./repository/user.js";
 import { UsersService } from "./users.service.js";
 
 @Controller("users")

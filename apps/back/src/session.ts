@@ -3,7 +3,7 @@ import type { Request, Response } from "express";
 import expressSession, { type SessionOptions } from "express-session";
 import { createClient } from "redis";
 
-import type User from "./users/user.js";
+import type User from "./users/repository/user.js";
 
 declare module "express-session" {
   interface SessionData {
