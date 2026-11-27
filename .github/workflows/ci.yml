@@ -70,7 +70,6 @@ jobs:
       - name: Run integration test
         uses: ./.github/actions/back-integration-test
         with:
-          environment: 'test'
           test_src: 'src/users/repository/user.repository.test.ts'
 
   ai-mikro-orm-user-repository-build:
