@@ -61,7 +61,7 @@ function testUserCanBeCreated() {
   it("User can be created", async () => {
     const draft = getUserDraft();
     const result = await repository.insertUser(draft);
-    expect(result).toBeUndefined();
+    expect(result).toMatchObject(draft);
   });
 }
 
