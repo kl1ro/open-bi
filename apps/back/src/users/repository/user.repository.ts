@@ -2,9 +2,11 @@ import type User from "./user.js";
 import type { UserForm } from "./user.js";
 
 export abstract class UserRepository {
+  public abstract insertUser(user: UserForm): Promise<User>;
+  public abstract deleteUserById(id: User["id"]): Promise<void>;
+
   public abstract findUserByEmail(email: User["email"]): Promise<User | undefined>;
   public abstract findUserById(id: User["id"]): Promise<User | undefined>;
-  public abstract insertUser(user: UserForm): Promise<void>;
   public abstract getUserById(id: User["id"]): Promise<User>;
 }
 
