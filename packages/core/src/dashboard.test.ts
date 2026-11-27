@@ -14,8 +14,8 @@ describe("Unit test dashboard functionality", () => {
   testWidgetAppliedWithoutItemConfigBecomesRoot();
   testWidgetCanBeRemoved();
 
-	testRootCanBeFound();
-	testWidgetCanBeCheckedToBeRoot();
+  testRootCanBeFound();
+  testWidgetCanBeCheckedToBeRoot();
 });
 
 function testWidgetAppliedToEmptyDashboardBecomesRoot() {
@@ -47,7 +47,7 @@ function testWidgetCanBeRemoved() {
 function testRootCanBeFound() {
   it("Root can be found", () => {
     const { dashboard, expected } = getRootCanBeFoundTestSetup();
-		const deps = { dashboard };
+    const deps = { dashboard };
     const result = findRootConfig(deps);
     expect(result).toStrictEqual(expected);
   });
@@ -55,12 +55,12 @@ function testRootCanBeFound() {
 
 function testWidgetCanBeCheckedToBeRoot() {
   it("Root can be found", () => {
-    const { dashboard, root, notRoot} = getWidgetCanBeCheckedToBeRootTestSetup();
-		const deps = { dashboard };
+    const { dashboard, root, notRoot } = getWidgetCanBeCheckedToBeRootTestSetup();
+    const deps = { dashboard };
     const rightResult = isRootConfig(root, deps);
-		const wrongResult = isRootConfig(notRoot, deps);
+    const wrongResult = isRootConfig(notRoot, deps);
     expect(rightResult).toStrictEqual(true);
-		expect(wrongResult).toStrictEqual(false);
+    expect(wrongResult).toStrictEqual(false);
   });
 }
 
@@ -142,37 +142,37 @@ function getWidgetCanBeRemovedTestSetup() {
 }
 
 function getRootCanBeFoundTestSetup() {
-	const root: WidgetConfig = {
+  const root: WidgetConfig = {
     id: "1",
     type: "layout",
     layout: "absolute",
   };
 
   const dashboard: DashboardConfig = {
-    widgetConfigs: {[root.id]: root},
-		rootId: root.id,
+    widgetConfigs: { [root.id]: root },
+    rootId: root.id,
   };
 
   return { dashboard, expected: root };
 }
 
 function getWidgetCanBeCheckedToBeRootTestSetup() {
-	const root: WidgetConfig = {
+  const root: WidgetConfig = {
     id: "1",
     type: "layout",
     layout: "absolute",
   };
 
-	const child: WidgetConfig = {
-		id: "2",
+  const child: WidgetConfig = {
+    id: "2",
     parentId: "1",
     type: "layout",
     layout: "absolute",
-	}
+  };
 
   const dashboard: DashboardConfig = {
-    widgetConfigs: {[root.id]: root, [child.id]: child},
-		rootId: root.id,
+    widgetConfigs: { [root.id]: root, [child.id]: child },
+    rootId: root.id,
   };
 
   return { dashboard, root, notRoot: child };
