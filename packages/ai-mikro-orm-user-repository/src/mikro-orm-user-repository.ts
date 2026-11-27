@@ -1,6 +1,11 @@
-import { EntityManager, UniqueConstraintViolationException } from "@mikro-orm/postgresql";
+import {
+  EntityManager,
+  UniqueConstraintViolationException,
+  raw,
+} from "@mikro-orm/postgresql";
 import { Injectable } from "@nestjs/common";
 import type User from "open-bi-back/users/repository/user.js";
+import type { UserForm } from "open-bi-back/users/repository/user.js";
 import {
   EmailTakenError,
   UserInsertFailedError,
@@ -15,6 +20,19 @@ import { USERS_EMAIL_UNIQUE } from "open-bi-back/users/repository/user.schema.js
 export class AiMikroOrmUserRepository extends UserRepository {
   public constructor(private readonly entityManager: EntityManager) {
     super();
+  }
+
+  public async insertUser(form: UserForm): Promise<User> {
+    try {
+      const id = await insertUserForm(form, this.deps());
+      return await getInsertedUser(id, this.deps());
+    } catch (error) {
+      throw interpretInsertUserError(error, form);
+    }
+  }
+
+  public async deleteUserById(id: User["id"]): Promise<void> {
+    await deleteUserById(id, this.deps());
   }
 
   public async findUserByEmail(email: User["email"]): Promise<User | undefined> {
@@ -37,15 +55,6 @@ export class AiMikroOrmUserRepository extends UserRepository {
     }
   }
 
-  public async insertUser(user: User) {
-    try {
-      const userEntity = getUserEntity(this.deps());
-      await this.entityManager.insert(userEntity, user);
-    } catch (error) {
-      throw interpretInsertUserError(error, user);
-    }
-  }
-
   public async getUserById(id: User["id"]): Promise<User> {
     const user = await this.findUserById(id);
     if (!user) throw new UserNotFoundError({ id });
@@ -55,6 +64,40 @@ export class AiMikroOrmUserRepository extends UserRepository {
   private deps(): GetUserEntityDeps {
     return { entityManager: this.entityManager };
   }
+}
+
+async function insertUserForm(form: UserForm, deps: InsertUserFormDeps) {
+  const userEntity = getUserEntity(deps);
+
+  return deps.entityManager.insert(userEntity, {
+    email: form.email,
+    passwordHash: form.passwordHash,
+    createdAt: raw("now()"),
+  });
+}
+
+interface InsertUserFormDeps {
+  entityManager: EntityManager;
+}
+
+async function getInsertedUser(id: User["id"], deps: GetInsertedUserDeps): Promise<User> {
+  const userEntity = getUserEntity(deps);
+  const user = await deps.entityManager.findOne(userEntity, { id });
+  if (!user) throw new UserInsertFailedError({ id });
+  return user;
+}
+
+interface GetInsertedUserDeps {
+  entityManager: EntityManager;
+}
+
+async function deleteUserById(id: User["id"], deps: DeleteUserByIdDeps) {
+  const userEntity = getUserEntity(deps);
+  await deps.entityManager.nativeDelete(userEntity, { id });
+}
+
+interface DeleteUserByIdDeps {
+  entityManager: EntityManager;
 }
 
 function getUserEntity(deps: GetUserEntityDeps) {
@@ -68,12 +111,14 @@ interface GetUserEntityDeps {
 
 function interpretInsertUserError(
   error: unknown,
-  user: User,
+  form: UserForm,
 ): EmailTakenError | UserInsertFailedError {
-  if (isEmailUniqueViolation(error))
-    return new EmailTakenError({ email: user.email, cause: error });
+  if (error instanceof UserInsertFailedError) return error;
 
-  return new UserInsertFailedError({ id: user.id, cause: error });
+  if (isEmailUniqueViolation(error))
+    return new EmailTakenError({ email: form.email, cause: error });
+
+  throw error;
 }
 
 function isEmailUniqueViolation(error: unknown) {
