@@ -90,8 +90,8 @@ jobs:
             open-bi-back-test \
             sh -c "npx mikro-orm migration:up --config src/mikro-orm.config.ts && npx vitest run src/users/repository/user.repository.test.ts"
 
-  ai-mikro-orm-user-repository-build:
-    name: AI user repository build
+  ai-mikro-orm-user-repositouuidv7ry-build:
+    name: AI user repo build
     needs: ai-mikro-orm-user-repository-test
     runs-on: ubuntu-latest
 
