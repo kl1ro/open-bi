@@ -54,7 +54,7 @@ function testRootCanBeFound() {
 }
 
 function testWidgetCanBeCheckedToBeRoot() {
-  it("Root can be found", () => {
+  it("Root can be checked to be root", () => {
     const { dashboard, root, notRoot } = getWidgetCanBeCheckedToBeRootTestSetup();
     const deps = { dashboard };
     const rightResult = isRootConfig(root, deps);
