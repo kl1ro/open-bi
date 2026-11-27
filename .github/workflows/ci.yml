@@ -29,6 +29,8 @@ jobs:
 
       - run: npm run lint
 
+      - run: npx vitest run .
+
   core-build:
     name: Core build
     needs: core-test
