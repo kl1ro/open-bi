@@ -1,5 +1,4 @@
-import { randomUUIDv7 } from "crypto";
-
+import { v7 as uuidv7 } from "uuid";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { MikroORM } from "@mikro-orm/core";
 import { Test } from "@nestjs/testing";
@@ -105,7 +104,7 @@ function testUserCanBeGottenById() {
 
 function testGetUserByIdThrowsIfNotFound() {
   it("getUserById throws if user not found", async () => {
-    const promise = repository.getUserById(randomUUIDv7());
+    const promise = repository.getUserById(uuidv7());
     await expect(promise).rejects.toThrow(UserNotFoundError);
   });
 }
