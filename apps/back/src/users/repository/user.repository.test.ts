@@ -5,19 +5,30 @@ import { MikroOrmModule } from "@mikro-orm/nestjs";
 
 import { devConfig } from "../../mikro-orm.config.js";
 import { UsersModule } from "../users.module.js";
-import { EmailTakenError, UserRepository } from "./user.repository.js";
+import { EmailTakenError, UserNotFoundError, UserRepository } from "./user.repository.js";
+import type User from "./user.js";
 
 let orm: MikroORM;
 let repository: UserRepository;
+
+const NUMBER_TO_SEED = 1000;
 
 describe("User repository", () => {
   setupOrm();
   cleanupBeforeEachTest();
 
   testRepositoryExist();
-  testUserCreation();
-  testUserFindByEmail();
-  testUserEmailUniqueConstraint();
+
+  testUserCanBeCreated();
+  testUsersCantHaveSameEmail();
+
+  testUserCanBeDeletedById();
+
+  testUserCanBeFoundById();
+  testUserCanBeFoundByEmail();
+
+  testUserCanBeGottenById();
+  testGetUserByIdThrowsIfNotFound();
 
   cleanupAfterAllTests();
 });
@@ -46,29 +57,64 @@ function testRepositoryExist() {
   });
 }
 
-function testUserCreation() {
+function testUserCanBeCreated() {
   it("User can be created", async () => {
-    const { draft } = getUserCreationTestSetup();
+    const draft = getUserDraft();
     const result = await repository.insertUser(draft);
     expect(result).toBeUndefined();
   });
 }
 
-function testUserFindByEmail() {
-  it("User can be found by email", async () => {
-    const { draft } = getUserCreationTestSetup();
-    await repository.insertUser(draft);
-    const result = await repository.findUserByEmail(draft.email);
-    expect(result).toMatchObject(draft);
-  });
-}
-
-function testUserEmailUniqueConstraint() {
+function testUsersCantHaveSameEmail() {
   it("Users can't have same email", async () => {
-    const { draft } = getUserCreationTestSetup();
+    const draft = getUserDraft();
     await repository.insertUser(draft);
     const promise = repository.insertUser(draft);
     await expect(promise).rejects.toThrow(EmailTakenError);
+  });
+}
+
+function testUserCanBeFoundById() {
+  it("User can be found by ID", async () => {
+    const seeded = await seedUsers();
+    const expected = getRandomUser(seeded);
+    const result = await repository.findUserById(expected.id);
+    expect(result).toStrictEqual(expected);
+  });
+}
+
+function testUserCanBeFoundByEmail() {
+  it("User can be found by email", async () => {
+    const seeded = await seedUsers();
+    const expected = getRandomUser(seeded);
+    const result = await repository.findUserByEmail(expected.email);
+    expect(result).toStrictEqual(expected);
+  });
+}
+
+function testUserCanBeGottenById() {
+  it("User can be gotten by ID", async () => {
+    const seeded = await seedUsers();
+    const expected = getRandomUser(seeded);
+    const result = await repository.getUserById(expected.id);
+    expect(result).toStrictEqual(expected);
+  });
+}
+
+function testGetUserByIdThrowsIfNotFound() {
+  it("getUserById throws if user not found", async () => {
+    await seedUsers();
+    const promise = repository.getUserById("SOME_UNREALISTIC_UUID_V7");
+    await expect(promise).rejects.toThrow(UserNotFoundError);
+  });
+}
+
+function testUserCanBeDeletedById() {
+  it("User can be deleted by ID", async () => {
+    const seeded = await seedUsers();
+    const toDelete = getRandomUser(seeded);
+    const result = await repository.deleteUserById(toDelete.id);
+    expect(result).toBeUndefined();
   });
 }
 
@@ -78,11 +124,39 @@ function cleanupAfterAllTests() {
   });
 }
 
-function getUserCreationTestSetup() {
+function getUserDraft() {
   const draft = {
     email: "test@test.com",
     passwordHash: "testhash",
   };
 
-  return { draft };
+  return draft;
+}
+
+function getRandomUser(users: User[]) {
+  if (!users.length) throw new Error("getRandomUser has empty input array");
+  const randomIndex = Math.round(Math.random() * NUMBER_TO_SEED);
+  const user = users.at(randomIndex)!;
+  return user;
+}
+
+async function seedUsers() {
+  const drafts = getSeedDrafts();
+  const promises = drafts.map((draft) => repository.insertUser(draft));
+  const seeded = await Promise.all(promises);
+  return seeded;
+}
+
+function getSeedDrafts() {
+  const draft = getUserDraft();
+
+  const drafts = Array.from({ length: NUMBER_TO_SEED }).map(
+    (empty, i) =>
+      ({
+        ...draft,
+        email: `${i}.${draft.email}`,
+      }) as const,
+  );
+
+  return drafts;
 }
