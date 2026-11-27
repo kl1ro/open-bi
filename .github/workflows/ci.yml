@@ -67,28 +67,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Test package from the app
-        working-directory: apps/back
-        run: |
-          cp .env.example .env
-          set -a
-          source .env
-          set +a
-          docker compose up -d --wait postgres
-          docker build -f test.Dockerfile -t open-bi-back-test ../..
-          docker run --rm \
-            --network back_default \
-            -e POSTGRES_USER \
-            -e POSTGRES_PASSWORD \
-            -e POSTGRES_DB \
-            -e PORT \
-            -e DATABASE_URL \
-            -e REDIS_URL \
-            -e SESSION_SECRET \
-            -e COOKIE_SECURE \
-            -e TRUST_PROXY \
-            open-bi-back-test \
-            sh -c "npx mikro-orm migration:up --config src/mikro-orm.config.ts && npx vitest run src/users/repository/user.repository.test.ts"
+      - name: Run integration test
+        uses: ./.github/actions/back-integration-test
+        with:
+          environment: 'test'
+          test_src: 'src/users/repository/user.repository.test.ts'
 
   ai-mikro-orm-user-repository-build:
     name: AI user repo build
