@@ -8,7 +8,7 @@ import { globalIgnores } from 'eslint/config';
 export default tseslint.config(
   globalIgnores(['node_modules/', 'dist/', 'build/', '.next/', 'out/']),
   {
-    ignores: ['eslint.config.mjs', 'postcss.config.mjs'],
+    ignores: ['eslint.config.mjs', 'postcss.config.mjs', 'vitest.config.ts'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
