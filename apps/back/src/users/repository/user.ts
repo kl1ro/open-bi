@@ -7,11 +7,8 @@ export default interface User {
 
 export type UserForm = Omit<User, "id" | "createdAt">;
 
-export function convertUserToView(user: User): UserView {
+export function convertUserToView(user: User) {
   return { id: user.id, email: user.email };
 }
 
-export interface UserView {
-  id: User["id"];
-  email: User["email"];
-}
+export type UserView = ReturnType<typeof convertUserToView>;
